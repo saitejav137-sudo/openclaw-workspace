@@ -1591,17 +1591,20 @@ class WebSocketManager:
         self.clients = set()
         self.server = None
 
-    async def handler(self, websocket, path):
+    async def handler(self, websocket):
         self.clients.add(websocket)
-        print(f"[WS] Client connected: {websocket.remote_address}")
+        print(f"[WS] Client connected")
         try:
             async for message in websocket:
-                data = json.loads(message)
-                await self.handle_message(websocket, data)
+                try:
+                    data = json.loads(message)
+                    await self.handle_message(websocket, data)
+                except json.JSONDecodeError as e:
+                    print(f"[WS] JSON error: {e}")
         except Exception as e:
             print(f"[WS] Error: {e}")
         finally:
-            self.clients.remove(websocket)
+            self.clients.discard(websocket)
             print(f"[WS] Client disconnected")
 
     async def handle_message(self, websocket, data):
