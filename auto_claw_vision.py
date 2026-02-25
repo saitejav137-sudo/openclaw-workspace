@@ -102,9 +102,17 @@ class VisionConfig:
     # Template settings
     template_path: Optional[str] = None
     template_threshold: float = 0.8
+    # Multiple templates
+    templates: List[str] = None  # Multiple template paths
     # Color settings
     target_color: Optional[Tuple[int, int, int]] = None  # BGR
     color_tolerance: int = 30
+    # Logging
+    log_file: Optional[str] = None
+    log_enabled: bool = False
+    # Screen recording on trigger
+    record_on_trigger: bool = False
+    record_dir: str = "/tmp/auto_claw_records"
     # General
     capture_screen: int = 0  # Monitor number
     action: str = "alt+o"  # Keyboard shortcut to trigger
@@ -113,6 +121,8 @@ class VisionConfig:
     def __post_init__(self):
         if self.conditions is None:
             self.conditions = []
+        if self.templates is None:
+            self.templates = []
 
 
 class ScreenCapture:
@@ -248,23 +258,36 @@ class VisionEngine:
         return non_zero_ratio > self.config.change_threshold
 
     def _process_template(self) -> bool:
-        """Template matching for object detection"""
-        if not self.config.template_path or not os.path.exists(self.config.template_path):
-            return False
+        """Template matching for object detection - supports multiple templates"""
+        # Collect all template paths
+        template_paths = []
+        if self.config.template_path and os.path.exists(self.config.template_path):
+            template_paths.append(self.config.template_path)
+        if self.config.templates:
+            for t in self.config.templates:
+                if os.path.exists(t):
+                    template_paths.append(t)
 
-        # Load template
-        template = cv2.imread(self.config.template_path)
-        if template is None:
+        if not template_paths:
             return False
 
         # Capture screen
         img = ScreenCapture.capture_region(self.config.region)
 
-        # Template matching
-        result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        # Check each template
+        for template_path in template_paths:
+            template = cv2.imread(template_path)
+            if template is None:
+                continue
 
-        return max_val >= self.config.template_threshold
+            # Template matching
+            result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+            if max_val >= self.config.template_threshold:
+                return True
+
+        return False
 
     def _process_color(self) -> bool:
         """Color detection in region"""
@@ -394,6 +417,86 @@ class AutomationAction:
         subprocess.run(cmd, shell=True)
 
 
+class Logger:
+    """File and console logging"""
+
+    _instance = None
+
+    @classmethod
+    def get_instance(cls, log_file: Optional[str] = None):
+        if cls._instance is None:
+            cls._instance = cls(log_file)
+        return cls._instance
+
+    def __init__(self, log_file: Optional[str] = None):
+        self.log_file = log_file
+        if log_file:
+            # Create directory if needed
+            os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+    def log(self, message: str, level: str = "INFO"):
+        """Log a message to file and/or console"""
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        log_line = f"[{timestamp}] [{level}] {message}"
+
+        # Console output
+        print(log_line)
+
+        # File output
+        if self.log_file:
+            try:
+                with open(self.log_file, "a") as f:
+                    f.write(log_line + "\n")
+            except Exception as e:
+                print(f"Log write error: {e}")
+
+    def info(self, msg):
+        self.log(msg, "INFO")
+
+    def warning(self, msg):
+        self.log(msg, "WARNING")
+
+    def error(self, msg):
+        self.log(msg, "ERROR")
+
+
+class ScreenRecorder:
+    """Records screen on trigger events"""
+
+    def __init__(self, record_dir: str = "/tmp/auto_claw_records"):
+        self.record_dir = record_dir
+        os.makedirs(record_dir, exist_ok=True)
+
+    def capture_trigger(self, region: Optional[Tuple[int, int, int, int]] = None) -> str:
+        """Capture screenshot and save to file, return path"""
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        filename = f"trigger_{timestamp}.png"
+        filepath = os.path.join(self.record_dir, filename)
+
+        img = ScreenCapture.capture_region(region)
+        cv2.imwrite(filepath, img)
+
+        return filepath
+
+    def capture_sequence(self, count: int = 3, delay: float = 0.1,
+                        region: Optional[Tuple[int, int, int, int]] = None) -> List[str]:
+        """Capture sequence of screenshots"""
+        paths = []
+        for i in range(count):
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            filename = f"trigger_{timestamp}_{i}.png"
+            filepath = os.path.join(self.record_dir, filename)
+
+            img = ScreenCapture.capture_region(region)
+            cv2.imwrite(filepath, img)
+            paths.append(filepath)
+
+            if i < count - 1:
+                time.sleep(delay)
+
+        return paths
+
+
 class TriggerManager:
     """Manages trigger state and debouncing"""
 
@@ -455,7 +558,18 @@ class VisionHTTPHandler(http.server.BaseHTTPRequestHandler):
         }
 
         if triggered:
-            print(f">>> VISION TRIGGER! Mode: {self.vision_engine.config.mode.value}")
+            msg = f">>> VISION TRIGGER! Mode: {self.vision_engine.config.mode.value}"
+            print(msg)
+            if self.vision_engine.config.log_enabled:
+                logger = Logger.get_instance(self.vision_engine.config.log_file)
+                logger.info(msg)
+
+            # Record screenshot on trigger
+            if self.vision_engine.config.record_on_trigger:
+                recorder = ScreenRecorder(self.vision_engine.config.record_dir)
+                filepath = recorder.capture_trigger(self.vision_engine.config.region)
+                print(f"  [Recorded] {filepath}")
+
             threading.Thread(
                 target=AutomationAction.execute,
                 args=(self.vision_engine.config.action, self.vision_engine.config.action_delay)
@@ -480,20 +594,43 @@ class VisionHTTPServer:
 
         print(f"[Polling] Started - checking every {self.config.poll_interval}s")
 
+        # Initialize logger and recorder if enabled
+        logger = None
+        recorder = None
+        if self.config.log_enabled:
+            logger = Logger.get_instance(self.config.log_file)
+            logger.info(f"Polling started - interval: {self.config.poll_interval}s")
+        if self.config.record_on_trigger:
+            recorder = ScreenRecorder(self.config.record_dir)
+
         while self.running:
             try:
                 result = engine.process()
                 triggered = trigger_mgr.should_trigger(result)
 
                 if triggered:
-                    print(f">>> POLL TRIGGER! Mode: {self.config.mode.value}")
+                    msg = f">>> POLL TRIGGER! Mode: {self.config.mode.value}"
+                    print(msg)
+                    if logger:
+                        logger.info(msg)
+
+                    # Record screenshot on trigger
+                    if recorder:
+                        filepath = recorder.capture_trigger(self.config.region)
+                        print(f"  [Recorded] {filepath}")
+                        if logger:
+                            logger.info(f"Screenshot saved: {filepath}")
+
                     threading.Thread(
                         target=AutomationAction.execute,
                         args=(self.config.action, self.config.action_delay)
                     ).start()
 
             except Exception as e:
-                print(f"[Polling] Error: {e}")
+                err_msg = f"[Polling] Error: {e}"
+                print(err_msg)
+                if logger:
+                    logger.error(err_msg)
 
             time.sleep(self.config.poll_interval)
 
@@ -552,6 +689,7 @@ def parse_args():
 
     # Template options
     parser.add_argument("--template", type=str, help="Path to template image")
+    parser.add_argument("--templates", type=str, nargs="+", help="Multiple template paths (OR match)")
 
     # Color options
     parser.add_argument("--color", type=str, help="Target color as 'B,G,R'")
@@ -579,6 +717,15 @@ def parse_args():
     # Polling options
     parser.add_argument("--poll", action="store_true", help="Enable continuous polling mode")
     parser.add_argument("--interval", type=float, default=0.5, help="Polling interval in seconds")
+
+    # Logging options
+    parser.add_argument("--log", type=str, help="Log file path")
+    parser.add_argument("--log-enable", action="store_true", help="Enable logging to file")
+
+    # Recording options
+    parser.add_argument("--record", action="store_true", help="Record screenshot on trigger")
+    parser.add_argument("--record-dir", type=str, default="/tmp/auto_claw_records",
+                       help="Directory to save triggered screenshots")
 
     return parser.parse_args()
 
@@ -651,10 +798,22 @@ def main():
         region=region,
         change_threshold=args.threshold,
         template_path=args.template,
+        templates=args.templates if args.templates else [],
         target_color=target_color,
         action=args.action,
-        action_delay=args.delay
+        action_delay=args.delay,
+        log_file=args.log,
+        log_enabled=args.log_enable,
+        record_on_trigger=args.record,
+        record_dir=args.record_dir
     )
+
+    # Initialize logger
+    if args.log or args.log_enable:
+        logger = Logger.get_instance(args.log)
+        if args.log:
+            logger.info(f"Logging started - log file: {args.log}")
+        logger.info(f"Mode: {mode.value}, Polling: {args.poll}")
 
     # Start server
     server = VisionHTTPServer(args.port, config)
