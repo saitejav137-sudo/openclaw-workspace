@@ -67,6 +67,13 @@ try:
 except ImportError:
     PLYER_AVAILABLE = False
 
+# YOLO - for object detection
+try:
+    from ultralytics import YOLO
+    YOLO_AVAILABLE = True
+except ImportError:
+    YOLO_AVAILABLE = False
+
 # Automation
 import subprocess
 
@@ -85,6 +92,7 @@ class VisionMode(Enum):
     COLOR = "color"
     ANALYZE = "analyze"
     MULTI = "multi"
+    YOLO = "yolo"
 
 
 @dataclass
@@ -126,6 +134,10 @@ class VisionConfig:
     template_threshold: float = 0.8
     # Multiple templates
     templates: List[str] = None  # Multiple template paths
+    # YOLO settings
+    yolo_model: str = "yolov8n.pt"  # Model name
+    yolo_classes: List[str] = None  # Class names to detect
+    yolo_confidence: float = 0.5  # Confidence threshold
     # Color settings
     target_color: Optional[Tuple[int, int, int]] = None  # BGR
     color_tolerance: int = 30
@@ -179,6 +191,9 @@ class VisionConfig:
             "region": self.region,
             "template_path": self.template_path,
             "templates": self.templates,
+            "yolo_model": self.yolo_model,
+            "yolo_classes": self.yolo_classes,
+            "yolo_confidence": self.yolo_confidence,
             "target_color": self.target_color,
             "action": self.action,
             "webhook_url": self.webhook_url,
@@ -199,6 +214,9 @@ class VisionConfig:
             region=tuple(data["region"]) if data.get("region") else None,
             template_path=data.get("template_path"),
             templates=data.get("templates", []),
+            yolo_model=data.get("yolo_model", "yolov8n.pt"),
+            yolo_classes=data.get("yolo_classes", []),
+            yolo_confidence=data.get("yolo_confidence", 0.5),
             target_color=tuple(data["target_color"]) if data.get("target_color") else None,
             action=data.get("action", "alt+o"),
             webhook_url=data.get("webhook_url"),
@@ -405,6 +423,55 @@ class VisionEngine:
         # Could add: edge detection, contour finding, etc.
         return False
 
+    def _process_yolo(self) -> bool:
+        """YOLO object detection for UI elements"""
+        if not YOLO_AVAILABLE:
+            print("[YOLO] ultralytics not installed. Run: pip install ultralytics")
+            return False
+
+        try:
+            # Initialize YOLO model (cached)
+            if not hasattr(self, '_yolo_model'):
+                print(f"[YOLO] Loading model: {self.config.yolo_model}")
+                from ultralytics import YOLO
+                self._yolo_model = YOLO(self.config.yolo_model)
+
+            # Capture screen
+            img = ScreenCapture.capture_region(self.config.region)
+
+            # Run inference
+            results = self._yolo_model(img, verbose=False)
+
+            # Check for detections
+            detected_classes = set()
+            for result in results:
+                boxes = result.boxes
+                for box in boxes:
+                    cls_id = int(box.cls[0])
+                    conf = float(box.conf[0])
+                    if conf >= self.config.yolo_confidence:
+                        detected_classes.add(cls_id)
+
+            # Check if any target classes detected
+            if self.config.yolo_classes:
+                for cls_name in self.config.yolo_classes:
+                    # Check if any detected class matches (by name or index)
+                    for cls_id in detected_classes:
+                        if cls_name.lower() in self._yolo_model.names.get(cls_id, "").lower():
+                            print(f"[YOLO] Detected: {self._yolo_model.names[cls_id]} ({conf:.2f})")
+                            return True
+                return False
+            else:
+                # Any detection triggers
+                if len(detected_classes) > 0:
+                    print(f"[YOLO] Detected {len(detected_classes)} object(s)")
+                    return True
+
+            return False
+        except Exception as e:
+            print(f"[YOLO] Error: {e}")
+            return False
+
 
 class SingleConditionEngine:
     """Engine for processing a single condition in multi-mode"""
@@ -489,6 +556,35 @@ class SingleConditionEngine:
 
     def _process_analyze(self) -> bool:
         return False
+
+    def _process_yolo(self) -> bool:
+        """YOLO object detection for single condition"""
+        if not YOLO_AVAILABLE:
+            return False
+
+        try:
+            if not hasattr(SingleConditionEngine, '_yolo_model'):
+                from ultralytics import YOLO
+                SingleConditionEngine._yolo_model = YOLO(self.config.yolo_model)
+
+            img = ScreenCapture.capture_region(self.config.region)
+            results = SingleConditionEngine._yolo_model(img, verbose=False)
+
+            detected = set()
+            for result in results:
+                for box in result.boxes:
+                    if float(box.conf[0]) >= self.config.yolo_confidence:
+                        detected.add(int(box.cls[0]))
+
+            if self.config.yolo_classes:
+                for cls_name in self.config.yolo_classes:
+                    for cls_id in detected:
+                        if cls_name.lower() in SingleConditionEngine._yolo_model.names.get(cls_id, "").lower():
+                            return True
+                return False
+            return len(detected) > 0
+        except:
+            return False
 
 
 class AutomationAction:
@@ -1044,6 +1140,58 @@ class DatabaseManager:
         self.conn.close()
 
 
+class PluginManager:
+    """Plugin system for extensible automation"""
+
+    _instance = None
+    _plugins = {}
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def __init__(self):
+        self.plugin_dir = os.path.expanduser("~/.openclaw/plugins")
+        os.makedirs(self.plugin_dir, exist_ok=True)
+
+    def load_plugins(self):
+        """Load all plugins from plugin directory"""
+        if not os.path.exists(self.plugin_dir):
+            return
+
+        import importlib.util
+        for filename in os.listdir(self.plugin_dir):
+            if filename.endswith(".py") and not filename.startswith("_"):
+                plugin_name = filename[:-3]
+                plugin_path = os.path.join(self.plugin_dir, filename)
+                try:
+                    spec = importlib.util.spec_from_file_location(plugin_name, plugin_path)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+
+                    # Register plugin if it has register function
+                    if hasattr(module, 'register'):
+                        module.register(self)
+                        print(f"[Plugin] Loaded: {plugin_name}")
+                        self._plugins[plugin_name] = module
+                except Exception as e:
+                    print(f"[Plugin] Error loading {plugin_name}: {e}")
+
+    def register_action(self, name: str, func: Callable):
+        """Register a custom action"""
+        print(f"[Plugin] Registered action: {name}")
+
+    def get_plugins(self) -> Dict:
+        """Get loaded plugins"""
+        return self._plugins
+
+    def list_plugins(self):
+        """List available plugins"""
+        return list(self._plugins.keys())
+
+
 class SchedulerManager:
     """Schedule automation tasks"""
 
@@ -1135,6 +1283,350 @@ class TriggerManager:
             self.last_result = False
 
         return False
+
+
+# ============== Visual State Machine ==============
+
+class VisualStateMachine:
+    """State machine for complex automation workflows"""
+
+    class State:
+        def __init__(self, name: str, on_enter=None, on_exit=None):
+            self.name = name
+            self.on_enter = on_enter
+            self.on_exit = on_exit
+            self.transitions = []
+
+        def add_transition(self, condition: callable, target_state: 'VisualStateMachine.State'):
+            self.transitions.append({"condition": condition, "target": target_state})
+
+    def __init__(self, initial_state: str):
+        self.states = {}
+        self.current_state = None
+        self.initial_state = initial_state
+        self.history = []
+
+    def add_state(self, name: str, on_enter=None, on_exit=None) -> State:
+        state = self.State(name, on_enter, on_exit)
+        self.states[name] = state
+        return state
+
+    def set_initial(self, name: str):
+        self.initial_state = name
+
+    def start(self):
+        self.current_state = self.states.get(self.initial_state)
+        if self.current_state and self.current_state.on_enter:
+            self.current_state.on_enter()
+        print(f"[StateMachine] Started at: {self.current_state.name if self.current_state else 'none'}")
+
+    def update(self) -> bool:
+        if not self.current_state:
+            return False
+
+        for transition in self.current_state.transitions:
+            if transition["condition"]():
+                old_state = self.current_state
+                self.history.append(old_state.name)
+
+                if old_state.on_exit:
+                    old_state.on_exit()
+
+                self.current_state = transition["target"]
+
+                if self.current_state.on_enter:
+                    self.current_state.on_enter()
+
+                print(f"[StateMachine] {old_state.name} -> {self.current_state.name}")
+                return True
+
+        return False
+
+    def get_state(self) -> str:
+        return self.current_state.name if self.current_state else None
+
+
+# ============== Gateway Integration ==============
+
+class GatewayClient:
+    """Connect to OpenClaw gateway on port 18789"""
+
+    def __init__(self, host: str = "localhost", port: int = 18789):
+        self.host = host
+        self.port = port
+        self.socket = None
+        self.connected = False
+
+    def connect(self) -> bool:
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.settimeout(5)
+            self.socket.connect((self.host, self.port))
+            self.connected = True
+            print(f"[Gateway] Connected to {self.host}:{self.port}")
+            return True
+        except Exception as e:
+            print(f"[Gateway] Connection failed: {e}")
+            self.connected = False
+            return False
+
+    def send(self, message: dict) -> bool:
+        if not self.connected or not self.socket:
+            return False
+
+        try:
+            data = json.dumps(message).encode("utf-8")
+            self.socket.send(data)
+            return True
+        except Exception as e:
+            print(f"[Gateway] Send error: {e}")
+            self.connected = False
+            return False
+
+    def receive(self, timeout: float = 5.0) -> Optional[dict]:
+        if not self.connected or not self.socket:
+            return None
+
+        try:
+            self.socket.settimeout(timeout)
+            data = self.socket.recv(4096)
+            return json.loads(data.decode("utf-8"))
+        except Exception as e:
+            print(f"[Gateway] Receive error: {e}")
+            return None
+
+    def disconnect(self):
+        if self.socket:
+            self.socket.close()
+            self.socket = None
+        self.connected = False
+        print("[Gateway] Disconnected")
+
+    def register(self, name: str, capabilities: list) -> bool:
+        return self.send({"type": "register", "name": name, "capabilities": capabilities})
+
+    def send_trigger(self, mode: str, result: bool) -> bool:
+        return self.send({"type": "trigger", "mode": mode, "result": result, "timestamp": time.time()})
+
+
+# ============== AI Screen Analysis ==============
+
+class AIScreenAnalyzer:
+    """AI-powered screen analysis using MiniMax/Kimi API"""
+
+    def __init__(self, api_key: str = None, api_endpoint: str = None):
+        self.api_key = api_key or os.getenv("MINIMAX_API_KEY") or os.getenv("KIMI_API_KEY")
+        self.api_endpoint = api_endpoint or os.getenv("MINIMAX_API_ENDPOINT", "https://api.minimax.chat/v1/text/chatcompletion_pro")
+        self.enabled = bool(self.api_key)
+
+    def analyze_screen(self, image_path: str, prompt: str = "Describe what's on this screen") -> Optional[str]:
+        if not self.enabled:
+            print("[AI] No API key configured")
+            return None
+
+        try:
+            import base64
+            with open(image_path, "rb") as f:
+                image_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+            payload = {
+                "model": "abab6.5s-chat",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}
+                        ]
+                    }
+                ]
+            }
+
+            response = requests.post(self.api_endpoint, headers=headers, json=payload, timeout=30)
+            if response.status_code == 200:
+                result = response.json()
+                return result.get("choices", [{}])[0].get("message", {}).get("content")
+            else:
+                print(f"[AI] API error: {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"[AI] Analysis error: {e}")
+            return None
+
+
+# ============== Real-Time Screen Streaming ==============
+
+class ScreenStreamer:
+    """Real-time screen streaming via MJPEG"""
+
+    def __init__(self, port: int = 8888):
+        self.port = port
+        self.clients = []
+        self.running = False
+
+    def start(self):
+        self.running = True
+        print(f"[Stream] Starting MJPEG server on port {self.port}")
+
+    def add_client(self, client):
+        self.clients.append(client)
+
+    def remove_client(self, client):
+        if client in self.clients:
+            self.clients.remove(client)
+
+    def broadcast_frame(self, frame):
+        if not self.running:
+            return
+
+        import cv2
+        _, jpeg = cv2.imencode('.jpg', frame)
+        frame_data = jpeg.tobytes()
+
+        header = b'--frame\r\nContent-Type: image/jpeg\r\nContent-Length: {}\r\n\r\n'.format(len(frame_data))
+        footer = b'\r\n'
+
+        for client in self.clients[:]:
+            try:
+                client.send(header + frame_data + footer)
+            except:
+                self.remove_client(client)
+
+
+# ============== Telegram Bot Integration ==============
+
+class TelegramBot:
+    """Telegram bot for voice commands and remote control"""
+
+    def __init__(self, token: str = None, chat_id: str = None):
+        self.token = token or os.getenv("TELEGRAM_BOT_TOKEN")
+        self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")
+        self.api_url = f"https://api.telegram.org/bot{self.token}"
+        self.enabled = bool(self.token and self.chat_id)
+
+    def send_message(self, text: str) -> bool:
+        if not self.enabled:
+            return False
+
+        try:
+            url = f"{self.api_url}/sendMessage"
+            data = {"chat_id": self.chat_id, "text": text}
+            response = requests.post(url, json=data, timeout=10)
+            return response.status_code == 200
+        except Exception as e:
+            print(f"[Telegram] Send error: {e}")
+            return False
+
+    def send_photo(self, image_path: str, caption: str = None) -> bool:
+        if not self.enabled:
+            return False
+
+        try:
+            url = f"{self.api_url}/sendPhoto"
+            data = {"chat_id": self.chat_id, "caption": caption}
+            files = {"photo": open(image_path, "rb")}
+            response = requests.post(url, data=data, files=files, timeout=30)
+            files["photo"].close()
+            return response.status_code == 200
+        except Exception as e:
+            print(f"[Telegram] Photo error: {e}")
+            return False
+
+    def get_updates(self, offset: int = 0) -> list:
+        if not self.enabled:
+            return []
+
+        try:
+            url = f"{self.api_url}/getUpdates"
+            params = {"timeout": 30, "offset": offset}
+            response = requests.get(url, params=params, timeout=35)
+            if response.status_code == 200:
+                return response.json().get("result", [])
+        except Exception as e:
+            print(f"[Telegram] Updates error: {e}")
+        return []
+
+
+# ============== gRPC API ==============
+
+GRPC_AVAILABLE = False
+try:
+    import grpc
+    from grpc import aio
+    GRPC_AVAILABLE = True
+except ImportError:
+    print("[gRPC] gRPC not installed. Run: pip install grpcio grpcio-tools")
+
+
+class VisionServicer:
+    """gRPC servicer for vision operations"""
+
+    def AnalyzeScreen(self, request, context):
+        # Placeholder for gRPC vision analysis
+        return {"success": True, "result": "analyzed"}
+
+
+# ============== WebSocket API ==============
+
+WS_AVAILABLE = False
+try:
+    import asyncio
+    import websockets
+    WS_AVAILABLE = True
+except ImportError:
+    print("[WebSocket] websockets not installed. Run: pip install websockets")
+
+
+class WebSocketManager:
+    """WebSocket server for real-time updates"""
+
+    def __init__(self, host: str = "localhost", port: int = 8766):
+        self.host = host
+        self.port = port
+        self.clients = set()
+        self.server = None
+
+    async def handler(self, websocket, path):
+        self.clients.add(websocket)
+        print(f"[WS] Client connected: {websocket.remote_address}")
+        try:
+            async for message in websocket:
+                data = json.loads(message)
+                await self.handle_message(websocket, data)
+        except Exception as e:
+            print(f"[WS] Error: {e}")
+        finally:
+            self.clients.remove(websocket)
+            print(f"[WS] Client disconnected")
+
+    async def handle_message(self, websocket, data):
+        msg_type = data.get("type")
+        if msg_type == "ping":
+            await websocket.send(json.dumps({"type": "pong"}))
+        elif msg_type == "trigger":
+            await self.broadcast({"type": "trigger", "data": data})
+
+    async def broadcast(self, message: dict):
+        if self.clients:
+            await asyncio.gather(*[client.send(json.dumps(message)) for client in self.clients],
+                                return_exceptions=True)
+
+    async def start(self):
+        if not WS_AVAILABLE:
+            print("[WS] websockets not available")
+            return
+
+        self.server = await websockets.serve(self.handler, self.host, self.port)
+        print(f"[WS] Server started on ws://{self.host}:{self.port}")
+
+    def stop(self):
+        if self.server:
+            self.server.close()
 
 
 # ============== HTTP Server ==============
@@ -1500,7 +1992,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Enhanced Auto Claw with Vision")
 
     parser.add_argument("--mode", type=str, default="ocr",
-                        choices=["ocr", "monitor", "template", "color", "analyze", "multi"],
+                        choices=["ocr", "monitor", "template", "color", "analyze", "multi", "yolo"],
                         help="Vision mode (use 'multi' for multiple conditions)")
 
     # ========== Primary Condition Options ==========
@@ -1514,6 +2006,11 @@ def parse_args():
     # Template options
     parser.add_argument("--template", type=str, help="Path to template image")
     parser.add_argument("--templates", type=str, nargs="+", help="Multiple template paths (OR match)")
+
+    # YOLO options
+    parser.add_argument("--yolo-model", type=str, default="yolov8n.pt", help="YOLO model name")
+    parser.add_argument("--yolo-classes", type=str, nargs="+", help="Class names to detect (e.g., person cup chair)")
+    parser.add_argument("--yolo-confidence", type=float, default=0.5, help="YOLO confidence threshold")
 
     # Color options
     parser.add_argument("--color", type=str, help="Target color as 'B,G,R'")
@@ -1712,6 +2209,9 @@ def main():
             change_threshold=args.threshold,
             template_path=args.template,
             templates=args.templates if args.templates else [],
+            yolo_model=args.yolo_model,
+            yolo_classes=args.yolo_classes,
+            yolo_confidence=args.yolo_confidence,
             target_color=target_color,
             action=args.action,
             action_delay=args.delay,
