@@ -1059,7 +1059,7 @@ class VisionHTTPServer:
 def parse_args():
     parser = argparse.ArgumentParser(description="Enhanced Auto Claw with Vision")
 
-    parser.add_argument("--mode", type=str, required=True,
+    parser.add_argument("--mode", type=str, default="ocr",
                         choices=["ocr", "monitor", "template", "color", "analyze", "multi"],
                         help="Vision mode (use 'multi' for multiple conditions)")
 
