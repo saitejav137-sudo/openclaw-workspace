@@ -135,6 +135,9 @@ class VisionConfig:
     # Screen recording on trigger
     record_on_trigger: bool = False
     record_dir: str = "/tmp/auto_claw_records"
+    # Database
+    db_enabled: bool = False
+    db_path: str = None
     # Webhooks
     webhook_url: Optional[str] = None
     webhook_enabled: bool = False
@@ -799,6 +802,288 @@ class ConfigManager:
         return False
 
 
+
+class RegionSelector:
+    """Interactive screen region selector with click-and-drag"""
+
+    @staticmethod
+    def select_region() -> Optional[Tuple[int, int, int, int]]:
+        """Open interactive overlay to select screen region"""
+        try:
+            import tkinter as tk
+            from PIL import ImageGrab
+
+            selection = {"start": None, "end": None, "done": False}
+
+            root = tk.Tk()
+            root.attributes("-fullscreen", True)
+            root.attributes("-alpha", 0.3)
+            root.configure(bg="black")
+            root.cursor = "crosshair"
+
+            # Get screen size
+            screen_width = root.winfo_screenwidth()
+            screen_height = root.winfo_screenheight()
+
+            canvas = tk.Canvas(root, width=screen_width, height=screen_height, bg="", highlightthickness=0)
+            canvas.pack()
+
+            # Create selection rectangle
+            rect_id = canvas.create_rectangle(0, 0, 0, 0, outline="red", width=3, fill="")
+
+            # Labels
+            label = canvas.create_text(20, 20, text="Click and drag to select region. Press ESC to cancel.",
+                                     fill="white", font=("Arial", 16), anchor="nw")
+
+            def on_mouse_down(event):
+                selection["start"] = (event.x, event.y)
+                canvas.coords(rect_id, event.x, event.y, event.x, event.y)
+
+            def on_mouse_move(event):
+                if selection["start"]:
+                    canvas.coords(rect_id, selection["start"][0], selection["start"][1],
+                                 event.x, event.y)
+
+            def on_mouse_up(event):
+                selection["end"] = (event.x, event.y)
+                selection["done"] = True
+                root.quit()
+
+            def on_key(event):
+                if event.keysym == "Escape":
+                    selection["done"] = True
+                    root.quit()
+
+            canvas.bind("<Button-1>", on_mouse_down)
+            canvas.bind("<B1-Motion>", on_mouse_move)
+            canvas.bind("<ButtonRelease-1>", on_mouse_up)
+            root.bind("<Key>", on_key)
+
+            root.mainloop()
+            root.destroy()
+
+            if selection["start"] and selection["end"] and selection["start"] != selection["end"]:
+                x1 = min(selection["start"][0], selection["end"][0])
+                y1 = min(selection["start"][1], selection["end"][1])
+                x2 = max(selection["start"][0], selection["end"][0])
+                y2 = max(selection["start"][1], selection["end"][1])
+                width = x2 - x1
+                height = y2 - y1
+                print(f"[RegionSelector] Selected: x={x1}, y={y1}, w={width}, h={height}")
+                return (x1, y1, width, height)
+
+            print("[RegionSelector] Selection cancelled")
+            return None
+
+        except Exception as e:
+            print(f"[RegionSelector] Error: {e}")
+            return None
+
+
+class MultiMonitor:
+    """Multi-monitor support"""
+
+    @staticmethod
+    def get_monitors() -> List[Dict]:
+        """Get all connected monitors with positions and sizes"""
+        monitors = []
+        try:
+            import subprocess
+            # Use xrandr to get monitor info
+            result = subprocess.run(["xrandr"], capture_output=True, text=True)
+            lines = result.stdout.split("\n")
+
+            current = {}
+            for line in lines:
+                if " connected" in line:
+                    parts = line.split()
+                    name = parts[0]
+                    # Parse resolution and position
+                    if "(" in line:
+                        res_part = line.split("(")[0].strip().split()[-1]
+                        if "x" in res_part:
+                            w, h = map(int, res_part.split("x"))
+                            # Try to get position
+                            if "+" in line:
+                                pos = line.split("+")[1].split()
+                                x = int(pos[0])
+                                y = int(pos[1]) if len(pos) > 1 else 0
+                            else:
+                                x, y = 0, 0
+                            monitors.append({
+                                "name": name,
+                                "x": x,
+                                "y": y,
+                                "width": w,
+                                "height": h
+                            })
+        except Exception as e:
+            # Fallback: try mss
+            try:
+                with mss.mss() as sct:
+                    for i, mon in enumerate(sct.monitors):
+                        if i > 0:  # Skip primary
+                            monitors.append({
+                                "name": f"monitor-{i}",
+                                "x": mon["left"],
+                                "y": mon["top"],
+                                "width": mon["width"],
+                                "height": mon["height"]
+                            })
+            except:
+                pass
+
+        # Always add primary
+        if not monitors:
+            monitors.append({"name": "primary", "x": 0, "y": 0, "width": 1920, "height": 1080})
+
+        return monitors
+
+
+class DatabaseManager:
+    """SQLite database for trigger history"""
+
+    _instance = None
+
+    @classmethod
+    def get_instance(cls, db_path: str = None):
+        if cls._instance is None:
+            cls._instance = cls(db_path)
+        return cls._instance
+
+    def __init__(self, db_path: str = None):
+        import sqlite3
+        self.db_path = db_path or os.path.expanduser("~/.openclaw/triggers.db")
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        self._init_db()
+
+    def _init_db(self):
+        """Initialize database schema"""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS triggers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp REAL NOT NULL,
+                mode TEXT NOT NULL,
+                condition_met INTEGER NOT NULL,
+                triggered INTEGER NOT NULL,
+                screenshot_path TEXT,
+                action_taken TEXT,
+                success INTEGER DEFAULT 1,
+                context_json TEXT
+            )
+        """)
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_timestamp ON triggers(timestamp)
+        """)
+        self.conn.commit()
+
+    def log_trigger(self, mode: str, condition_met: bool, triggered: bool,
+                    screenshot_path: str = None, action_taken: str = None,
+                    success: bool = True, context: dict = None):
+        """Log a trigger event"""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            INSERT INTO triggers (timestamp, mode, condition_met, triggered,
+                               screenshot_path, action_taken, success, context_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (time.time(), mode, condition_met, triggered, screenshot_path,
+              action_taken, success, json.dumps(context) if context else None))
+        self.conn.commit()
+
+    def get_recent(self, limit: int = 100) -> List[Dict]:
+        """Get recent triggers"""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT id, timestamp, mode, condition_met, triggered,
+                   screenshot_path, action_taken, success
+            FROM triggers
+            ORDER BY timestamp DESC
+            LIMIT ?
+        """, (limit,))
+        rows = cursor.fetchall()
+        return [
+            {
+                "id": r[0],
+                "timestamp": r[1],
+                "mode": r[2],
+                "condition_met": bool(r[3]),
+                "triggered": bool(r[4]),
+                "screenshot_path": r[5],
+                "action_taken": r[6],
+                "success": bool(r[7])
+            }
+            for r in rows
+        ]
+
+    def get_stats(self) -> Dict:
+        """Get trigger statistics"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM triggers")
+        total = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM triggers WHERE triggered = 1")
+        triggered = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM triggers WHERE success = 0")
+        failed = cursor.fetchone()[0]
+
+        cursor.execute("SELECT mode, COUNT(*) FROM triggers GROUP BY mode")
+        by_mode = dict(cursor.fetchall())
+
+        return {
+            "total": total,
+            "triggered": triggered,
+            "failed": failed,
+            "success_rate": ((triggered - failed) / triggered * 100) if triggered > 0 else 0,
+            "by_mode": by_mode
+        }
+
+    def close(self):
+        self.conn.close()
+
+
+class SchedulerManager:
+    """Schedule automation tasks"""
+
+    def __init__(self):
+        self.jobs = []
+        self.running = False
+
+    def add_job(self, name: str, interval_seconds: float, config: VisionConfig):
+        """Add a scheduled job"""
+        self.jobs.append({
+            "name": name,
+            "interval": interval_seconds,
+            "config": config,
+            "last_run": 0
+        })
+        print(f"[Scheduler] Added job: {name} every {interval_seconds}s")
+
+    def run(self):
+        """Run scheduler loop"""
+        self.running = True
+        print("[Scheduler] Started")
+
+        while self.running:
+            current_time = time.time()
+            for job in self.jobs:
+                if current_time - job["last_run"] >= job["interval"]:
+                    job["last_run"] = current_time
+                    print(f"[Scheduler] Running job: {job['name']}")
+                    # Execute the job
+                    engine = VisionEngine(job["config"])
+                    result = engine.process()
+                    if result:
+                        print(f"[Scheduler] Job {job['name']} detected condition!")
+
+            time.sleep(1)
+
+    def stop(self):
+        self.running = False
+
+
 class AdaptivePoller:
     """Smart polling that adjusts interval based on activity"""
 
@@ -860,11 +1145,147 @@ class VisionHTTPHandler(http.server.BaseHTTPRequestHandler):
     vision_engine: Optional[VisionEngine] = None
     trigger_manager: TriggerManager = None
 
+    def _generate_dashboard(self) -> str:
+        """Generate simple dashboard HTML"""
+        return """<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenClaw Vision</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        h1 { color: #00ff88; }
+        .stats { display: flex; gap: 20px; margin: 20px 0; }
+        .stat-box { background: #2a2a2a; padding: 20px; border-radius: 8px; min-width: 150px; }
+        .stat-box h3 { margin: 0 0 10px 0; color: #888; }
+        .stat-box .value { font-size: 32px; font-weight: bold; }
+        .green { color: #00ff88; }
+        .red { color: #ff4444; }
+        .trigger-btn { background: #00ff88; color: #000; padding: 15px 30px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        .trigger-btn:hover { background: #00cc6a; }
+        .screenshot { margin-top: 20px; }
+        .screenshot img { max-width: 100%; border-radius: 8px; }
+        .log { background: #2a2a2a; padding: 15px; border-radius: 8px; margin-top: 20px; max-height: 300px; overflow-y: auto; }
+        .log pre { margin: 0; font-family: monospace; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>🤖 OpenClaw Vision Dashboard</h1>
+    <button class="trigger-btn" onclick="trigger()">Manual Trigger</button>
+    <div class="stats">
+        <div class="stat-box">
+            <h3>Total</h3>
+            <div class="value" id="total">-</div>
+        </div>
+        <div class="stat-box">
+            <h3>Triggered</h3>
+            <div class="value green" id="triggered">-</div>
+        </div>
+        <div class="stat-box">
+            <h3>Failed</h3>
+            <div class="value red" id="failed">-</div>
+        </div>
+        <div class="stat-box">
+            <h3>Success Rate</h3>
+            <div class="value" id="rate">-</div>
+        </div>
+    </div>
+    <div class="screenshot">
+        <h3>Latest Screenshot</h3>
+        <img id="screenshot" src="/api/screenshot" alt="No screenshot yet">
+    </div>
+    <div class="log">
+        <h3>Recent Triggers</h3>
+        <pre id="log"></pre>
+    </div>
+    <script>
+        function loadStats() {
+            fetch('/api/stats')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.stats) {
+                        document.getElementById('total').textContent = data.stats.total;
+                        document.getElementById('triggered').textContent = data.stats.triggered;
+                        document.getElementById('failed').textContent = data.stats.failed;
+                        document.getElementById('rate').textContent = data.stats.success_rate.toFixed(1) + '%';
+
+                        let log = '';
+                        data.recent.forEach(r => {
+                            log += new Date(r.timestamp * 1000).toLocaleString() + ' | ' +
+                                  r.mode + ' | ' + (r.triggered ? 'TRIGGERED' : 'detected') + '\\n';
+                        });
+                        document.getElementById('log').textContent = log;
+                    }
+                });
+        }
+        function trigger() {
+            fetch('/')
+                .then(r => r.json())
+                .then(data => {
+                    console.log('Triggered:', data);
+                    loadStats();
+                    document.getElementById('screenshot').src = '/api/screenshot?t=' + Date.now();
+                });
+        }
+        loadStats();
+        setInterval(loadStats, 5000);
+        setInterval(() => {
+            document.getElementById('screenshot').src = '/api/screenshot?t=' + Date.now();
+        }, 10000);
+    </script>
+</body>
+</html>"""
+
     def log_message(self, format, *args):
         """Custom logging"""
         print(f"[HTTP] {args[0]}")
 
     def do_GET(self):
+        # Check if it's a dashboard request
+        if self.path == '/dashboard' or self.path == '/':
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.end_headers()
+            html = self._generate_dashboard()
+            self.wfile.write(html.encode())
+            return
+
+        if self.path == '/api/stats':
+            # Return JSON stats
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            try:
+                db_path = os.path.expanduser("~/.openclaw/triggers.db")
+                if os.path.exists(db_path):
+                    db = DatabaseManager.get_instance(db_path)
+                    stats = db.get_stats()
+                    recent = db.get_recent(10)
+                    self.wfile.write(json.dumps({"stats": stats, "recent": recent}).encode())
+                else:
+                    self.wfile.write(json.dumps({"error": "No database"}).encode())
+            except Exception as e:
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+            return
+
+        if self.path == '/api/screenshot':
+            # Return latest screenshot
+            self.send_response(200)
+            self.send_header('Content-Type', 'image/png')
+            self.end_headers()
+            try:
+                import glob
+                files = sorted(glob.glob("/tmp/auto_claw_records/*.png"), key=os.path.getmtime)
+                if files:
+                    with open(files[-1], 'rb') as f:
+                        self.wfile.write(f.read())
+                else:
+                    self.wfile.write(b'')
+            except:
+                self.wfile.write(b'')
+            return
+
+        # Default: run vision analysis
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -950,6 +1371,13 @@ class VisionHTTPServer:
                 self.config.active_interval
             )
 
+        # Initialize database
+        db = None
+        if self.config.db_enabled:
+            db_path = self.config.db_path or os.path.expanduser("~/.openclaw/triggers.db")
+            db = DatabaseManager.get_instance(db_path)
+            print(f"[Database] Enabled: {db_path}")
+
         if self.config.watch_config and self.config.config_file:
             config_manager = ConfigManager.get_instance()
 
@@ -978,11 +1406,23 @@ class VisionHTTPServer:
                         logger.info(msg)
 
                     # Record screenshot
+                    screenshot_path = None
                     if recorder:
-                        filepath = recorder.capture_trigger(self.config.region)
-                        print(f"  [Recorded] {filepath}")
+                        screenshot_path = recorder.capture_trigger(self.config.region)
+                        print(f"  [Recorded] {screenshot_path}")
                         if logger:
-                            logger.info(f"Screenshot saved: {filepath}")
+                            logger.info(f"Screenshot saved: {screenshot_path}")
+
+                    # Log to database
+                    if db:
+                        db.log_trigger(
+                            mode=self.config.mode.value,
+                            condition_met=result,
+                            triggered=True,
+                            screenshot_path=screenshot_path,
+                            action_taken=self.config.action
+                        )
+                        print(f"  [Database] Logged trigger")
 
                     # Send webhook
                     if webhook:
@@ -1143,6 +1583,15 @@ def parse_args():
     parser.add_argument("--save-profile", type=str, help="Save current config as profile")
     parser.add_argument("--list-profiles", action="store_true", help="List available profiles")
 
+    # New Features
+    parser.add_argument("--select-region", action="store_true", help="Interactive region selector")
+    parser.add_argument("--list-monitors", action="store_true", help="List connected monitors")
+    parser.add_argument("--monitor", type=int, default=1, help="Monitor number to capture (1=primary)")
+    parser.add_argument("--db", type=str, help="SQLite database path for history")
+    parser.add_argument("--db-enable", action="store_true", help="Enable trigger history database")
+    parser.add_argument("--schedule", type=str, help="Schedule: 'every N seconds' or cron-like")
+    parser.add_argument("--stats", action="store_true", help="Show trigger statistics")
+
     return parser.parse_args()
 
 
@@ -1269,6 +1718,8 @@ def main():
             log_file=args.log,
             log_enabled=args.log_enable,
             record_on_trigger=args.record,
+            db_enabled=args.db_enable,
+            db_path=args.db,
             record_dir=args.record_dir,
             webhook_url=args.webhook,
             webhook_enabled=args.webhook_enable,
@@ -1294,6 +1745,37 @@ def main():
         if args.log:
             logger.info(f"Logging started - log file: {args.log}")
         logger.info(f"Mode: {mode.value}, Polling: {args.poll}")
+
+    # Handle new feature commands
+    if args.select_region:
+        region = RegionSelector.select_region()
+        if region:
+            print(f"\nSelected region: {region}")
+            print(f"Use with: --region '{region[0]},{region[1]},{region[2]},{region[3]}'")
+        return
+
+    if args.list_monitors:
+        monitors = MultiMonitor.get_monitors()
+        print("\nConnected Monitors:")
+        for i, m in enumerate(monitors):
+            print(f"  {i+1}. {m['name']}: x={m['x']}, y={m['y']}, {m['width']}x{m['height']}")
+        return
+
+    if args.stats:
+        db_path = args.db or os.path.expanduser("~/.openclaw/triggers.db")
+        if os.path.exists(db_path):
+            db = DatabaseManager(db_path)
+            stats = db.get_stats()
+            print("\n=== Trigger Statistics ===")
+            print(f"Total triggers: {stats['total']}")
+            print(f"Successful: {stats['triggered']}")
+            print(f"Failed: {stats['failed']}")
+            print(f"Success rate: {stats['success_rate']:.1f}%")
+            print(f"\nBy mode: {stats['by_mode']}")
+            db.close()
+        else:
+            print("No database found. Run with --db-enable first.")
+        return
 
     # Start server
     server = VisionHTTPServer(args.port, config)
