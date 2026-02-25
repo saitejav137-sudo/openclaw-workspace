@@ -7,9 +7,17 @@ Capabilities:
 3. Object/element detection (template matching)
 4. Color detection
 5. Screenshot analysis
+6. Adaptive polling
+7. Webhook notifications
+8. Desktop notifications
+9. Mouse actions
+10. Action sequences
+11. YAML configuration
+12. Configuration profiles
 
 Usage:
     python3 auto_claw_vision.py --mode <mode> [options]
+    python3 auto_claw_vision.py --config <config.yaml>
 
 Modes:
     ocr           - Detect text on screen and trigger on match
@@ -26,10 +34,13 @@ import time
 import json
 import threading
 import argparse
+import subprocess
 from dataclasses import dataclass, field
 from typing import Optional, Callable, List, Tuple, Dict, Any
 from enum import Enum
 import base64
+import yaml
+import requests
 
 # Vision imports
 import cv2
@@ -48,6 +59,13 @@ except ImportError:
         PYTESSERACT_AVAILABLE = True
     except ImportError:
         PYTESSERACT_AVAILABLE = False
+
+# Notifications
+try:
+    from plyer import notification
+    PLYER_AVAILABLE = True
+except ImportError:
+    PLYER_AVAILABLE = False
 
 # Automation
 import subprocess
@@ -93,6 +111,10 @@ class VisionConfig:
     # Polling mode
     polling: bool = False
     poll_interval: float = 0.5  # Check every X seconds
+    # Adaptive polling
+    adaptive_polling: bool = False
+    idle_interval: float = 2.0  # Interval when idle
+    active_interval: float = 0.2  # Interval when active
     # OCR settings
     target_text: Optional[str] = None
     text_case_sensitive: bool = False
@@ -113,6 +135,21 @@ class VisionConfig:
     # Screen recording on trigger
     record_on_trigger: bool = False
     record_dir: str = "/tmp/auto_claw_records"
+    # Webhooks
+    webhook_url: Optional[str] = None
+    webhook_enabled: bool = False
+    # Desktop notifications
+    notify_enabled: bool = False
+    notify_title: str = "OpenClaw"
+    # Mouse actions
+    mouse_actions: List[Dict] = None  # [{"action": "click", "x": 100, "y": 200}, ...]
+    # Action sequences
+    action_sequence: List[Dict] = None  # [{"action": "key", "key": "alt+o", "delay": 1.5}, ...]
+    # Configuration profiles
+    profile_name: Optional[str] = None
+    config_file: Optional[str] = None  # YAML config file path
+    # Dynamic reload
+    watch_config: bool = False
     # General
     capture_screen: int = 0  # Monitor number
     action: str = "alt+o"  # Keyboard shortcut to trigger
@@ -123,6 +160,51 @@ class VisionConfig:
             self.conditions = []
         if self.templates is None:
             self.templates = []
+        if self.mouse_actions is None:
+            self.mouse_actions = []
+        if self.action_sequence is None:
+            self.action_sequence = []
+
+    def to_dict(self) -> Dict:
+        """Convert config to dictionary"""
+        return {
+            "mode": self.mode.value if isinstance(self.mode, VisionMode) else self.mode,
+            "polling": self.polling,
+            "poll_interval": self.poll_interval,
+            "adaptive_polling": self.adaptive_polling,
+            "target_text": self.target_text,
+            "region": self.region,
+            "template_path": self.template_path,
+            "templates": self.templates,
+            "target_color": self.target_color,
+            "action": self.action,
+            "webhook_url": self.webhook_url,
+            "notify_enabled": self.notify_enabled,
+            "mouse_actions": self.mouse_actions,
+            "action_sequence": self.action_sequence,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'VisionConfig':
+        """Create config from dictionary"""
+        config = cls(
+            mode=VisionMode(data.get("mode", "ocr")),
+            polling=data.get("polling", False),
+            poll_interval=data.get("poll_interval", 0.5),
+            adaptive_polling=data.get("adaptive_polling", False),
+            target_text=data.get("target_text"),
+            region=tuple(data["region"]) if data.get("region") else None,
+            template_path=data.get("template_path"),
+            templates=data.get("templates", []),
+            target_color=tuple(data["target_color"]) if data.get("target_color") else None,
+            action=data.get("action", "alt+o"),
+            webhook_url=data.get("webhook_url"),
+            webhook_enabled=data.get("webhook_enabled", False),
+            notify_enabled=data.get("notify_enabled", False),
+            mouse_actions=data.get("mouse_actions", []),
+            action_sequence=data.get("action_sequence", []),
+        )
+        return config
 
 
 class ScreenCapture:
@@ -497,6 +579,230 @@ class ScreenRecorder:
         return paths
 
 
+class WebhookNotifier:
+    """Send HTTP webhooks on trigger events"""
+
+    def __init__(self, webhook_url: str = None):
+        self.webhook_url = webhook_url
+        self.enabled = bool(webhook_url)
+
+    def send(self, data: Dict):
+        """Send webhook notification"""
+        if not self.enabled or not self.webhook_url:
+            return
+
+        try:
+            payload = {
+                "event": "trigger",
+                "timestamp": time.time(),
+                "data": data
+            }
+            # Fire and forget - don't block
+            threading.Thread(
+                target=requests.post,
+                args=(self.webhook_url,),
+                kwargs={"json": payload, "timeout": 5}
+            ).start()
+            print(f"[Webhook] Sent to {self.webhook_url}")
+        except Exception as e:
+            print(f"[Webhook] Error: {e}")
+
+
+class NotificationManager:
+    """Send desktop notifications"""
+
+    def __init__(self, enabled: bool = False, title: str = "OpenClaw"):
+        self.enabled = enabled
+        self.title = title
+
+    def notify(self, message: str):
+        """Send desktop notification"""
+        if not self.enabled or not PLYER_AVAILABLE:
+            return
+
+        try:
+            notification.notify(
+                title=self.title,
+                message=message,
+                timeout=5
+            )
+            print(f"[Notify] {message}")
+        except Exception as e:
+            print(f"[Notify] Error: {e}")
+
+
+class MouseController:
+    """Mouse automation actions"""
+
+    @staticmethod
+    def move(x: int, y: int):
+        """Move mouse to coordinates"""
+        subprocess.run(["xdotool", "mousemove", str(x), str(y)], check=False)
+
+    @staticmethod
+    def click(button: str = "1"):
+        """Click mouse button (1=left, 2=middle, 3=right)"""
+        subprocess.run(["xdotool", "click", button], check=False)
+
+    @staticmethod
+    def double_click(button: str = "1"):
+        """Double click"""
+        subprocess.run(["xdotool", "click", "--repeat", "2", button], check=False)
+
+    @staticmethod
+    def drag(start_x: int, start_y: int, end_x: int, end_y: int):
+        """Drag from start to end"""
+        subprocess.run(["xdotool", "mousemove", str(start_x), str(start_y)], check=False)
+        time.sleep(0.1)
+        subprocess.run(["xdotool", "mousedown", "1"], check=False)
+        time.sleep(0.1)
+        subprocess.run(["xdotool", "mousemove", str(end_x), str(end_y)], check=False)
+        time.sleep(0.1)
+        subprocess.run(["xdotool", "mouseup", "1"], check=False)
+
+    @staticmethod
+    def scroll(clicks: int):
+        """Scroll (positive=up, negative=down)"""
+        subprocess.run(["xdotool", "click", "4" if clicks > 0 else "5"] * abs(clicks), check=False)
+
+    @classmethod
+    def execute_action(cls, action: Dict):
+        """Execute a mouse action from config"""
+        action_type = action.get("action", "")
+
+        if action_type == "move":
+            cls.move(action.get("x", 0), action.get("y", 0))
+        elif action_type == "click":
+            cls.click(action.get("button", "1"))
+        elif action_type == "double_click":
+            cls.double_click(action.get("button", "1"))
+        elif action_type == "drag":
+            cls.drag(
+                action.get("start_x", 0), action.get("start_y", 0),
+                action.get("end_x", 0), action.get("end_y", 0)
+            )
+        elif action_type == "scroll":
+            cls.scroll(action.get("clicks", 3))
+
+
+class ActionSequencer:
+    """Execute multi-step action sequences"""
+
+    @staticmethod
+    def execute_sequence(actions: List[Dict]):
+        """Execute a sequence of actions with delays"""
+        if not actions:
+            return
+
+        def run_actions():
+            for i, action in enumerate(actions):
+                action_type = action.get("type", "key")
+
+                if action_type == "key":
+                    # Keyboard action
+                    key = action.get("key", "alt+o")
+                    delay = action.get("delay", 1.5)
+                    time.sleep(delay)
+                    subprocess.run(["xdotool", "key", "--clearmodifiers", key], check=False)
+                    print(f"[Sequence] Key: {key}")
+
+                elif action_type == "mouse":
+                    # Mouse action
+                    MouseController.execute_action(action.get("mouse", {}))
+                    delay = action.get("delay", 0.5)
+                    time.sleep(delay)
+                    print(f"[Sequence] Mouse action")
+
+                elif action_type == "wait":
+                    # Just wait
+                    delay = action.get("delay", 1.0)
+                    time.sleep(delay)
+                    print(f"[Sequence] Wait: {delay}s")
+
+        # Run in background thread
+        threading.Thread(target=run_actions, daemon=True).start()
+
+
+class ConfigManager:
+    """YAML configuration file management"""
+
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def __init__(self):
+        self.config_file = None
+        self.last_modified = 0
+
+    def load_config(self, config_path: str) -> Dict:
+        """Load configuration from YAML file"""
+        if not os.path.exists(config_path):
+            print(f"[Config] File not found: {config_path}")
+            return {}
+
+        try:
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+                print(f"[Config] Loaded: {config_path}")
+                self.config_file = config_path
+                self.last_modified = os.path.getmtime(config_path)
+                return config or {}
+        except Exception as e:
+            print(f"[Config] Error loading: {e}")
+            return {}
+
+    def save_config(self, config_path: str, data: Dict):
+        """Save configuration to YAML file"""
+        try:
+            with open(config_path, 'w') as f:
+                yaml.dump(data, f, default_flow_style=False)
+                print(f"[Config] Saved: {config_path}")
+        except Exception as e:
+            print(f"[Config] Error saving: {e}")
+
+    def check_reload(self) -> bool:
+        """Check if config file was modified"""
+        if not self.config_file or not os.path.exists(self.config_file):
+            return False
+
+        current_mtime = os.path.getmtime(self.config_file)
+        if current_mtime > self.last_modified:
+            self.last_modified = current_mtime
+            return True
+        return False
+
+
+class AdaptivePoller:
+    """Smart polling that adjusts interval based on activity"""
+
+    def __init__(self, idle_interval: float = 2.0, active_interval: float = 0.2):
+        self.idle_interval = idle_interval
+        self.active_interval = active_interval
+        self.current_interval = idle_interval
+        self.was_active = False
+
+    def update(self, detected: bool) -> float:
+        """Update interval based on detection result"""
+        if detected:
+            # Active - use fast polling
+            if not self.was_active:
+                print(f"[Adaptive] Switching to active mode ({self.active_interval}s)")
+            self.current_interval = self.active_interval
+            self.was_active = True
+        else:
+            # Idle - use slow polling
+            if self.was_active:
+                print(f"[Adaptive] Switching to idle mode ({self.idle_interval}s)")
+            self.current_interval = self.idle_interval
+            self.was_active = False
+
+        return self.current_interval
+
+
 class TriggerManager:
     """Manages trigger state and debouncing"""
 
@@ -594,37 +900,92 @@ class VisionHTTPServer:
 
         print(f"[Polling] Started - checking every {self.config.poll_interval}s")
 
-        # Initialize logger and recorder if enabled
+        # Initialize all managers
         logger = None
         recorder = None
+        webhook = None
+        notifier = None
+        adaptive_poller = None
+        config_manager = None
+
         if self.config.log_enabled:
             logger = Logger.get_instance(self.config.log_file)
             logger.info(f"Polling started - interval: {self.config.poll_interval}s")
+
         if self.config.record_on_trigger:
             recorder = ScreenRecorder(self.config.record_dir)
 
+        if self.config.webhook_enabled and self.config.webhook_url:
+            webhook = WebhookNotifier(self.config.webhook_url)
+
+        if self.config.notify_enabled:
+            notifier = NotificationManager(True, self.config.notify_title)
+
+        if self.config.adaptive_polling:
+            adaptive_poller = AdaptivePoller(
+                self.config.idle_interval,
+                self.config.active_interval
+            )
+
+        if self.config.watch_config and self.config.config_file:
+            config_manager = ConfigManager.get_instance()
+
+        current_interval = self.config.poll_interval
+
         while self.running:
             try:
+                # Check for config reload
+                if config_manager and config_manager.check_reload():
+                    new_config = config_manager.load_config(self.config.config_file)
+                    print("[Config] Reloaded configuration")
+
                 result = engine.process()
                 triggered = trigger_mgr.should_trigger(result)
+
+                # Update adaptive polling
+                if adaptive_poller:
+                    current_interval = adaptive_poller.update(result)
 
                 if triggered:
                     msg = f">>> POLL TRIGGER! Mode: {self.config.mode.value}"
                     print(msg)
+
+                    # Log
                     if logger:
                         logger.info(msg)
 
-                    # Record screenshot on trigger
+                    # Record screenshot
                     if recorder:
                         filepath = recorder.capture_trigger(self.config.region)
                         print(f"  [Recorded] {filepath}")
                         if logger:
                             logger.info(f"Screenshot saved: {filepath}")
 
-                    threading.Thread(
-                        target=AutomationAction.execute,
-                        args=(self.config.action, self.config.action_delay)
-                    ).start()
+                    # Send webhook
+                    if webhook:
+                        webhook.send({
+                            "mode": self.config.mode.value,
+                            "trigger_count": trigger_mgr.trigger_count,
+                            "condition_met": result
+                        })
+
+                    # Send notification
+                    if notifier:
+                        notifier.notify(f"Triggered: {self.config.mode.value}")
+
+                    # Execute mouse actions
+                    for mouse_action in self.config.mouse_actions:
+                        MouseController.execute_action(mouse_action)
+
+                    # Execute action sequence
+                    if self.config.action_sequence:
+                        ActionSequencer.execute_sequence(self.config.action_sequence)
+                    else:
+                        # Default keyboard action
+                        threading.Thread(
+                            target=AutomationAction.execute,
+                            args=(self.config.action, self.config.action_delay)
+                        ).start()
 
             except Exception as e:
                 err_msg = f"[Polling] Error: {e}"
@@ -632,7 +993,7 @@ class VisionHTTPServer:
                 if logger:
                     logger.error(err_msg)
 
-            time.sleep(self.config.poll_interval)
+            time.sleep(current_interval)
 
     def start(self):
         """Start the HTTP server with optional polling"""
@@ -727,89 +1088,182 @@ def parse_args():
     parser.add_argument("--record-dir", type=str, default="/tmp/auto_claw_records",
                        help="Directory to save triggered screenshots")
 
+    # Adaptive polling options
+    parser.add_argument("--adaptive", action="store_true", help="Enable adaptive polling")
+    parser.add_argument("--idle-interval", type=float, default=2.0, help="Polling interval when idle")
+    parser.add_argument("--active-interval", type=float, default=0.2, help="Polling interval when active")
+
+    # Webhook options
+    parser.add_argument("--webhook", type=str, help="Webhook URL to send notifications")
+    parser.add_argument("--webhook-enable", action="store_true", help="Enable webhook notifications")
+
+    # Notification options
+    parser.add_argument("--notify", action="store_true", help="Enable desktop notifications")
+    parser.add_argument("--notify-title", type=str, default="OpenClaw", help="Notification title")
+
+    # Mouse action options (can be specified multiple times)
+    parser.add_argument("--mouse-click", type=str, help="Mouse click at x,y (e.g., '100,200')")
+    parser.add_argument("--mouse-move", type=str, help="Move mouse to x,y")
+    parser.add_argument("--mouse-scroll", type=int, help="Scroll clicks (positive=up, negative=down)")
+
+    # Action sequence (JSON string)
+    parser.add_argument("--sequence", type=str, help="Action sequence as JSON string")
+
+    # YAML configuration
+    parser.add_argument("--config", type=str, help="YAML configuration file")
+
+    # Dynamic config reload
+    parser.add_argument("--watch", action="store_true", help="Watch config file for changes")
+
+    # Configuration profiles
+    parser.add_argument("--profile", type=str, help="Configuration profile name")
+    parser.add_argument("--save-profile", type=str, help="Save current config as profile")
+    parser.add_argument("--list-profiles", action="store_true", help="List available profiles")
+
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
 
-    # Parse region
-    region = None
-    if args.region:
-        region = tuple(map(int, args.region.split(",")))
+    # Handle configuration profiles
+    config_manager = ConfigManager.get_instance()
+    profile_dir = os.path.expanduser("~/.openclaw")
+    os.makedirs(profile_dir, exist_ok=True)
 
-    # Parse color
-    target_color = None
-    if args.color:
-        target_color = tuple(map(int, args.color.split(",")))
+    # List profiles
+    if args.list_profiles:
+        profiles = [f.replace('.yaml', '') for f in os.listdir(profile_dir) if f.endswith('.yaml')]
+        print(f"Available profiles: {profiles if profiles else 'None'}")
+        return
 
-    # Build conditions list for multi-mode
-    conditions = []
-
-    # Primary condition (always included)
-    primary_condition = TriggerCondition(
-        mode=VisionMode(args.mode) if args.mode != "multi" else VisionMode.OCR,
-        target_text=args.text,
-        region=region,
-        change_threshold=args.threshold,
-        template_path=args.template,
-        target_color=target_color
-    )
-    conditions.append(primary_condition)
-
-    # Secondary condition (for multi-mode)
-    if args.cond2_mode:
-        cond2_region = None
-        if args.cond2_region:
-            cond2_region = tuple(map(int, args.cond2_region.split(",")))
-
-        cond2_color = None
-        if args.cond2_color:
-            cond2_color = tuple(map(int, args.cond2_color.split(",")))
-
-        secondary_condition = TriggerCondition(
-            mode=VisionMode(args.cond2_mode),
-            target_text=args.cond2_text,
-            region=cond2_region,
-            change_threshold=args.cond2_threshold,
-            template_path=args.cond2_template,
-            target_color=cond2_color
-        )
-        conditions.append(secondary_condition)
-
-    # Determine mode
-    if args.mode == "multi" or args.cond2_mode:
-        # Multi-mode
-        mode = VisionMode.MULTI
-        # Use primary condition's mode if only one condition
-        if len(conditions) == 1:
-            mode = conditions[0].mode
+    # Load from YAML config if provided
+    if args.config:
+        yaml_config = config_manager.load_config(args.config)
+        if yaml_config:
+            # Override with CLI args
+            if 'mode' not in yaml_config:
+                yaml_config['mode'] = args.mode
+            config = VisionConfig.from_dict(yaml_config)
+            config.config_file = args.config
+        else:
+            config = None
     else:
-        mode = VisionMode(args.mode)
+        config = None
 
-    # Create config
-    config = VisionConfig(
-        mode=mode,
-        conditions=conditions if mode == VisionMode.MULTI else [],
-        condition_logic=args.logic,
-        polling=args.poll,
-        poll_interval=args.interval,
-        target_text=args.text,
-        region=region,
-        change_threshold=args.threshold,
-        template_path=args.template,
-        templates=args.templates if args.templates else [],
-        target_color=target_color,
-        action=args.action,
-        action_delay=args.delay,
-        log_file=args.log,
-        log_enabled=args.log_enable,
-        record_on_trigger=args.record,
-        record_dir=args.record_dir
-    )
+    # If no config yet, build from args
+    if config is None:
+        # Parse region
+        region = None
+        if args.region:
+            region = tuple(map(int, args.region.split(",")))
+
+        # Parse color
+        target_color = None
+        if args.color:
+            target_color = tuple(map(int, args.color.split(",")))
+
+        # Build conditions list for multi-mode
+        conditions = []
+
+        # Primary condition
+        primary_condition = TriggerCondition(
+            mode=VisionMode(args.mode) if args.mode != "multi" else VisionMode.OCR,
+            target_text=args.text,
+            region=region,
+            change_threshold=args.threshold,
+            template_path=args.template,
+            target_color=target_color
+        )
+        conditions.append(primary_condition)
+
+        # Secondary condition
+        if args.cond2_mode:
+            cond2_region = None
+            if args.cond2_region:
+                cond2_region = tuple(map(int, args.cond2_region.split(",")))
+            cond2_color = None
+            if args.cond2_color:
+                cond2_color = tuple(map(int, args.cond2_color.split(",")))
+            secondary_condition = TriggerCondition(
+                mode=VisionMode(args.cond2_mode),
+                target_text=args.cond2_text,
+                region=cond2_region,
+                change_threshold=args.cond2_threshold,
+                template_path=args.cond2_template,
+                target_color=cond2_color
+            )
+            conditions.append(secondary_condition)
+
+        # Determine mode
+        if args.mode == "multi" or args.cond2_mode:
+            mode = VisionMode.MULTI
+            if len(conditions) == 1:
+                mode = conditions[0].mode
+        else:
+            mode = VisionMode(args.mode)
+
+        # Build mouse actions
+        mouse_actions = []
+        if args.mouse_click:
+            x, y = map(int, args.mouse_click.split(','))
+            mouse_actions.append({"action": "click", "x": x, "y": y})
+        if args.mouse_move:
+            x, y = map(int, args.mouse_move.split(','))
+            mouse_actions.append({"action": "move", "x": x, "y": y})
+        if args.mouse_scroll:
+            mouse_actions.append({"action": "scroll", "clicks": args.mouse_scroll})
+
+        # Parse action sequence
+        action_sequence = []
+        if args.sequence:
+            try:
+                action_sequence = json.loads(args.sequence)
+            except json.JSONDecodeError:
+                print(f"[Error] Invalid JSON in --sequence: {args.sequence}")
+
+        # Create config
+        config = VisionConfig(
+            mode=mode,
+            conditions=conditions if mode == VisionMode.MULTI else [],
+            condition_logic=args.logic,
+            polling=args.poll,
+            poll_interval=args.interval,
+            adaptive_polling=args.adaptive,
+            idle_interval=args.idle_interval,
+            active_interval=args.active_interval,
+            target_text=args.text,
+            region=region,
+            change_threshold=args.threshold,
+            template_path=args.template,
+            templates=args.templates if args.templates else [],
+            target_color=target_color,
+            action=args.action,
+            action_delay=args.delay,
+            log_file=args.log,
+            log_enabled=args.log_enable,
+            record_on_trigger=args.record,
+            record_dir=args.record_dir,
+            webhook_url=args.webhook,
+            webhook_enabled=args.webhook_enable,
+            notify_enabled=args.notify,
+            notify_title=args.notify_title,
+            mouse_actions=mouse_actions,
+            action_sequence=action_sequence,
+            config_file=args.config,
+            watch_config=args.watch,
+            profile_name=args.profile
+        )
+
+    # Save profile if requested
+    if args.save_profile:
+        profile_path = os.path.join(profile_dir, f"{args.save_profile}.yaml")
+        config_manager.save_config(profile_path, config.to_dict())
+        print(f"Profile saved: {profile_path}")
+        return
 
     # Initialize logger
-    if args.log or args.log_enable:
+    if config.log_enabled:
         logger = Logger.get_instance(args.log)
         if args.log:
             logger.info(f"Logging started - log file: {args.log}")
