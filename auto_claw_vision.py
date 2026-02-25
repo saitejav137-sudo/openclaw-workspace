@@ -418,11 +418,38 @@ class VisionEngine:
         return ratio > 0.01  # At least 1% of region
 
     def _process_analyze(self) -> bool:
-        """General analysis - placeholder for custom logic"""
-        img = ScreenCapture.capture_region(self.config.region)
-        # TODO: Implement custom analysis logic
-        # Could add: edge detection, contour finding, etc.
-        return False
+        """AI-powered screen analysis using BLIP"""
+        try:
+            # Capture the region
+            img = ScreenCapture.capture_region(self.config.region)
+            if img is None:
+                return False
+
+            # Save to temp file for AI analysis
+            temp_path = "/tmp/analyze_temp.png"
+            cv2.imwrite(temp_path, img)
+
+            # Use BLIP AI analyzer
+            ai = AIScreenAnalyzer.get_instance()
+            result = ai.analyze_screen(temp_path, self.config.target_text or "Describe this screen")
+
+            if result:
+                print(f"[Analyze] AI: {result}")
+                # Store result for webhook/notification
+                self.last_analysis = result
+
+                # If target_text is specified, check if it's in the analysis
+                if self.config.target_text:
+                    return self.config.target_text.lower() in result.lower()
+
+                # Always return True when analysis succeeds (to trigger action)
+                return True
+
+            return False
+
+        except Exception as e:
+            print(f"[Analyze] Error: {e}")
+            return False
 
     def _process_yolo(self) -> bool:
         """YOLO object detection for UI elements"""
