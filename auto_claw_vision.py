@@ -1242,7 +1242,7 @@ class VisionHTTPHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         # Check if it's a dashboard request
-        if self.path == '/dashboard' or self.path == '/':
+        if self.path == '/dashboard':
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
             self.end_headers()
