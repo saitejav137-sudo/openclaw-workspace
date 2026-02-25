@@ -1160,19 +1160,22 @@ def main():
         print(f"Available profiles: {profiles if profiles else 'None'}")
         return
 
-    # Load from YAML config if provided
+    # Load from YAML config or profile if provided
+    config = None
     if args.config:
         yaml_config = config_manager.load_config(args.config)
         if yaml_config:
-            # Override with CLI args
-            if 'mode' not in yaml_config:
-                yaml_config['mode'] = args.mode
             config = VisionConfig.from_dict(yaml_config)
             config.config_file = args.config
-        else:
-            config = None
-    else:
-        config = None
+
+    # Load from profile if specified
+    if args.profile and not config:
+        profile_path = os.path.join(profile_dir, f"{args.profile}.yaml")
+        if os.path.exists(profile_path):
+            profile_config = config_manager.load_config(profile_path)
+            if profile_config:
+                config = VisionConfig.from_dict(profile_config)
+                print(f"[Profile] Loaded: {args.profile}")
 
     # If no config yet, build from args
     if config is None:
