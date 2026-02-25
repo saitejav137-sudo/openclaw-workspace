@@ -1505,8 +1505,27 @@ class TelegramBot:
     """Telegram bot for voice commands and remote control"""
 
     def __init__(self, token: str = None, chat_id: str = None):
+        # Try multiple sources for credentials
         self.token = token or os.getenv("TELEGRAM_BOT_TOKEN")
         self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")
+
+        # Load from OpenClaw config if not set
+        if not self.token or not self.chat_id:
+            config_path = os.path.expanduser("~/.openclaw/openclaw.json")
+            if os.path.exists(config_path):
+                try:
+                    with open(config_path) as f:
+                        config = json.load(f)
+                    # Try channels.telegram
+                    tg = config.get("channels", {}).get("telegram", {})
+                    if tg.get("enabled") and tg.get("botToken"):
+                        self.token = tg["botToken"]
+                        allow_from = tg.get("allowFrom", [])
+                        if allow_from:
+                            self.chat_id = str(allow_from[0])
+                except Exception as e:
+                    print(f"[Telegram] Config error: {e}")
+
         self.api_url = f"https://api.telegram.org/bot{self.token}"
         self.enabled = bool(self.token and self.chat_id)
 
