@@ -35,6 +35,7 @@ import time
 import json
 import threading
 import argparse
+import asyncio
 import subprocess
 from dataclasses import dataclass, field
 from typing import Optional, Callable, List, Tuple, Dict, Any
@@ -157,6 +158,14 @@ class VisionConfig:
     # Desktop notifications
     notify_enabled: bool = False
     notify_title: str = "OpenClaw"
+    # Integration settings
+    gateway_enabled: bool = False
+    gateway_port: int = 18789
+    telegram_enabled: bool = False
+    websocket_enabled: bool = False
+    websocket_port: int = 8766
+    stream_enabled: bool = False
+    stream_port: int = 8888
     # Mouse actions
     mouse_actions: List[Dict] = None  # [{"action": "click", "x": 100, "y": 200}, ...]
     # Action sequences
@@ -2016,6 +2025,22 @@ class VisionHTTPServer:
                     if notifier:
                         notifier.notify(f"Triggered: {self.config.mode.value}")
 
+                    # Send Telegram notification
+                    if hasattr(self, 'telegram_bot') and self.telegram_bot:
+                        self.telegram_bot.send_message(f"🤖 OpenClaw Trigger: {self.config.mode.value}")
+
+                    # Send to Gateway
+                    if hasattr(self, 'gateway_client') and self.gateway_client:
+                        self.gateway_client.send_trigger(self.config.mode.value, result)
+
+                    # Broadcast via WebSocket
+                    if hasattr(self, 'ws_manager') and self.ws_manager:
+                        asyncio.create_task(self.ws_manager.broadcast({
+                            "type": "trigger",
+                            "mode": self.config.mode.value,
+                            "result": result
+                        }))
+
                     # Execute mouse actions
                     for mouse_action in self.config.mouse_actions:
                         MouseController.execute_action(mouse_action)
@@ -2046,6 +2071,55 @@ class VisionHTTPServer:
         # Allow handler to access config
         global handler_config
         handler_config = self.config
+
+        # Initialize integration services
+        self.gateway_client = None
+        self.telegram_bot = None
+        self.ws_manager = None
+        self.streamer = None
+        self.loop = None
+
+        # Connect to Gateway
+        if self.config.gateway_enabled:
+            try:
+                self.gateway_client = GatewayClient(port=self.config.gateway_port)
+                self.gateway_client.connect()
+                self.gateway_client.register('openclaw_vision', ['ocr', 'template', 'yolo', 'color', 'monitor', 'analyze'])
+                print(f"[Gateway] Connected to port {self.config.gateway_port}")
+            except Exception as e:
+                print(f"[Gateway] Connection failed: {e}")
+
+        # Initialize Telegram
+        if self.config.telegram_enabled:
+            try:
+                self.telegram_bot = TelegramBot()
+                if self.telegram_bot.enabled:
+                    print(f"[Telegram] Enabled: {self.telegram_bot.chat_id}")
+                else:
+                    print("[Telegram] Not configured")
+            except Exception as e:
+                print(f"[Telegram] Error: {e}")
+
+        # Start WebSocket server
+        if self.config.websocket_enabled:
+            try:
+                import asyncio
+                self.loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(self.loop)
+                self.ws_manager = WebSocketManager(port=self.config.websocket_port)
+                self.loop.run_until_complete(self.ws_manager.start())
+                print(f"[WebSocket] Started on port {self.config.websocket_port}")
+            except Exception as e:
+                print(f"[WebSocket] Error: {e}")
+
+        # Start MJPEG Streamer
+        if self.config.stream_enabled:
+            try:
+                self.streamer = ScreenStreamer(port=self.config.stream_port)
+                self.streamer.start()
+                print(f"[Stream] Started on port {self.config.stream_port}")
+            except Exception as e:
+                print(f"[Stream] Error: {e}")
 
         # Start polling if enabled
         if self.config.polling:
@@ -2148,6 +2222,15 @@ def parse_args():
     # Notification options
     parser.add_argument("--notify", action="store_true", help="Enable desktop notifications")
     parser.add_argument("--notify-title", type=str, default="OpenClaw", help="Notification title")
+
+    # Integration options
+    parser.add_argument("--gateway-enable", action="store_true", help="Connect to OpenClaw gateway")
+    parser.add_argument("--gateway-port", type=int, default=18789, help="Gateway port")
+    parser.add_argument("--telegram-enable", action="store_true", help="Send Telegram notifications on trigger")
+    parser.add_argument("--websocket-enable", action="store_true", help="Enable WebSocket server")
+    parser.add_argument("--websocket-port", type=int, default=8766, help="WebSocket port")
+    parser.add_argument("--stream-enable", action="store_true", help="Enable MJPEG screen streaming")
+    parser.add_argument("--stream-port", type=int, default=8888, help="Streaming port")
 
     # Mouse action options (can be specified multiple times)
     parser.add_argument("--mouse-click", type=str, help="Mouse click at x,y (e.g., '100,200')")
@@ -2313,6 +2396,13 @@ def main():
             webhook_enabled=args.webhook_enable,
             notify_enabled=args.notify,
             notify_title=args.notify_title,
+            gateway_enabled=args.gateway_enable,
+            gateway_port=args.gateway_port,
+            telegram_enabled=args.telegram_enable,
+            websocket_enabled=args.websocket_enable,
+            websocket_port=args.websocket_port,
+            stream_enabled=args.stream_enable,
+            stream_port=args.stream_port,
             mouse_actions=mouse_actions,
             action_sequence=action_sequence,
             config_file=args.config,
