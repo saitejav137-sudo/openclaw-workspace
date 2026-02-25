@@ -614,21 +614,44 @@ class NotificationManager:
     def __init__(self, enabled: bool = False, title: str = "OpenClaw"):
         self.enabled = enabled
         self.title = title
+        self._notify2 = None
+        self._init_notify2()
+
+    def _init_notify2(self):
+        """Try to initialize notify2"""
+        try:
+            import notify2
+            notify2.init(self.title)
+            self._notify2 = notify2
+        except Exception:
+            pass
 
     def notify(self, message: str):
         """Send desktop notification"""
-        if not self.enabled or not PLYER_AVAILABLE:
+        if not self.enabled:
             return
 
-        try:
-            notification.notify(
-                title=self.title,
-                message=message,
-                timeout=5
-            )
-            print(f"[Notify] {message}")
-        except Exception as e:
-            print(f"[Notify] Error: {e}")
+        # Try notify2 first
+        if self._notify2:
+            try:
+                n = self._notify2.Notification(self.title, message)
+                n.show()
+                print(f"[Notify] {message}")
+                return
+            except Exception as e:
+                print(f"[Notify2] Error: {e}")
+
+        # Fallback to plyer
+        if PLYER_AVAILABLE:
+            try:
+                notification.notify(
+                    title=self.title,
+                    message=message,
+                    timeout=5
+                )
+                print(f"[Notify] {message}")
+            except Exception as e:
+                print(f"[Notify] Error: {e}")
 
 
 class MouseController:
