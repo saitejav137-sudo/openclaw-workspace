@@ -6,6 +6,7 @@ Direct browser automation using Playwright - no extension needed!
 
 import time
 import base64
+import os
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 from urllib.parse import urljoin
@@ -59,15 +60,34 @@ class BrowserAgent:
     def start(self) -> bool:
         """Start browser"""
         try:
+            # Check if we're in an asyncio loop - if so, use async approach
+            try:
+                import asyncio
+                asyncio.get_running_loop()
+                in_async = True
+            except RuntimeError:
+                in_async = False
+
+            if in_async:
+                # Use threading to run sync code
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(self._start_browser)
+                    return future.result()
+            else:
+                return self._start_browser()
+        except Exception as e:
+            logger.error(f"Failed to start browser: {e}")
+            return False
+
+    def _start_browser(self) -> bool:
+        """Start browser (runs in thread if needed)"""
+        try:
             from playwright.sync_api import sync_playwright
-            import os
-            import subprocess
 
             # Get current display
             display = os.environ.get('DISPLAY', ':0')
             logger.info(f"Starting browser with DISPLAY={display}")
-
-            self._playwright = sync_playwright().start()
 
             # Try to use system Chrome first (better display support)
             chrome_paths = [
@@ -101,6 +121,9 @@ class BrowserAgent:
                 ])
 
             logger.info(f"Launch args: {launch_args}")
+
+            # Start playwright and store instance
+            self._playwright = sync_playwright().start()
 
             if chrome_executable:
                 # Use system Chrome with Playwright
