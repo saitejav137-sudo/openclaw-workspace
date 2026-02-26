@@ -23,6 +23,7 @@ from .actions import (
 from .logger import Logger, get_logger, setup_logging
 from .scheduler import Scheduler, ScheduleType, ScheduleJob, get_scheduler
 from .workflow import WorkflowManager, Workflow, NodeType, WorkflowExecutor
+from .window import WindowMonitor, WindowAction, start_window_monitor, stop_window_monitor, get_window_monitor
 
 __all__ = [
     "VisionConfig",
@@ -55,4 +56,9 @@ __all__ = [
     "Workflow",
     "NodeType",
     "WorkflowExecutor",
+    "WindowMonitor",
+    "WindowAction",
+    "start_window_monitor",
+    "stop_window_monitor",
+    "get_window_monitor",
 ]

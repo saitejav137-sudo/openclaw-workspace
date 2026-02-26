@@ -26,6 +26,7 @@ class VisionMode(Enum):
     YOLO = "yolo"
     FUZZY = "fuzzy"
     REGRESSION = "regression"
+    WINDOW = "window"
 
 
 # JSON Schema for VisionConfig validation
@@ -197,6 +198,11 @@ class VisionConfig:
     yolo_model: str = "yolov8n.pt"
     yolo_classes: List[str] = field(default_factory=list)
     yolo_confidence: float = 0.5
+
+    # Window monitoring settings
+    window_signal: str = "TRIGGER_CLAW"
+    window_poll_interval: float = 0.3
+    window_debounce: float = 3.0
 
     # Color settings
     target_color: Optional[tuple] = None

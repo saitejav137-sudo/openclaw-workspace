@@ -145,9 +145,14 @@ def parse_args():
         "--mode",
         type=str,
         default="ocr",
-        choices=[m.value for m in VisionMode],
+        choices=["ocr", "monitor", "template", "color", "yolo", "fuzzy", "regression", "window"],
         help="Detection mode"
     )
+
+    # Window monitoring options
+    parser.add_argument("--window-signal", type=str, default="TRIGGER_CLAW", help="Window title signal to watch")
+    parser.add_argument("--window-poll", type=float, default=0.3, help="Window poll interval")
+    parser.add_argument("--window-debounce", type=float, default=3.0, help="Debounce seconds")
 
     # Detection options
     parser.add_argument("--text", type=str, help="Text to detect (OCR)")

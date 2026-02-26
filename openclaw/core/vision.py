@@ -543,6 +543,32 @@ class VisionEngine:
         logger.info("AI Analyze mode - requires BLIP integration")
         return False
 
+    def _process_window(self) -> bool:
+        """Window title monitoring - checks for trigger signal"""
+        from .window import get_window_monitor
+
+        monitor = get_window_monitor()
+        if not monitor:
+            # Start a new monitor
+            from .window import start_window_monitor
+            start_window_monitor(
+                trigger_signal=self.config.window_signal,
+                callback=None,
+                poll_interval=self.config.window_poll_interval
+            )
+            monitor = get_window_monitor()
+
+        if monitor:
+            current_title = monitor.get_active_window()
+            if current_title and self.config.window_signal in current_title:
+                # Check debounce
+                if time.time() - monitor.last_trigger_time > self.config.window_debounce:
+                    logger.info(f">>> WINDOW SIGNAL DETECTED: {current_title}")
+                    monitor.last_trigger_time = time.time()
+                    return True
+
+        return False
+
 
 # Export classes
 __all__ = [
