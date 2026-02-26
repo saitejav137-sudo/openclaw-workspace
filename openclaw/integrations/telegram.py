@@ -30,6 +30,14 @@ except ImportError:
     BROWSER_AVAILABLE = False
     logger.warning("Browser fetch not available")
 
+# Import browser agent for direct browser control
+try:
+    from .browser_agent import BrowserAgent, get_browser_agent, close_browser_agent
+    BROWSER_AGENT_AVAILABLE = True
+except ImportError:
+    BROWSER_AGENT_AVAILABLE = False
+    logger.warning("Browser agent not available")
+
 
 @dataclass
 class TelegramCommand:
@@ -78,6 +86,10 @@ class TelegramBot:
                 self.browser_available = False
         else:
             self.browser_fetcher = None
+
+        # Initialize browser agent for direct browser control
+        self.browser_agent_available = BROWSER_AGENT_AVAILABLE
+        self.browser_agent = None
 
         if self.enabled:
             self._register_default_commands()
@@ -138,7 +150,19 @@ class TelegramBot:
         if self.browser_available:
             self.register_command("browse", "Browse URL with real browser", self._handle_browse)
             self.register_command("bs", "Browser search", self._handle_browser_search)
-            logger.info("Browser commands registered")
+
+        # Browser agent commands (direct browser control)
+        if self.browser_agent_available:
+            self.register_command("browser", "Start browser agent", self._handle_browser_start)
+            self.register_command("goto", "Navigate to URL", self._handle_browser_goto)
+            self.register_command("click", "Click element", self._handle_browser_click)
+            self.register_command("type", "Type text", self._handle_browser_type)
+            self.register_command("screenshot", "Take screenshot", self._handle_browser_screenshot)
+            self.register_command("extract", "Extract text from element", self._handle_browser_extract)
+            self.register_command("eval", "Execute JavaScript", self._handle_browser_eval)
+            self.register_command("binfo", "Browser info", self._handle_browser_info)
+            self.register_command("bclose", "Close browser", self._handle_browser_close)
+            logger.info("Browser agent commands registered")
 
     def register_command(self, name: str, description: str, handler: Callable):
         """Register a bot command"""
@@ -296,6 +320,171 @@ class TelegramBot:
                 return f"Error: {str(e)}"
 
         return "Search not available"
+
+    def _handle_browser_start(self, args: List[str]) -> str:
+        """Handle /browser command - start browser agent"""
+        if not self.browser_agent_available:
+            return "Browser agent not available. Install playwright: pip install playwright && playwright install chromium"
+
+        try:
+            if self.browser_agent is None:
+                headless = False  # Show browser for user to see
+                self.browser_agent = get_browser_agent(headless=headless)
+                info = self.browser_agent.get_page_info()
+                return f"Browser started!\nURL: {info.get('url', 'blank')}\nTitle: {info.get('title', 'New tab')}"
+            else:
+                return "Browser already running. Use /goto, /click, /type, etc."
+        except Exception as e:
+            logger.error(f"Browser start error: {e}")
+            return f"Error starting browser: {str(e)}"
+
+    def _handle_browser_goto(self, args: List[str]) -> str:
+        """Handle /goto command - navigate to URL"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if not args:
+            return "Usage: /goto <url>\nExample: /goto https://google.com"
+
+        url = " ".join(args)
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = "https://" + url
+
+        try:
+            result = self.browser_agent.navigate(url)
+            if result.success:
+                info = self.browser_agent.get_page_info()
+                return f"Navigated to: {info.get('url')}\nTitle: {info.get('title')}"
+            else:
+                return f"Navigation failed: {result.error}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_click(self, args: List[str]) -> str:
+        """Handle /click command - click element"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if not args:
+            return "Usage: /click <selector>\nExample: /click button#submit"
+
+        selector = " ".join(args)
+
+        try:
+            result = self.browser_agent.click(selector)
+            if result.success:
+                info = self.browser_agent.get_page_info()
+                return f"Clicked: {selector}\nCurrent URL: {info.get('url')}"
+            else:
+                return f"Click failed: {result.error}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_type(self, args: List[str]) -> str:
+        """Handle /type command - type text"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if len(args) < 2:
+            return "Usage: /type <selector> <text>\nExample: /type input#search Python"
+
+        selector = args[0]
+        text = " ".join(args[1:])
+
+        try:
+            result = self.browser_agent.type(selector, text)
+            if result.success:
+                return f"Typed '{text}' into {selector}"
+            else:
+                return f"Type failed: {result.error}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_screenshot(self, args: List[str]) -> str:
+        """Handle /screenshot command - take screenshot"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        try:
+            result = self.browser_agent.screenshot()
+            if result.success and result.screenshot:
+                # Return base64 for now - bot can send as photo
+                return f"Screenshot taken! ({len(result.screenshot)} bytes base64)\nUse /browse command to view in browser"
+            else:
+                return f"Screenshot failed: {result.error}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_extract(self, args: List[str]) -> str:
+        """Handle /extract command - extract text"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if not args:
+            return "Usage: /extract <selector>\nExample: /extract div.content"
+
+        selector = " ".join(args)
+
+        try:
+            result = self.browser_agent.extract_text(selector)
+            if result.success:
+                texts = result.data
+                if texts:
+                    # Return first 10 matches
+                    output = f"Found {len(texts)} elements:\n"
+                    for i, text in enumerate(texts[:10], 1):
+                        text = text.strip()[:200]
+                        if text:
+                            output += f"{i}. {text}\n"
+                    return output
+                else:
+                    return f"No text found in: {selector}"
+            else:
+                return f"Extract failed: {result.error}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_eval(self, args: List[str]) -> str:
+        """Handle /eval command - execute JavaScript"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if not args:
+            return "Usage: /eval <javascript>\nExample: /eval document.title"
+
+        script = " ".join(args)
+
+        try:
+            result = self.browser_agent.evaluate(script)
+            if result.success:
+                data = str(result.data)[:500]
+                return f"Result: {data}"
+            else:
+                return f"Eval failed: {result.error}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_info(self, args: List[str]) -> str:
+        """Handle /binfo command - browser info"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        try:
+            info = self.browser_agent.get_page_info()
+            return f"Browser Info:\nURL: {info.get('url')}\nTitle: {info.get('title')}\nActive: {info.get('initialized')}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_close(self, args: List[str]) -> str:
+        """Handle /bclose command - close browser"""
+        try:
+            if self.browser_agent:
+                self.browser_agent.stop()
+                self.browser_agent = None
+                return "Browser closed"
+            return "Browser not running"
+        except Exception as e:
+            return f"Error: {str(e)}"
 
     def _make_request(self, method: str, data: Dict = None, files: Dict = None) -> Optional[Dict]:
         """Make API request with retry"""

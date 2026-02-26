@@ -38,6 +38,13 @@ from .browser_fetch import (
     fetch_url,
     web_search,
 )
+from .browser_agent import (
+    BrowserAction,
+    BrowserResult,
+    BrowserAgent,
+    get_browser_agent,
+    close_browser_agent,
+)
 
 __all__ = [
     "VisionHTTPServer",
@@ -85,4 +92,10 @@ __all__ = [
     "get_simple_fetcher",
     "fetch_url",
     "web_search",
+    # Browser agent module
+    "BrowserAction",
+    "BrowserResult",
+    "BrowserAgent",
+    "get_browser_agent",
+    "close_browser_agent",
 ]
