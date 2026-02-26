@@ -374,8 +374,16 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
         <pre id="log"></pre>
     </div>
     <script>
+        const API_KEY = new URLSearchParams(window.location.search).get('api_key') || '';
+
+        function addApiKey(url) {
+            if (!API_KEY) return url;
+            const separator = url.includes('?') ? '&' : '?';
+            return url + separator + 'api_key=' + API_KEY;
+        }
+
         function loadStats() {
-            fetch('/api/stats')
+            fetch(addApiKey('/api/stats'))
                 .then(r => r.json())
                 .then(data => {
                     if (data.total !== undefined) {
@@ -388,7 +396,7 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
                 .catch(() => {});
         }
         function trigger() {
-            fetch('/api/trigger?api_key=demo')
+            fetch(addApiKey('/api/trigger'))
                 .then(r => r.json())
                 .then(data => {
                     console.log('Triggered:', data);
@@ -397,7 +405,7 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
                 .catch(err => console.error(err));
         }
         function loadHealth() {
-            fetch('/health')
+            fetch(addApiKey('/health'))
                 .then(r => r.json())
                 .then(data => {
                     const status = document.getElementById('healthStatus');
