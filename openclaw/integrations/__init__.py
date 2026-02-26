@@ -17,6 +17,18 @@ from .auth import (
     init_auth_manager,
     ROLE_PERMISSIONS
 )
+from .search import (
+    SearchProvider,
+    SearchResult,
+    SearchResponse,
+    DuckDuckGoSearch,
+    BraveSearch,
+    SearchEngine,
+    get_search_engine,
+    search,
+    quick_search,
+    answer,
+)
 
 __all__ = [
     "VisionHTTPServer",
@@ -45,4 +57,15 @@ __all__ = [
     "get_auth_manager",
     "init_auth_manager",
     "ROLE_PERMISSIONS",
+    # Search module
+    "SearchProvider",
+    "SearchResult",
+    "SearchResponse",
+    "DuckDuckGoSearch",
+    "BraveSearch",
+    "SearchEngine",
+    "get_search_engine",
+    "search",
+    "quick_search",
+    "answer",
 ]

@@ -16,7 +16,7 @@ from enum import Enum
 from contextlib import contextmanager
 from urllib.parse import urlparse
 
-from core.logger import get_logger
+from openclaw.core.logger import get_logger
 
 logger = get_logger("database")
 

@@ -14,6 +14,14 @@ from ..core.actions import RetryConfig, ActionExecutor
 
 logger = get_logger("telegram")
 
+# Import search module for internet access
+try:
+    from .search import SearchEngine, get_search_engine, SearchResponse
+    SEARCH_AVAILABLE = True
+except ImportError:
+    SEARCH_AVAILABLE = False
+    logger.warning("Search module not available")
+
 
 @dataclass
 class TelegramCommand:
@@ -30,7 +38,9 @@ class TelegramBot:
         self,
         token: Optional[str] = None,
         chat_id: Optional[str] = None,
-        retry_config: RetryConfig = None
+        retry_config: RetryConfig = None,
+        search_provider: str = "duckduckgo",
+        brave_api_key: Optional[str] = None
     ):
         self.token = token or self._load_token()
         self.chat_id = chat_id or self._load_chat_id()
@@ -41,8 +51,16 @@ class TelegramBot:
         self._commands: Dict[str, TelegramCommand] = {}
         self._command_callbacks: Dict[str, Callable] = {}
 
+        # Initialize search engine for internet access
+        self.search_available = SEARCH_AVAILABLE
+        if self.search_available:
+            self.search_engine = get_search_engine(search_provider, brave_api_key)
+        else:
+            self.search_engine = None
+
         if self.enabled:
             self._register_default_commands()
+            self._register_search_commands()
 
     def _load_token(self) -> Optional[str]:
         """Load token from environment or config"""
@@ -86,6 +104,13 @@ class TelegramBot:
         self.register_command("status", "Get system status", self._handle_status)
         self.register_command("trigger", "Trigger manual check", self._handle_trigger)
 
+    def _register_search_commands(self):
+        """Register search-related commands"""
+        if self.search_available:
+            self.register_command("search", "Search the internet", self._handle_search)
+            self.register_command("ask", "Quick answer from web", self._handle_ask)
+            logger.info("Search commands registered")
+
     def register_command(self, name: str, description: str, handler: Callable):
         """Register a bot command"""
         self._commands[name] = TelegramCommand(name, description, handler)
@@ -105,6 +130,76 @@ class TelegramBot:
     def _handle_trigger(self, args: List[str]) -> str:
         """Handle /trigger command"""
         return "Trigger executed"
+
+    def _handle_search(self, args: List[str]) -> str:
+        """Handle /search command - search the internet"""
+        if not self.search_available:
+            return "Search is not available. Please install required dependencies."
+
+        if not args:
+            return "Usage: /search <query>\nExample: /search python tutorial"
+
+        query = " ".join(args)
+
+        try:
+            # Get search results
+            response = self.search_engine.search(query, max_results=5)
+
+            if not response.results:
+                return f"No results found for: {query}"
+
+            # Format results
+            lines = [f"Results for: {query}\n"]
+
+            for i, result in enumerate(response.results, 1):
+                lines.append(f"{i}. {result.title}")
+                lines.append(f"   {result.url}")
+                if result.snippet:
+                    snippet = result.snippet[:150] + "..." if len(result.snippet) > 150 else result.snippet
+                    lines.append(f"   {snippet}")
+                lines.append("")
+
+            return "\n".join(lines)
+
+        except Exception as e:
+            logger.error(f"Search error: {e}")
+            return f"Search error: {str(e)}"
+
+    def _handle_ask(self, args: List[str]) -> str:
+        """Handle /ask command - quick answer from web"""
+        if not self.search_available:
+            return "Search is not available. Please install required dependencies."
+
+        if not args:
+            return "Usage: /ask <question>\nExample: /ask what is python"
+
+        query = " ".join(args)
+
+        try:
+            # Try quick answer first
+            answer = self.search_engine.quick_answer(query)
+
+            if answer:
+                return f"Answer: {answer}"
+
+            # Fall back to search
+            response = self.search_engine.search(query, max_results=3)
+
+            if not response.results:
+                return f"No information found for: {query}"
+
+            lines = [f"Here's what I found about: {query}\n"]
+
+            for i, result in enumerate(response.results[:3], 1):
+                if result.snippet:
+                    lines.append(f"{i}. {result.snippet[:200]}...")
+                    lines.append(f"   Source: {result.url}\n")
+
+            return "\n".join(lines)
+
+        except Exception as e:
+            logger.error(f"Ask error: {e}")
+            return f"Error: {str(e)}"
 
     def _make_request(self, method: str, data: Dict = None, files: Dict = None) -> Optional[Dict]:
         """Make API request with retry"""
