@@ -7,7 +7,7 @@ import json
 import base64
 import ssl
 import os
-from typing import Optional, Dict, Any, Callable
+from typing import Optional, Dict, Any, Callable, List
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from dataclasses import dataclass
 from enum import Enum
@@ -180,16 +180,51 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
     vision_engine: Optional[VisionEngine] = None
     auth: Optional[APIKeyAuth] = None
     rate_limiter: Optional[RateLimiter] = None
+    allowed_origins: List[str] = []  # Configure allowed origins
 
     def log_message(self, format, *args):
         """Override to use our logger"""
         logger.debug(f"HTTP: {args[0]}")
 
+    def _get_allowed_origin(self) -> str:
+        """Get the allowed origin for CORS based on request origin.
+
+        Returns:
+            The matching allowed origin, or empty string if not allowed
+        """
+        if not self.allowed_origins:
+            # If no origins configured, don't send CORS headers (more secure)
+            return ""
+
+        request_origin = self.headers.get("Origin", "")
+        if request_origin in self.allowed_origins:
+            return request_origin
+
+        # Also check without port for development
+        if request_origin:
+            # Extract origin without port
+            origin_parts = request_origin.split("://")
+            if len(origin_parts) == 2:
+                host_part = origin_parts[1].split(":")[0]  # Remove port
+                for allowed in self.allowed_origins:
+                    if allowed.startswith("http://") or allowed.startswith("https://"):
+                        allowed_host = allowed.split("://")[1].split(":")[0]
+                        if host_part == allowed_host:
+                            return request_origin
+
+        return ""
+
     def _send_json(self, data: Dict, status: int = 200):
         """Send JSON response"""
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
-        self.send_header("Access-Control-Allow-Origin", "*")
+
+        # Secure CORS: only allow specific origins
+        allowed_origin = self._get_allowed_origin()
+        if allowed_origin:
+            self.send_header("Access-Control-Allow-Origin", allowed_origin)
+            self.send_header("Access-Control-Allow-Credentials", "true")
+
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
         self.end_headers()
@@ -200,11 +235,16 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
         self._send_json({"status": "error", "message": message}, status)
 
     def do_OPTIONS(self):
-        """Handle CORS preflight"""
+        """Handle CORS preflight with secure origin checking"""
+        allowed_origin = self._get_allowed_origin()
+
         self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
+        if allowed_origin:
+            self.send_header("Access-Control-Allow-Origin", allowed_origin)
+            self.send_header("Access-Control-Allow-Credentials", "true")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+        self.send_header("Access-Control-Max-Age", "3600")  # Cache preflight for 1 hour
         self.end_headers()
 
     def do_GET(self):
@@ -596,10 +636,11 @@ class VisionHTTPServer:
         # Setup rate limiter - disabled by default (set to None for no limit)
         self.rate_limiter = None
 
-        # Setup handler class
+        # Setup handler class with allowed origins from config
         VisionHTTPHandler.vision_engine = self.vision_engine
         VisionHTTPHandler.auth = self.auth
         VisionHTTPHandler.rate_limiter = self.rate_limiter
+        VisionHTTPHandler.allowed_origins = config.allowed_origins or []
 
     @staticmethod
     def generate_self_signed_cert(cert_path: str = "/tmp/openclaw.crt",

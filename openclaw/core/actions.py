@@ -99,19 +99,44 @@ class KeyboardAction:
     """Keyboard automation actions"""
 
     @staticmethod
-    def press(key: str, delay: float = 0) -> bool:
-        """Press a keyboard key"""
+    def press(key: str, delay: float = 0.0) -> bool:
+        """Press a keyboard key using xdotool.
+
+        Args:
+            key: Key name (e.g., 'alt+o', 'Return')
+            delay: Delay in seconds before pressing
+
+        Returns:
+            True if key press succeeded, False otherwise
+
+        Raises:
+            subprocess.TimeoutExpired: If xdotool times out
+            OSError: If xdotool is not installed
+        """
         if delay > 0:
             time.sleep(delay)
 
+        # Validate key against whitelist to prevent injection
+        allowed_keys = {
+            'alt', 'ctrl', 'shift', 'super', 'tab', 'enter', 'return',
+            'space', 'backspace', 'delete', 'escape', 'esc',
+            'up', 'down', 'left', 'right',
+            'home', 'end', 'pageup', 'pagedown',
+            'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        }
+
         try:
-            cmd = f"xdotool key --clearmodifiers {key}"
+            # Use list form to prevent shell injection
+            cmd = ["xdotool", "key", "--clearmodifiers", key]
             result = subprocess.run(
                 cmd,
-                shell=True,
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
+                check=False
             )
             success = result.returncode == 0
             if success:
@@ -124,19 +149,38 @@ class KeyboardAction:
             logger.error(f"Key press timed out: {key}")
             return False
 
+        except OSError as e:
+            logger.error(f"OS error during key press (xdotool installed?): {e}")
+            return False
+
         except Exception as e:
-            logger.error(f"Key press error: {e}")
+            logger.error(f"Unexpected error during key press: {e}")
             return False
 
     @staticmethod
     def type_text(text: str, delay: float = 0.1) -> bool:
-        """Type text"""
+        """Type text character by character using xdotool.
+
+        Args:
+            text: Text to type
+            delay: Delay between keystrokes in seconds
+
+        Returns:
+            True if typing succeeded, False otherwise
+        """
         try:
+            # Use list form to prevent shell injection
             for char in text:
-                cmd = f"xdotool key {char}"
-                subprocess.run(cmd, shell=True, check=False)
+                cmd = ["xdotool", "key", char]
+                subprocess.run(cmd, capture_output=True, timeout=5, check=False)
                 time.sleep(delay)
             return True
+        except subprocess.TimeoutExpired:
+            logger.error(f"Type text timed out")
+            return False
+        except OSError as e:
+            logger.error(f"OS error during type text: {e}")
+            return False
         except Exception as e:
             logger.error(f"Type text error: {e}")
             return False

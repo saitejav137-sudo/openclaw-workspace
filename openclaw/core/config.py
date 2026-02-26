@@ -86,6 +86,11 @@ VISION_CONFIG_SCHEMA = {
         "websocket_port": {"type": "number", "minimum": 1, "maximum": 65535},
         "stream_enabled": {"type": "boolean"},
         "stream_port": {"type": "number", "minimum": 1, "maximum": 65535},
+        "allowed_origins": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "http_enabled": {"type": "boolean"},
         "mouse_actions": {
             "type": "array",
             "items": {
@@ -265,6 +270,12 @@ class VisionConfig:
     tls_cert_path: str = ""
     tls_key_path: str = ""
 
+    # CORS - Security: specify exact origins for production
+    allowed_origins: List[str] = field(default_factory=list)
+
+    # HTTP Server
+    http_enabled: bool = True
+
     # General
     capture_screen: int = 0
     action: str = "alt+o"
@@ -391,6 +402,8 @@ class VisionConfig:
             stream_enabled=data.get("stream_enabled", False),
             stream_port=data.get("stream_port", 8888),
             stream_host=data.get("stream_host", "localhost"),
+            allowed_origins=data.get("allowed_origins", []),
+            http_enabled=data.get("http_enabled", True),
             mouse_actions=data.get("mouse_actions", []),
             action_sequence=data.get("action_sequence", []),
             api_key=data.get("api_key"),

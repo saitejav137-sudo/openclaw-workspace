@@ -18,11 +18,20 @@ logger = get_logger("vision")
 
 
 class ScreenCapture:
-    """Cross-platform screen capture with caching support"""
+    """Cross-platform screen capture with caching support.
+
+    This class provides screen capture functionality with optional caching
+    to improve performance for repeated captures.
+
+    Attributes:
+        _cache: Dictionary storing cached screenshots with timestamps
+        _cache_lock: Thread lock for cache operations
+        _cache_ttl: Time-to-live for cached screenshots in seconds
+    """
 
     _cache: Dict[str, Tuple[np.ndarray, float]] = {}
     _cache_lock = threading.Lock()
-    _cache_ttl = 0.5  # Cache TTL in seconds
+    _cache_ttl: float = 0.5  # Cache TTL in seconds
 
     @classmethod
     def capture_region(
@@ -30,7 +39,19 @@ class ScreenCapture:
         region: Optional[Tuple[int, int, int, int]] = None,
         use_cache: bool = False
     ) -> np.ndarray:
-        """Capture screen or region with optional caching"""
+        """Capture a region of the screen.
+
+        Args:
+            region: Tuple of (x, y, width, height) for the region to capture.
+                   If None, captures the entire primary monitor.
+            use_cache: If True, uses cached screenshot if available and not expired.
+
+        Returns:
+            Screenshot as numpy array in BGR format
+
+        Raises:
+            ImportError: If mss is not installed
+        """
         import mss
 
         cache_key = str(region) if region else "full"
@@ -64,12 +85,19 @@ class ScreenCapture:
 
     @classmethod
     def capture_full(cls, screen: int = 1) -> np.ndarray:
-        """Capture full screen"""
+        """Capture the full primary monitor.
+
+        Args:
+            screen: Monitor index (1 = primary, default)
+
+        Returns:
+            Screenshot as numpy array in BGR format
+        """
         return cls.capture_region(None)
 
     @classmethod
     def clear_cache(cls) -> None:
-        """Clear capture cache"""
+        """Clear all cached screenshots."""
         with cls._cache_lock:
             cls._cache.clear()
 
@@ -77,44 +105,74 @@ class ScreenCapture:
 class OCREngine:
     """OCR engine with EasyOCR and fallback support"""
 
-    _reader = None
-    _languages = ["en"]
-    _lock = threading.Lock()
-
     def __init__(self, languages: List[str] = None):
         self.languages = languages or ["en"]
-        self._init_reader()
+        self._reader = None  # Lazy loaded instance variable
+        self._pytesseract = None
+        self._lock = threading.Lock()
+        self._initialized = False
 
-    def _init_reader(self):
-        """Initialize OCR reader"""
-        try:
-            import easyocr
-            with self._lock:
-                if OCREngine._reader is None or OCREngine._languages != self.languages:
-                    OCREngine._reader = easyocr.Reader(self.languages, gpu=True)
-                    OCREngine._languages = self.languages
-                    logger.info(f"OCR initialized with languages: {self.languages}")
-        except ImportError:
+    def _ensure_initialized(self) -> None:
+        """Lazily initialize the OCR reader"""
+        if self._initialized:
+            return
+
+        with self._lock:
+            if self._initialized:  # Double-check after acquiring lock
+                return
+
             try:
-                import pytesseract
-                self._pytesseract = pytesseract
-                logger.info("Using pytesseract as OCR backend")
+                import easyocr
+                self._reader = easyocr.Reader(self.languages, gpu=True)
+                logger.info(f"OCR initialized with languages: {self.languages}")
             except ImportError:
-                logger.error("No OCR engine available")
+                try:
+                    import pytesseract
+                    self._pytesseract = pytesseract
+                    logger.info("Using pytesseract as OCR backend")
+                except ImportError:
+                    logger.error("No OCR engine available")
+
+            self._initialized = True
+
+    @property
+    def reader(self):
+        """Get the OCR reader (lazy initialization)"""
+        self._ensure_initialized()
+        return self._reader
+
+    @property
+    def pytesseract(self):
+        """Get the pytesseract module (lazy initialization)"""
+        self._ensure_initialized()
+        return self._pytesseract
 
     def read(self, image: np.ndarray) -> str:
-        """Read text from image"""
-        if hasattr(self, '_reader') and self._reader:
+        """Read text from image.
+
+        Args:
+            image: Input image as numpy array
+
+        Returns:
+            Extracted text as string
+        """
+        self._ensure_initialized()
+
+        if self._reader is not None:
             results = self._reader.readtext(image)
             return ' '.join([r[1] for r in results])
-        elif hasattr(self, '_pytesseract'):
+        elif self._pytesseract is not None:
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             return self._pytesseract.image_to_string(gray)
         return ""
 
-    @classmethod
-    def is_available(cls) -> bool:
-        """Check if OCR is available"""
+    @staticmethod
+    def is_available() -> bool:
+        """Check if any OCR engine is available.
+
+        Returns:
+            True if EasyOCR or PyTesseract is installed, False otherwise
+        """
         try:
             import easyocr
             return True
@@ -127,11 +185,38 @@ class OCREngine:
 
 
 class FuzzyMatcher:
-    """Fuzzy text matching using Levenshtein distance"""
+    """Fuzzy text matching using Levenshtein distance.
+
+    Provides methods for calculating string similarity and fuzzy matching
+    with configurable thresholds. Uses case-insensitive comparison.
+
+    Example:
+        >>> matcher = FuzzyMatcher()
+        >>> matcher.similarity("hello", "hello")
+        1.0
+        >>> matcher.match("Hello World", "hello world", threshold=0.9)
+        True
+    """
 
     @staticmethod
     def levenshtein_distance(s1: str, s2: str) -> int:
-        """Calculate Levenshtein distance between two strings"""
+        """Calculate the Levenshtein (edit) distance between two strings.
+
+        The Levenshtein distance is the minimum number of single-character
+        edits (insertions, deletions, or substitutions) required to change
+        one string into the other.
+
+        Args:
+            s1: First string
+            s2: Second string
+
+        Returns:
+            The edit distance between the two strings
+
+        Example:
+            >>> FuzzyMatcher.levenshtein_distance("kitten", "sitting")
+            3
+        """
         if len(s1) < len(s2):
             return FuzzyMatcher.levenshtein_distance(s2, s1)
 
@@ -152,7 +237,24 @@ class FuzzyMatcher:
 
     @staticmethod
     def similarity(s1: str, s2: str) -> float:
-        """Calculate similarity ratio (0-1)"""
+        """Calculate similarity ratio between two strings.
+
+        Uses Levenshtein distance to compute a similarity score between 0 and 1,
+        where 1 means identical strings. Comparison is case-insensitive.
+
+        Args:
+            s1: First string
+            s2: Second string
+
+        Returns:
+            Similarity score between 0.0 and 1.0
+
+        Example:
+            >>> FuzzyMatcher.similarity("hello", "hello")
+            1.0
+            >>> FuzzyMatcher.similarity("hello", "world")
+            0.0
+        """
         if not s1 and not s2:
             return 1.0
         if not s1 or not s2:
@@ -165,7 +267,20 @@ class FuzzyMatcher:
 
     @staticmethod
     def match(text: str, pattern: str, threshold: float = 0.8) -> bool:
-        """Check if pattern matches text above threshold"""
+        """Check if pattern matches text above similarity threshold.
+
+        Args:
+            text: Text to search in
+            pattern: Pattern to match against
+            threshold: Minimum similarity score (0.0 to 1.0), default 0.8
+
+        Returns:
+            True if similarity >= threshold, False otherwise
+
+        Example:
+            >>> FuzzyMatcher.match("Click Here Button", "click here", threshold=0.7)
+            True
+        """
         similarity = FuzzyMatcher.similarity(text, pattern)
         return similarity >= threshold
 

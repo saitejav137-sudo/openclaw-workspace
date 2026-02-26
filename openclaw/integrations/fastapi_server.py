@@ -464,6 +464,11 @@ def create_app(config: VisionConfig = None, rate_limit: RateLimitConfig = None) 
     if rate_limit:
         rate_limiter = RateLimiter(rate_limit)
 
+    # Determine allowed origins from config
+    allowed_origins = []
+    if config and config.allowed_origins:
+        allowed_origins = config.allowed_origins
+
     # Create app
     app = FastAPI(
         title="OpenClaw REST API",
@@ -479,13 +484,20 @@ def create_app(config: VisionConfig = None, rate_limit: RateLimitConfig = None) 
     app.add_middleware(SanitizationMiddleware)
     app.add_middleware(RateLimitMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
+
+    # CORS - secure by default: only allow specific origins if configured
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_origins=allowed_origins if allowed_origins else [],  # Empty = no CORS
+        allow_credentials=True if allowed_origins else False,
+        allow_methods=["GET", "POST", "PUT", "DELETE"] if allowed_origins else [],
+        allow_headers=["Authorization", "Content-Type"] if allowed_origins else [],
     )
+
+    if allowed_origins:
+        logger.info(f"CORS enabled for origins: {allowed_origins}")
+    else:
+        logger.info("CORS disabled (no origins configured)")
 
     # Store app reference for shutdown
     app.state.shutdown_handler = shutdown_handler

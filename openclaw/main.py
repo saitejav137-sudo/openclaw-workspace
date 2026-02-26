@@ -68,7 +68,7 @@ class OpenClaw:
         logger.info(f"Vision engine initialized: {self.config.mode.value}")
 
         # Initialize HTTP server
-        if True:  # Always enable HTTP
+        if self.config.http_enabled:
             self.http_server = VisionHTTPServer(
                 8765, self.config,
                 tls_enabled=self.config.tls_enabled,
@@ -207,6 +207,8 @@ def parse_args():
     parser.add_argument("--notify-title", type=str, default="OpenClaw", help="Notification title")
 
     # Integrations
+    parser.add_argument("--http-enable", dest="http_enabled", action="store_true", default=None, help="Enable HTTP server")
+    parser.add_argument("--http-disable", dest="http_enabled", action="store_false", help="Disable HTTP server")
     parser.add_argument("--gateway-enable", action="store_true", help="Enable gateway")
     parser.add_argument("--gateway-port", type=int, default=18789, help="Gateway port")
 
@@ -300,6 +302,7 @@ def build_config(args) -> VisionConfig:
         telegram_chat_id=args.telegram_chat_id,
         websocket_enabled=args.websocket_enable,
         websocket_port=args.websocket_port,
+        http_enabled=args.http_enabled if args.http_enabled is not None else True,
         api_key=args.api_key,
         rate_limit=args.rate_limit,
         fuzzy_threshold=args.fuzzy_threshold,
