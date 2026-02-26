@@ -60,17 +60,29 @@ class BrowserAgent:
         """Start browser"""
         try:
             from playwright.sync_api import sync_playwright
+            import os
 
             self._playwright = sync_playwright().start()
+
+            # Build launch args
+            launch_args = [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+            ]
+
+            # If not headless, add window size args
+            if not self.headless:
+                launch_args.extend([
+                    '--start-maximized',
+                    '--window-size=1280,720',
+                ])
+
             self._browser = self._playwright.chromium.launch(
                 headless=self.headless,
                 slow_mo=self.slow_mo,
-                args=[
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu',
-                ]
+                args=launch_args
             )
 
             # Create context with default profile
