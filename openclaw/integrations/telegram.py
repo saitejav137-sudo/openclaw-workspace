@@ -90,6 +90,7 @@ class TelegramBot:
         # Initialize browser agent for direct browser control
         self.browser_agent_available = BROWSER_AGENT_AVAILABLE
         self.browser_agent = None
+        self._browser_headless = True  # Run headless for Chrome Remote Desktop compatibility
 
         if self.enabled:
             self._register_default_commands()
@@ -332,7 +333,7 @@ class TelegramBot:
 
         try:
             if self.browser_agent is None:
-                headless = False  # Show browser for user to see
+                headless = True  # Run headless for Chrome Remote Desktop compatibility
                 self.browser_agent = get_browser_agent(headless=headless)
                 info = self.browser_agent.get_page_info()
                 return f"Browser started!\nURL: {info.get('url', 'blank')}\nTitle: {info.get('title', 'New tab')}"
@@ -405,15 +406,39 @@ class TelegramBot:
             return f"Error: {str(e)}"
 
     def _handle_browser_screenshot(self, args: List[str]) -> str:
-        """Handle /screenshot command - take screenshot"""
+        """Handle /screenshot command - take screenshot and send to Telegram"""
         if not self.browser_agent:
             return "Browser not started. Use /browser first"
 
         try:
             result = self.browser_agent.screenshot()
             if result.success and result.screenshot:
-                # Return base64 for now - bot can send as photo
-                return f"Screenshot taken! ({len(result.screenshot)} bytes base64)\nUse /browse command to view in browser"
+                # Save screenshot to temp file
+                import base64
+                import tempfile
+                import os
+
+                # Decode base64
+                img_data = base64.b64decode(result.screenshot)
+
+                # Save to temp file
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+                    f.write(img_data)
+                    temp_path = f.name
+
+                # Send to Telegram
+                info = self.browser_agent.get_page_info()
+                caption = f"Screen: {info.get('title', 'Unknown')}"
+
+                sent = self.send_photo(temp_path, caption)
+
+                # Clean up
+                os.unlink(temp_path)
+
+                if sent:
+                    return f"Screenshot sent!"
+                else:
+                    return f"Screenshot taken but failed to send"
             else:
                 return f"Screenshot failed: {result.error}"
         except Exception as e:
