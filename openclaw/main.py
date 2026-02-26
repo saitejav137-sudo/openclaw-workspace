@@ -6,8 +6,8 @@ import argparse
 import signal
 import time
 
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add parent directory to path (to import openclaw package)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from openclaw.core import (
     VisionConfig,
