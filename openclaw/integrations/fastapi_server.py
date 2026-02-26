@@ -629,7 +629,7 @@ async def trigger(
         # Broadcast to WebSocket clients
         await manager.broadcast({
             "type": "trigger",
-            "data": asdict(response)
+            "data": response.model_dump()  # Use Pydantic's model_dump()
         })
 
         return response
