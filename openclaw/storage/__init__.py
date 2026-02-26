@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from contextlib import contextmanager
 from datetime import datetime
 
-from ..core.logger import get_logger
+from core.logger import get_logger
 
 logger = get_logger("storage")
 

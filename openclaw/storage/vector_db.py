@@ -17,7 +17,7 @@ import hashlib
 
 import numpy as np
 
-from ..core.logger import get_logger
+from core.logger import get_logger
 
 logger = get_logger("vector_db")
 

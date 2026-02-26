@@ -14,8 +14,8 @@ from enum import Enum
 import numpy as np
 import cv2
 
-from ..core.vision import ScreenCapture
-from ..core.logger import get_logger
+from .vision import ScreenCapture
+from .logger import get_logger
 
 logger = get_logger("blip")
 
