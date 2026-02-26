@@ -45,6 +45,22 @@ from .browser_agent import (
     get_browser_agent,
     close_browser_agent,
 )
+from .browser_api import (
+    browser_start,
+    browser_goto,
+    browser_click,
+    browser_click_text,
+    browser_type,
+    browser_input,
+    browser_submit,
+    browser_extract,
+    browser_extract_all,
+    browser_screenshot,
+    browser_info,
+    browser_close,
+    execute_browser_action,
+    quick_browse,
+)
 
 __all__ = [
     "VisionHTTPServer",

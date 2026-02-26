@@ -188,6 +188,10 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             self._handle_modern_dashboard()
         elif path == "/api/config":
             self._handle_get_config()
+        elif path == "/api/browser/info":
+            self._handle_browser_info()
+        elif path == "/api/browser/extract_all":
+            self._handle_browser_extract_all()
         else:
             # Default: run vision trigger
             self._handle_trigger()
@@ -205,6 +209,8 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             self._handle_trigger()
         elif path == "/api/config":
             self._handle_set_config()
+        elif path == "/api/browser":
+            self._handle_browser_action()
         else:
             self._send_error(404, "Not found")
 
@@ -328,6 +334,44 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
         """Update configuration"""
         # Would update config
         self._send_json({"status": "ok"})
+
+    def _handle_browser_info(self):
+        """Get browser info"""
+        try:
+            from .browser_api import browser_info
+            result = browser_info()
+            self._send_json(result)
+        except Exception as e:
+            self._send_json({"success": False, "error": str(e)})
+
+    def _handle_browser_extract_all(self):
+        """Extract all text from browser"""
+        try:
+            from .browser_api import browser_extract_all
+            result = browser_extract_all()
+            self._send_json(result)
+        except Exception as e:
+            self._send_json({"success": False, "error": str(e)})
+
+    def _handle_browser_action(self):
+        """Handle browser action"""
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > 0:
+                body = self.rfile.read(content_length)
+                data = json.loads(body.decode('utf-8'))
+            else:
+                data = {}
+
+            from .browser_api import execute_browser_action
+
+            action = data.get("action", "")
+            params = data.get("params", {})
+
+            result = execute_browser_action(action, params)
+            self._send_json(result)
+        except Exception as e:
+            self._send_json({"success": False, "error": str(e)})
 
     def _generate_dashboard(self) -> str:
         """Generate dashboard HTML"""
