@@ -11,7 +11,10 @@ import json
 
 
 class StructuredFormatter(logging.Formatter):
-    """JSON formatter for structured logging"""
+    """JSON formatter for structured logging with correlation ID support"""
+
+    # Thread-local storage for correlation ID
+    _correlation_id = None
 
     def format(self, record: logging.LogRecord) -> str:
         log_data = {
@@ -21,7 +24,8 @@ class StructuredFormatter(logging.Formatter):
             "message": record.getMessage(),
             "module": record.module,
             "function": record.funcName,
-            "line": record.lineno
+            "line": record.lineno,
+            "correlation_id": getattr(record, "correlation_id", None) or self._correlation_id or "N/A"
         }
 
         if record.exc_info:
@@ -31,6 +35,16 @@ class StructuredFormatter(logging.Formatter):
             log_data.update(record.extra_data)
 
         return json.dumps(log_data)
+
+    @classmethod
+    def set_correlation_id(cls, correlation_id: str):
+        """Set correlation ID for current thread/request"""
+        cls._correlation_id = correlation_id
+
+    @classmethod
+    def clear_correlation_id(cls):
+        """Clear correlation ID"""
+        cls._correlation_id = None
 
 
 class ColoredFormatter(logging.Formatter):

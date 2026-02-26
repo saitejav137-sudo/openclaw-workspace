@@ -5,6 +5,7 @@ from .telegram import TelegramBot
 from .websocket import WebSocketManager, WebSocketManagerSync
 from .streaming import StreamingServer, StreamManager, create_default_stream
 from .rest_api import RESTServer, RESTAPIHandler, TriggerStore, OPENAPI_SPEC
+from .fastapi_server import app as FastAPIApp, create_app, ConnectionManager, manager
 from .auth import (
     AuthManager,
     User,
@@ -31,6 +32,10 @@ __all__ = [
     "RESTAPIHandler",
     "TriggerStore",
     "OPENAPI_SPEC",
+    "FastAPIApp",
+    "create_app",
+    "ConnectionManager",
+    "manager",
     "AuthManager",
     "User",
     "UserRole",

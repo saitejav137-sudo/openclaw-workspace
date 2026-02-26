@@ -171,7 +171,7 @@ class CircuitBreaker:
         """Check if circuit is open"""
         if self._state == "open":
             # Check if recovery timeout has passed
-            if time.time() - self._last_failure_time > self._recovery_timeout:
+            if time.time() - self._last_failure_time > self.recovery_timeout:
                 self._state = "half_open"
                 return False
             return True
