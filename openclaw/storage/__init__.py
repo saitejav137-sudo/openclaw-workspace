@@ -262,3 +262,6 @@ __all__ = [
     "DatabaseManager",
     "TriggerRecord",
 ]
+
+# Import new database module
+from .database import DatabaseManager as AdvancedDatabaseManager, DatabaseConfig, DatabaseType

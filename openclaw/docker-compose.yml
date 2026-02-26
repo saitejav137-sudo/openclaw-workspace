@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  openclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: openclaw:latest
+    container_name: openclaw
+    environment:
+      - OPENCLAW_MODE=ocr
+      - OPENCLAW_POLL=true
+      - OPENCLAW_POLL_INTERVAL=0.5
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:-}
+      - OPENCLAW_DB_ENABLED=true
+      - OPENCLAW_DB_PATH=/data/openclaw.db
+      - OPENCLAW_LOG_ENABLED=true
+      - OPENCLAY_LOG_FILE=/data/logs/openclaw.log
+      - OPENCLAW_WEBHOOK_URL=${OPENCLAW_WEBHOOK_URL:-}
+      - OPENCLAW_TELEGRAM_ENABLED=${OPENCLAW_TELEGRAM_ENABLED:-false}
+      - OPENCLAW_TELEGRAM_TOKEN=${OPENCLAW_TELEGRAM_TOKEN:-}
+      - OPENCLAW_TELEGRAM_CHAT_ID=${OPENCLAW_TELEGRAM_CHAT_ID:-}
+      - OPENCLAW_WEBSOCKET_ENABLED=true
+      - OPENCLAW_STREAM_ENABLED=true
+    volumes:
+      - ./data:/data
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./config:/config:ro
+    ports:
+      - "8765:8765"  # HTTP API
+      - "8766:8766"  # WebSocket
+      - "8888:8888"  # Streaming
+    devices:
+      - /dev/video0:/dev/video0  # Optional: for video capture
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: openclaw-db
+    environment:
+      - POSTGRES_USER=openclaw
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-openclaw123}
+      - POSTGRES_DB=openclaw
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    profiles:
+      - database
+
+  # Optional: Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: openclaw-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    profiles:
+      - cache
+
+  # Optional: Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: openclaw-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: openclaw-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+      - postgres
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: openclaw-network
