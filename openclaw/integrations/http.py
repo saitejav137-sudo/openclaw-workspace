@@ -211,6 +211,8 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             self._handle_set_config()
         elif path == "/api/browser":
             self._handle_browser_action()
+        elif path == "/api/smart":
+            self._handle_smart_browse()
         else:
             self._send_error(404, "Not found")
 
@@ -369,6 +371,25 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             params = data.get("params", {})
 
             result = execute_browser_action(action, params)
+            self._send_json(result)
+        except Exception as e:
+            self._send_json({"success": False, "error": str(e)})
+
+    def _handle_smart_browse(self):
+        """Handle smart natural language browser control"""
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > 0:
+                body = self.rfile.read(content_length)
+                data = json.loads(body.decode('utf-8'))
+            else:
+                data = {}
+
+            instruction = data.get("instruction", "")
+
+            from .browser_api import smart_browse
+
+            result = smart_browse(instruction)
             self._send_json(result)
         except Exception as e:
             self._send_json({"success": False, "error": str(e)})

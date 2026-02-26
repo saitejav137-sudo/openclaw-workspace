@@ -263,6 +263,80 @@ def quick_browse(url: str) -> Dict[str, Any]:
     return browser_extract_all()
 
 
+def smart_browse(instruction: str) -> Dict[str, Any]:
+    """
+    Smart browser control - understands natural language instructions.
+
+    Examples:
+    - "go to gemini.google.com"
+    - "search for python tutorial"
+    - "click the submit button"
+    - "type hello in the search box"
+    """
+    instruction = instruction.lower().strip()
+
+    try:
+        agent = get_browser_controller()
+
+        # Ensure browser is started
+        if not agent._initialized:
+            result = browser_start()
+            if not result.get("success"):
+                return result
+
+        # Parse instruction
+        if "go to " in instruction or instruction.startswith("http"):
+            # Extract URL
+            url = instruction.replace("go to ", "").strip()
+            if not url.startswith("http"):
+                url = "https://" + url
+            return browser_goto(url)
+
+        elif "search for " in instruction or "search " in instruction:
+            # Extract search query
+            query = instruction.replace("search for ", "").replace("search ", "").strip()
+            # Go to Google and search
+            result = browser_goto("https://www.google.com")
+            if not result.get("success"):
+                return result
+            # Type in search box and submit
+            result = browser_input(query)
+            if not result.get("success"):
+                return result
+            return browser_submit()
+
+        elif instruction.startswith("click ") or "click the " in instruction:
+            # Extract what to click
+            text = instruction.replace("click the ", "").replace("click ", "").strip()
+            return browser_click_text(text)
+
+        elif instruction.startswith("type ") or "input " in instruction or "enter " in instruction:
+            # Extract text to type
+            text = instruction.replace("type ", "").replace("input ", "").replace("enter ", "").strip()
+            return browser_input(text)
+
+        elif "submit" in instruction or "press enter" in instruction:
+            return browser_submit()
+
+        elif "get page" in instruction or "extract" in instruction or "show" in instruction:
+            return browser_extract_all()
+
+        elif "screenshot" in instruction:
+            return browser_screenshot()
+
+        elif "info" in instruction or "status" in instruction:
+            return browser_info()
+
+        elif "close" in instruction or "quit" in instruction:
+            return browser_close()
+
+        else:
+            return {"success": False, "message": f"Unknown instruction: {instruction}. Try: 'go to <url>', 'search for <query>', 'click <text>', 'type <text>', 'submit', 'extract all'"}
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 __all__ = [
     "browser_start",
     "browser_goto",
