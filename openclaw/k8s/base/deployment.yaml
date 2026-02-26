@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openclaw
+  namespace: openclaw
+  labels:
+    app.kubernetes.io/name: openclaw
+    app.kubernetes.io/component: server
+    app.kubernetes.io/version: "2.0.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openclaw
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: openclaw
+        app.kubernetes.io/component: server
+    spec:
+      serviceAccountName: openclaw
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: openclaw
+          image: openclaw:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8765
+              protocol: TCP
+            - name: websocket
+              containerPort: 8766
+              protocol: TCP
+            - name: stream
+              containerPort: 8888
+              protocol: TCP
+          env:
+            - name: OPENCLAW_MODE
+              value: "ocr"
+            - name: OPENCLAW_POLL
+              value: "true"
+            - name: OPENCLAW_POLL_INTERVAL
+              value: "0.5"
+          envFrom:
+            - configMapRef:
+                name: openclaw-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: x11-socket
+              mountPath: /tmp/.X11-unix
+              readOnly: true
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: x11-socket
+          hostPath:
+            path: /tmp/.X11-unix
+      tolerations:
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoSchedule"
+          tolerationSeconds: 30

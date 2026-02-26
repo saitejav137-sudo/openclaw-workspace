@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openclaw
+  namespace: openclaw
+  labels:
+    app.kubernetes.io/name: openclaw
+    app.kubernetes.io/component: server
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8765
+      targetPort: http
+      protocol: TCP
+    - name: websocket
+      port: 8766
+      targetPort: websocket
+      protocol: TCP
+    - name: stream
+      port: 8888
+      targetPort: stream
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: openclaw
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openclaw-lb
+  namespace: openclaw
+  labels:
+    app.kubernetes.io/name: openclaw
+    app.kubernetes.io/component: loadbalancer
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: websocket
+      port: 8766
+      targetPort: websocket
+      protocol: TCP
+    - name: stream
+      port: 8888
+      targetPort: stream
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: openclaw

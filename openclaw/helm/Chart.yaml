@@ -1,0 +1,17 @@
+apiVersion: v2
+name: openclaw
+description: Vision-based automation framework
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+keywords:
+  - automation
+  - vision
+  - ocr
+  - computer-vision
+home: https://github.com/saitejav137-sudo/openclaw-workspace
+sources:
+  - https://github.com/saitejav137-sudo/openclaw-workspace
+maintainers:
+  - name: OpenClaw Team
+    email: team@openclaw.dev

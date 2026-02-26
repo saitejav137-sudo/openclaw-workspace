@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: openclaw
+
+resources:
+  - namespace.yaml
+  - rbac.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/name: openclaw
+  app.kubernetes.io/version: "2.0.0"
+
+configMapGenerator:
+  - name: openclaw-config
+    literals:
+      - OPENCLAW_VERSION=2.0.0
+
+images:
+  - name: openclaw
+    newTag: "2.0.0"

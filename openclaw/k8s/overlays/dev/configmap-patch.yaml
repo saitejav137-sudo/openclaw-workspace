@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openclaw-config
+data:
+  OPENCLAW_DEBUG: "true"
+  OPENCLAW_LOG_LEVEL: "debug"

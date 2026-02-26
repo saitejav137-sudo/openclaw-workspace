@@ -1,0 +1,107 @@
+# Default values for OpenClaw
+replicaCount: 1
+
+image:
+  repository: openclaw
+  pullPolicy: IfNotPresent
+  tag: "2.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+rbac:
+  create: true
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+service:
+  type: ClusterIP
+  ports:
+    http: 8765
+    websocket: 8766
+    stream: 8888
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/websocket-services: "openclaw"
+  hosts:
+    - host: openclaw.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: openclaw-tls
+  #    hosts:
+  #      - openclaw.local
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations:
+  - key: "node.kubernetes.io/not-ready"
+    operator: "Exists"
+    effect: "NoSchedule"
+    tolerationSeconds: 30
+
+affinity: {}
+
+# OpenClaw configuration
+config:
+  mode: ocr
+  poll: true
+  pollInterval: 0.5
+  apiKey: ""
+  db:
+    enabled: true
+    path: "/data/openclaw.db"
+  logging:
+    enabled: true
+    level: info
+    file: "/data/logs/openclaw.log"
+  websocket:
+    enabled: true
+  streaming:
+    enabled: true
+
+# Persistent storage
+persistence:
+  enabled: false
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi

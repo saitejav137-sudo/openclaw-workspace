@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openclaw.fullname" . }}
+  labels:
+    {{- include "openclaw.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openclaw.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "openclaw.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openclaw.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.ports.http }}
+              protocol: TCP
+            - name: websocket
+              containerPort: {{ .Values.service.ports.websocket }}
+              protocol: TCP
+            - name: stream
+              containerPort: {{ .Values.service.ports.stream }}
+              protocol: TCP
+          env:
+            - name: OPENCLAW_MODE
+              value: {{ .Values.config.mode | quote }}
+            - name: OPENCLAW_POLL
+              value: {{ .Values.config.poll | quote }}
+            - name: OPENCLAW_POLL_INTERVAL
+              value: {{ .Values.config.pollInterval | quote }}
+            - name: OPENCLAW_API_KEY
+              value: {{ .Values.config.apiKey | quote }}
+            - name: OPENCLAW_DB_ENABLED
+              value: {{ .Values.config.db.enabled | quote }}
+            - name: OPENCLAW_LOG_ENABLED
+              value: {{ .Values.config.logging.enabled | quote }}
+            - name: OPENCLAW_LOG_LEVEL
+              value: {{ .Values.config.logging.level | quote }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            {{- toYaml .Values.probes | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            {{- toYaml .Values.probes | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "openclaw.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}
