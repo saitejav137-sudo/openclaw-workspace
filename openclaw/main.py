@@ -69,7 +69,12 @@ class OpenClaw:
 
         # Initialize HTTP server
         if True:  # Always enable HTTP
-            self.http_server = VisionHTTPServer(8765, self.config)
+            self.http_server = VisionHTTPServer(
+                8765, self.config,
+                tls_enabled=self.config.tls_enabled,
+                cert_path=self.config.tls_cert_path,
+                key_path=self.config.tls_key_path
+            )
             logger.info("HTTP server initialized on port 8765")
 
         # Initialize Telegram

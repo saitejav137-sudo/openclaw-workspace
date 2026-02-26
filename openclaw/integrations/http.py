@@ -5,6 +5,8 @@ import hashlib
 import threading
 import json
 import base64
+import ssl
+import os
 from typing import Optional, Dict, Any, Callable
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from dataclasses import dataclass
@@ -58,6 +60,51 @@ class RateLimiter:
         with self._lock:
             self.allowance = self.rate
             self.last_check = time.time()
+
+
+# Input validation functions
+import re
+from urllib.parse import urlparse
+
+
+def validate_url(url: str) -> bool:
+    """Validate URL is safe and well-formed"""
+    if not url or len(url) > 2048:
+        return False
+    try:
+        parsed = urlparse(url)
+        return parsed.scheme in ('http', 'https') and parsed.netloc
+    except Exception:
+        return False
+
+
+def validate_action(action: str) -> bool:
+    """Validate browser action name"""
+    valid_actions = {
+        "start", "goto", "click", "click_text", "type", "input",
+        "submit", "extract", "extract_all", "screenshot", "info", "close"
+    }
+    return action in valid_actions
+
+
+def sanitize_string(s: str, max_length: int = 1000) -> str:
+    """Sanitize string input"""
+    if not isinstance(s, str):
+        return ""
+    # Remove null bytes and control characters
+    s = s.replace('\x00', '')
+    # Trim to max length
+    return s[:max_length].strip()
+
+
+def validate_selector(selector: str) -> bool:
+    """Validate CSS selector"""
+    if not selector or len(selector) > 500:
+        return False
+    # Basic validation - no dangerous characters
+    dangerous = ['<script', 'javascript:', 'onerror', 'onclick']
+    lower = selector.lower()
+    return not any(d in lower for d in dangerous)
 
 
 class APIKeyAuth:
@@ -365,13 +412,34 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             else:
                 data = {}
 
-            from .browser_api import execute_browser_action
+            # Validate action
+            action = sanitize_string(data.get("action", ""))
+            if not action or not validate_action(action):
+                self._send_json({"success": False, "error": "Invalid action"})
+                return
 
-            action = data.get("action", "")
             params = data.get("params", {})
+
+            # Validate URL for goto action
+            if action == "goto":
+                url = params.get("url", "")
+                if not validate_url(url):
+                    self._send_json({"success": False, "error": "Invalid URL"})
+                    return
+
+            # Validate selector for click/type actions
+            if action in ("click", "type"):
+                selector = params.get("selector", "")
+                if not validate_selector(selector):
+                    self._send_json({"success": False, "error": "Invalid selector"})
+                    return
+
+            from .browser_api import execute_browser_action
 
             result = execute_browser_action(action, params)
             self._send_json(result)
+        except json.JSONDecodeError:
+            self._send_json({"success": False, "error": "Invalid JSON"})
         except Exception as e:
             self._send_json({"success": False, "error": str(e)})
 
@@ -385,12 +453,18 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             else:
                 data = {}
 
-            instruction = data.get("instruction", "")
+            # Validate and sanitize instruction
+            instruction = sanitize_string(data.get("instruction", ""), max_length=5000)
+            if not instruction:
+                self._send_json({"success": False, "error": "Empty instruction"})
+                return
 
             from .browser_api import smart_browse
 
             result = smart_browse(instruction)
             self._send_json(result)
+        except json.JSONDecodeError:
+            self._send_json({"success": False, "error": "Invalid JSON"})
         except Exception as e:
             self._send_json({"success": False, "error": str(e)})
 
@@ -506,9 +580,13 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
 class VisionHTTPServer:
     """HTTP server with vision capabilities"""
 
-    def __init__(self, port: int, config: VisionConfig):
+    def __init__(self, port: int, config: VisionConfig, tls_enabled: bool = False,
+                 cert_path: str = "", key_path: str = ""):
         self.port = port
         self.config = config
+        self.tls_enabled = tls_enabled
+        self.cert_path = cert_path
+        self.key_path = key_path
         self.server: Optional[HTTPServer] = None
         self.vision_engine = VisionEngine(config)
 
@@ -523,12 +601,74 @@ class VisionHTTPServer:
         VisionHTTPHandler.auth = self.auth
         VisionHTTPHandler.rate_limiter = self.rate_limiter
 
+    @staticmethod
+    def generate_self_signed_cert(cert_path: str = "/tmp/openclaw.crt",
+                                   key_path: str = "/tmp/openclaw.key"):
+        """Generate self-signed certificate for development"""
+        import subprocess
+
+        # Check if openssl is available
+        try:
+            subprocess.run(["openssl", "version"], check=True, capture_output=True)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            logger.warning("OpenSSL not available, cannot generate cert")
+            return None, None
+
+        # Generate self-signed certificate
+        cmd = [
+            "openssl", "req", "-x509", "-newkey", "rsa:2048",
+            "-keyout", key_path, "-out", cert_path,
+            "-days", "365", "-nodes",
+            "-subj", "/CN=localhost/O=OpenClaw/C=US"
+        ]
+
+        try:
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Generated self-signed cert: {cert_path}")
+            return cert_path, key_path
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to generate cert: {e}")
+            return None, None
+
+    def _create_ssl_context(self) -> ssl.SSLContext:
+        """Create SSL context for HTTPS"""
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+
+        # Load certificate and key
+        if self.cert_path and self.key_path:
+            if os.path.exists(self.cert_path) and os.path.exists(self.key_path):
+                context.load_cert_chain(self.cert_path, self.key_path)
+                logger.info(f"Loaded TLS cert: {self.cert_path}")
+            else:
+                logger.warning(f"Cert or key file not found, generating self-signed")
+                cert, key = self.generate_self_signed_cert()
+                if cert and key:
+                    context.load_cert_chain(cert, key)
+        else:
+            # Generate self-signed for development
+            cert, key = self.generate_self_signed_cert()
+            if cert and key:
+                context.load_cert_chain(cert, key)
+
+        return context
+
     def start(self):
         """Start the HTTP server"""
         self.server = HTTPServer(("0.0.0.0", self.port), VisionHTTPHandler)
-        logger.info(f"HTTP server started on 0.0.0.0:{self.port}")
+
+        # Wrap with TLS if enabled
+        if self.tls_enabled:
+            ssl_context = self._create_ssl_context()
+            self.server.socket = ssl_context.wrap_socket(
+                self.server.socket, server_side=True
+            )
+            protocol = "HTTPS"
+        else:
+            protocol = "HTTP"
+
+        logger.info(f"{protocol} server started on 0.0.0.0:{self.port}")
         logger.info(f"API Key: {'Enabled' if self.auth.enabled else 'Disabled'}")
-        logger.info("Rate Limit: Disabled")
+        logger.info(f"TLS: {'Enabled' if self.tls_enabled else 'Disabled'}")
 
         try:
             self.server.serve_forever()

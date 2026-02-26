@@ -1,270 +1,71 @@
-"""Core modules for OpenClaw"""
+"""
+Core modules for OpenClaw
 
+This module uses lazy imports to avoid loading all submodules at startup.
+Import specific modules directly when needed for better performance.
+
+Example:
+    from openclaw.core.vision import VisionEngine
+    from openclaw.core.actions import TriggerAction
+"""
+
+# Lazy imports for commonly used classes
+def __getattr__(name):
+    """Lazy import attributes on demand"""
+
+    # Vision module
+    if name == "VisionEngine":
+        from .vision import VisionEngine
+        return VisionEngine
+    elif name == "ScreenCapture":
+        from .vision import ScreenCapture
+        return ScreenCapture
+    elif name == "OCREngine":
+        from .vision import OCREngine
+        return OCREngine
+    elif name == "VisionConfig":
+        from .config import VisionConfig
+        return VisionConfig
+    elif name == "VisionMode":
+        from .config import VisionMode
+        return VisionMode
+    elif name == "ConfigManager":
+        from .config import ConfigManager
+        return ConfigManager
+
+    # Actions module
+    elif name == "TriggerAction":
+        from .actions import TriggerAction
+        return TriggerAction
+    elif name == "ActionSequence":
+        from .actions import ActionSequence
+        return ActionSequence
+    elif name == "RetryConfig":
+        from .actions import RetryConfig
+        return RetryConfig
+
+    # Logger
+    elif name == "get_logger":
+        from .logger import get_logger
+        return get_logger
+    elif name == "setup_logging":
+        from .logger import setup_logging
+        return setup_logging
+
+    # AI
+    elif name == "NLInterface":
+        from .ai import NLInterface
+        return NLInterface
+
+    # Automation
+    elif name == "get_automation_backend":
+        from .automation import get_automation_backend
+        return get_automation_backend
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+# Direct imports for backwards compatibility
+# These are loaded on first import of the module
 from .config import VisionConfig, VisionMode, ConfigManager, ConfigValidationError
-from .vision import (
-    VisionEngine,
-    ScreenCapture,
-    OCREngine,
-    FuzzyMatcher,
-    TemplateMatcher,
-    ColorDetector,
-    ChangeDetector,
-    RegressionDetector
-)
-from .actions import (
-    RetryConfig,
-    RetryStrategy,
-    ActionExecutor,
-    KeyboardAction,
-    MouseAction,
-    ActionSequence,
-    TriggerAction
-)
 from .logger import Logger, get_logger, setup_logging
-from .scheduler import Scheduler, ScheduleType, ScheduleJob, get_scheduler
-from .workflow import WorkflowManager, Workflow, NodeType, WorkflowExecutor
-from .window import WindowMonitor, WindowAction, start_window_monitor, stop_window_monitor, get_window_monitor
-from .voice import VoiceEngine, VoiceTrigger, VoiceConfig, VoiceCommand, VoiceBackend, create_voice_trigger
-from .ai import NLInterface, NLPParser, NLPConfig, AutomationIntent, NLPMode, create_nlp_interface
-from .hot_reload import HotReloader, ConfigReloader, ReloadEvent, ReloadType, create_reloader
-from .anomaly import (
-    AnomalyDetector,
-    Anomaly,
-    AnomalyType,
-    TriggerEvent,
-    StatisticalAnalyzer,
-    MovingAverageDetector,
-    PatternDetector,
-    get_anomaly_detector
-)
-from .automation import (
-    Platform,
-    AutomationBackend,
-    LinuxAutomationBackend,
-    WindowsAutomationBackend,
-    MacOSAutomationBackend,
-    get_platform,
-    create_automation_backend,
-    get_automation_backend,
-    press,
-    type_text,
-    click,
-    move_to,
-    get_screen_size,
-    get_cursor_position,
-    Point,
-    Key
-)
-from .blip import (
-    BLIPEngine,
-    BLIPModelType,
-    CaptionResult,
-    VQAResult,
-    MiniMaxAI,
-    get_blip_engine,
-    get_minimax_ai,
-    analyze_screen_with_blip,
-    caption_screen,
-    ask_screen
-)
-from .recorder import (
-    ScreenRecorder,
-    RecordingConfig,
-    RecordingSession,
-    RecordingFormat,
-    RecordingQuality,
-    get_recorder,
-    start_recording,
-    stop_recording,
-    record_on_trigger
-)
-from .ai_advanced import (
-    YOLOVersion,
-    YOLODetector,
-    DetectionResult,
-    SAMSegmenter,
-    AgenticAI,
-    AgentState,
-    AgentAction,
-    EventDrivenOrchestrator,
-    EventType,
-    AutomationEvent,
-    MultiAgentCoordinator,
-    AgentInfo,
-    MCPClient,
-    get_yolo_detector,
-    get_sam_segmenter,
-    get_agentic_ai,
-    get_event_orchestrator,
-    get_multi_agent_coordinator,
-)
-from .streaming_analysis import (
-    StreamSource,
-    StreamConfig,
-    AnalysisResult,
-    StreamProcessor,
-    OpticalFlowDetector,
-    get_stream_processor,
-    get_optical_flow_detector,
-)
-from .agent_memory import (
-    MemoryType,
-    Memory,
-    MemoryQuery,
-    AgentMemory,
-    get_agent_memory,
-    remember_episodic,
-    remember_fact,
-    recall,
-)
-from .workspace import (
-    EnvironmentType,
-    WorkspaceConfig,
-    WorkspaceManager,
-    get_workspace_manager,
-    get_current_workspace,
-    switch_workspace,
-    is_development,
-    is_staging,
-    is_production
-)
-
-__all__ = [
-    "VisionConfig",
-    "VisionMode",
-    "ConfigManager",
-    "ConfigValidationError",
-    "VisionEngine",
-    "ScreenCapture",
-    "OCREngine",
-    "FuzzyMatcher",
-    "TemplateMatcher",
-    "ColorDetector",
-    "ChangeDetector",
-    "RegressionDetector",
-    "RetryConfig",
-    "RetryStrategy",
-    "ActionExecutor",
-    "KeyboardAction",
-    "MouseAction",
-    "ActionSequence",
-    "TriggerAction",
-    "Logger",
-    "get_logger",
-    "setup_logging",
-    "Scheduler",
-    "ScheduleType",
-    "ScheduleJob",
-    "get_scheduler",
-    "WorkflowManager",
-    "Workflow",
-    "NodeType",
-    "WorkflowExecutor",
-    "WindowMonitor",
-    "WindowAction",
-    "start_window_monitor",
-    "stop_window_monitor",
-    "get_window_monitor",
-    "VoiceEngine",
-    "VoiceTrigger",
-    "VoiceConfig",
-    "VoiceCommand",
-    "VoiceBackend",
-    "create_voice_trigger",
-    "NLInterface",
-    "NLPParser",
-    "NLPConfig",
-    "AutomationIntent",
-    "NLPMode",
-    "create_nlp_interface",
-    "HotReloader",
-    "ConfigReloader",
-    "ReloadEvent",
-    "ReloadType",
-    "create_reloader",
-    "AnomalyDetector",
-    "Anomaly",
-    "AnomalyType",
-    "TriggerEvent",
-    "StatisticalAnalyzer",
-    "MovingAverageDetector",
-    "PatternDetector",
-    "get_anomaly_detector",
-    "Platform",
-    "AutomationBackend",
-    "LinuxAutomationBackend",
-    "WindowsAutomationBackend",
-    "MacOSAutomationBackend",
-    "get_platform",
-    "create_automation_backend",
-    "get_automation_backend",
-    "press",
-    "type_text",
-    "click",
-    "move_to",
-    "get_screen_size",
-    "get_cursor_position",
-    "Point",
-    "Key",
-    "BLIPEngine",
-    "BLIPModelType",
-    "CaptionResult",
-    "VQAResult",
-    "MiniMaxAI",
-    "get_blip_engine",
-    "get_minimax_ai",
-    "analyze_screen_with_blip",
-    "caption_screen",
-    "ask_screen",
-    "ScreenRecorder",
-    "RecordingConfig",
-    "RecordingSession",
-    "RecordingFormat",
-    "RecordingQuality",
-    "get_recorder",
-    "start_recording",
-    "stop_recording",
-    "record_on_trigger",
-    "YOLOVersion",
-    "YOLODetector",
-    "DetectionResult",
-    "SAMSegmenter",
-    "AgenticAI",
-    "AgentState",
-    "AgentAction",
-    "EventDrivenOrchestrator",
-    "EventType",
-    "AutomationEvent",
-    "MultiAgentCoordinator",
-    "AgentInfo",
-    "MCPClient",
-    "get_yolo_detector",
-    "get_sam_segmenter",
-    "get_agentic_ai",
-    "get_event_orchestrator",
-    "get_multi_agent_coordinator",
-    "StreamSource",
-    "StreamConfig",
-    "AnalysisResult",
-    "StreamProcessor",
-    "OpticalFlowDetector",
-    "get_stream_processor",
-    "get_optical_flow_detector",
-    "MemoryType",
-    "Memory",
-    "MemoryQuery",
-    "AgentMemory",
-    "get_agent_memory",
-    "remember_episodic",
-    "remember_fact",
-    "recall",
-    "EnvironmentType",
-    "WorkspaceConfig",
-    "WorkspaceManager",
-    "get_workspace_manager",
-    "get_current_workspace",
-    "switch_workspace",
-    "is_development",
-    "is_staging",
-    "is_production",
-]

@@ -46,7 +46,7 @@ services:
     container_name: openclaw-db
     environment:
       - POSTGRES_USER=openclaw
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-openclaw123}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=openclaw
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -84,7 +84,7 @@ services:
     image: grafana/grafana:latest
     container_name: openclaw-grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
     ports:

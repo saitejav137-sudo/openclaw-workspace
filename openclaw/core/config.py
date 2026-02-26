@@ -260,6 +260,11 @@ class VisionConfig:
     api_key: Optional[str] = None
     rate_limit: int = 60  # requests per minute
 
+    # TLS/HTTPS
+    tls_enabled: bool = False
+    tls_cert_path: str = ""
+    tls_key_path: str = ""
+
     # General
     capture_screen: int = 0
     action: str = "alt+o"
