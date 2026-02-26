@@ -107,6 +107,16 @@ from .streaming_analysis import (
     get_stream_processor,
     get_optical_flow_detector,
 )
+from .agent_memory import (
+    MemoryType,
+    Memory,
+    MemoryQuery,
+    AgentMemory,
+    get_agent_memory,
+    remember_episodic,
+    remember_fact,
+    recall,
+)
 from .workspace import (
     EnvironmentType,
     WorkspaceConfig,
@@ -240,6 +250,14 @@ __all__ = [
     "OpticalFlowDetector",
     "get_stream_processor",
     "get_optical_flow_detector",
+    "MemoryType",
+    "Memory",
+    "MemoryQuery",
+    "AgentMemory",
+    "get_agent_memory",
+    "remember_episodic",
+    "remember_fact",
+    "recall",
     "EnvironmentType",
     "WorkspaceConfig",
     "WorkspaceManager",
