@@ -1,0 +1,281 @@
+[
+	{
+		"id": 1,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "googlevideo.com",
+			"initiatorDomains": [
+				"9anime.to"
+			],
+			"resourceTypes": [
+				"object"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 2,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "ebaystatic.com",
+			"resourceTypes": [
+				"image"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 3,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "000webhost.com",
+			"resourceTypes": [
+				"image",
+				"sub_frame",
+				"object",
+				"script"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 4,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "01counter.com",
+			"resourceTypes": [
+				"image",
+				"sub_frame",
+				"object",
+				"script"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 5,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "securite.01net.com",
+			"resourceTypes": [
+				"image"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 6,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "cs01.11h11m.net",
+			"resourceTypes": [
+				"image"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 7,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "12mgr.com",
+			"resourceTypes": [
+				"image",
+				"script"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 8,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "1dmp.io",
+			"resourceTypes": [
+				"image"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 9,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "benchmark.1e100cdn.net",
+			"resourceTypes": [
+				"image"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+		"id": 10,
+		"action": {
+			"type": "block"
+		},
+		"condition": {
+			"urlFilter": "s.206ads.com",
+			"resourceTypes": [
+				"image"
+			],
+			"isUrlFilterCaseSensitive": true
+		},
+		"priority": 1
+	},
+	{
+	  "id": 11,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "-telemetry.officeapps.live.com^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 12,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "-telemetry.officeapps.live.com.mcas.ms^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 14,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "google-analytics.com/analytics.js",
+			"initiatorDomains": [
+				"unique-tutorials.info",
+				"getintopc.com",
+				"solvetube.site",
+			  "tech-platform.info",
+			  "uniqlo.com",
+			  "www.snapchat.com",
+			  "open.spotify.com"
+			]
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 15,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "tns-counter.ru"
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 16,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "||pixel-*.rubiconproject.com^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 17,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "||pixel.rubiconproject.com^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 18,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "||smarttag.rubiconproject.com^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 19,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "||rubicon.wellsfargo.com^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 20,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "||stats.aws.rubiconproject.com^",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	},
+	{
+	  "id": 21,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "||googletagmanager.com/gtm.js",
+	    "domainType": "thirdParty",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 2
+	},
+	{
+	  "id": 22,
+	  "action": {
+	    "type": "block"
+	  },
+	  "condition": {
+	    "urlFilter": "://analytics.*/collect",
+	    "isUrlFilterCaseSensitive": false
+	  },
+	  "priority": 1
+	}
+]

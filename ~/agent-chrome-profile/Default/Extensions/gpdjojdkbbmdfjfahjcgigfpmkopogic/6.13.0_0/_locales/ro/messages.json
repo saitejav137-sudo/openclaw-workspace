@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "salvează pe Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "Secret"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "Adaugă o secțiune"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "Toate panourile"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "Închide extensia"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "Setări"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "Se pare că nu ești conectat la Pinterest. Să remediem situația!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "Psst!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Înapoi la selecția de panouri"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "Creează"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "Creează un panou"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "Introdu maximum 50 de caractere"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "Titlul panoului"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "Titlul panoului"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "Introdu numele panoului"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "Ceva nu a funcționat corect la noi"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "Fă secret acest panou"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "Doar tu și colaboratorii veți vedea acest panou"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "Salvează pe panou"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Înapoi la selecția de imagini"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "Toate panourile"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "Creează panou"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "Alegeri de top"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "Creează un panou pentru a continua"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "Alege un panou"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "Se încarcă panourile..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "Spinner de salvare"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "Salvat pe"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "Vezi secțiunile de panou"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "Panou de colaborare"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "Salvează"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "Panou secret"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "Înapoi la selecția secțiunii de panou"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "Creează"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "Creează o secțiune de panou"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "Introdu maximum 50 de caractere"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "Introdu numele secțiunii de panou"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "Ceva nu a funcționat corect la noi"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "Numele secțiunii de panou"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "Numele secțiunii de panou"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Înapoi la selecția de panouri"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "Adaugă o secțiune"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "Alege o secțiune de panou"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "Creează nou"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "Alege panou"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Salvează o idee pe Pinterest"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "Selectează până la douăzeci de imagini"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "Alege secțiunea de panou"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "Anulează"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "salvează pe Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "Creează panou"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "Ne pare rău, nu se pot adăuga Pinuri pe acest site! Raportează o problemă dacă consideri că aceasta este o eroare."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "O, nu..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "Acest site nu permite salvarea pe Pinterest. Te rugăm să contactezi proprietarul site-ului pentru orice întrebări."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "Salvează ideile preferate online ca să poți reveni cu ușurință la ele mai târziu."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Butonul Pinterest „Salvează”"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Salvează idei pe Pinterest."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "salvează pe Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "Ascunde butonul Salvează pentru imagini"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "Asistență"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "Nu s-au găsit imagini pentru adăugat ca Pinuri pe pagină"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Salvează o idee pe Pinterest"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "Selectează până la douăzeci de imagini"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "Continuă"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "Raportează o problemă"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "Fereastră popover cu informații despre setări"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "Dezactivează modul Deasupra imaginii sau raportează o eroare din setări"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "Conectează-te"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "Noul panou nu a putut fi creat"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "Primește asistență"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "Ne pare rău, ceva nu este tocmai în regulă aici. Verifică dacă ești conectat la Pinterest și încearcă din nou."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "Ups!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "Pagina nu a putut fi salvată"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "Continuă"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "Ne pare rău, nu se pot adăuga Pinuri de pe acest domeniu. Te rugăm să-l contactezi pe operatorul site-ului dacă ai întrebări."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "Nu"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "Da"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "Ascunde butoanele Pinterest „Salvează” suprapuse peste imagini"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "Opțiuni buton de salvare"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "Mergi la ecranul anterior"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "Caută după nume"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "Caută după nume"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "Salvat pe"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "Se salvează în"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "Ceva nu a funcționat corect la noi"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "Vizualizare"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Înapoi la setări"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest nu poate garanta un răspuns la acest mesaj."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "Descriere"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "Explică pe scurt ce s-a întâmplat"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "Raportează o problemă"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "Trimite"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "Îți mulțumim pentru feedback!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "Problemă trimisă"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "Site"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "Salvează"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "Salvează"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "Alege un panou"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "Salvează pe panou"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "Pin creat"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "Salvat pe"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "Vizualizare"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "Salvează"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "Spinner de salvare"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "Caută"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "Alege-le pe toate"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Înapoi"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "Dezactivează modul Deasupra imaginii"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "Gata"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "Setări"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "Deconectează-te"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "Raportează o problemă"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "Revocă accesul și deconectează-te"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "Conectează-te"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "Autorizează"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Autorizează extensia de browser Pinterest Save, ca să poți salva cu ușurință idei de pe site-uri web"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "Conectează-ți contul Pinterest"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "Încearcă din nou"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "Ai probleme?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "Spinner pentru progresul autentificării"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "Creează"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "Alegeri de top"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "Accesează"
+   }
+}

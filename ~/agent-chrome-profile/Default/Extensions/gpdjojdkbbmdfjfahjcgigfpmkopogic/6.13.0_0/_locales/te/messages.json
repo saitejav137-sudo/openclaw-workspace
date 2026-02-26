@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Pinterestకు సేవ్ చేయండి"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "రహస్యం"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "విభాగాన్ని జోడించండి"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "అన్ని బోర్డులు"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "ఎక్స్‌టెన్షన్‌ను మూసివేయి"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "సెట్టింగ్‌లు"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "మీరు Pinterestకు సైన్ ఇన్ చేయనట్లు కనిపిస్తోంది. దీనిని పరిష్కరిద్దాం!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "ష్!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "బోర్డు ఎంపికకు తిరిగి వెళ్లు"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "సృష్టించండి"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "బోర్డ్‌ని సృష్టించండి"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "దయచేసి 50 కంటే ఎక్కువ అక్షరాలను నమోదు చేయకండి"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "బోర్డు పేరు"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "బోర్డు పేరు"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "బోర్డు పేరును నమోదు చేయండి"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "మా వైపు ఏదో సమస్య ఏర్పడింది"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "ఈ బోర్డుని రహస్యంగా ఉంచండి"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "కేవలం మీరు మరియు సహకారులు మాత్రమే ఈ బోర్డును చూడగలరు"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "బోర్డుకి సేవ్ చేయి"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "చిత్రం ఎంపికకు తిరిగి వెళ్లు"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "అన్ని బోర్డులు"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "బోర్డుని సృష్టించండి"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "ప్రముఖ ఎంపికలు"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "కొనసాగించడానికి బోర్డును సృష్టించండి"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "బోర్డును ఎంచుకోండి"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "బోర్డులను లోడ్ చేస్తోంది..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "సేవ్ చేస్తోంది స్పిన్నర్"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "ఇందులో సేవ్ చేయబడింది"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "బోర్డు విభాగాలను చూడండి"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "సహకార బోర్డు"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "సేవ్"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "రహస్య బోర్డ్"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "విభాగం ఎంపికకు తిరిగి వెళ్లు"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "సృష్టించండి"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "విభాగాన్ని సృష్టించండి"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "దయచేసి 50 కంటే ఎక్కువ అక్షరాలను నమోదు చేయకండి"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "విభాగం పేరును నమోదు చేయండి"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "మా వైపు ఏదో సమస్య ఏర్పడింది"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "విభాగం పేరు"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "విభాగం పేరు"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "బోర్డు ఎంపికకు తిరిగి వెళ్లు"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "విభాగాన్ని జోడించండి"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "విభాగాన్ని ఎంచుకోండి"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "కొత్తదాన్ని సృష్టించు"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "బోర్డుని ఎంచుకోండి"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Pinterestకు ఆలోచనను సేవ్ చేయండి"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "గరిష్టంగా ఇరవై చిత్రాల వరకు ఎంచుకోండి"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "విభాగాన్ని ఎంచుకోండి"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "రద్దు చేయి"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Pinterestకు సేవ్ చేయండి"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "బోర్డుని సృష్టించండి"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "క్షమించండి, ఈ డొమైన్‌లో పిన్నింగ్ అనుమతించబడదు! ఇది పొరపాటున జరిగిందని మీరు భావిస్తే, దయచేసి సమస్యను నివేదించండి."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "అయ్యో..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "Pinterestకు సేవ్ చేయడాన్ని ఈ సైట్ అనుమతించదు. ఏవైనా సందేహాలు ఉన్నట్లయితే, దయచేసి యజమానిని సంప్రదించండి."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "మీకు ఇష్టమైన ఆలోచనలను ఆన్‌లైన్‌లో సేవ్ చేసుకోండి, తద్వారా మీరు వాటిని తర్వాత సులభంగా తిరిగి పొందవచ్చు."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Pinterest సేవ్ చేయి బటన్"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Pinterestకు ఆలోచనలను సేవ్ చేయండి."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Pinterestకు సేవ్ చేయండి"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "చిత్రాలలో సేవ్ చేయి బటన్‌ను దాచు"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "సహాయం"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "పేజీలో పిన్ చేయదగిన చిత్రాలు ఏవీ కనుగొనబడలేదు"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Pinterestకు ఆలోచనను సేవ్ చేయండి"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "గరిష్టంగా ఇరవై చిత్రాల వరకు ఎంచుకోండి"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "తర్వాత"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "సమస్యను రిపోర్ట్ చేయండి"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "సెట్టింగ్‌లు విద్య పాప్ఓవర్"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "సెట్టింగ్‌ల నుండి చిత్రం హోవర్‌ను నిలిపివేయండి లేదా బగ్‌ను రిపోర్ట్ చేయండి"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "సైన్ ఇన్ చేయి"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "కొత్త బోర్డుని సృష్టించడం సాధ్యం కాలేదు"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "సహాయం పొందండి"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "క్షమించండి, ఇక్కడ ఏదో తప్పుగా ఉంది. దయచేసి మీరు Pinterestకి లాగిన్ అయ్యారని తనిఖీ చేసి, మళ్లీ ప్రయత్నించండి."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "అయ్యో!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "ఈ పేజీని సేవ్ చేయడం సాధ్యం కాలేదు"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "తర్వాత"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "క్షమించండి, ఈ డొమైన్ నుండి పిన్నింగ్ అనుమతించబడదు. మీకు ఏవైనా ప్రశ్నలు ఉంటే, దయచేసి సైట్ ఆపరేటర్‌ను సంప్రదించండి."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "కాదు"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "అవును"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "కదులుతున్న సేవ్ చేయి బటన్‌లను దాచు"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "సేవ్ చేయి బటన్ ఎంపికలు"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "మునుపటి స్క్రీన్‌కు తిరిగి వెళ్లు"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "పేరుతో శోధించండి"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "పేరుతో శోధించండి"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "ఇందులో సేవ్ చేయబడింది"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "దీనికి సేవ్ చేస్తోంది"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "మా వైపు ఏదో సమస్య ఏర్పడింది"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "చూడండి"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "సెట్టింగ్‌లకు తిరిగి వెళ్లు"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest ఈ సందేశానికి ప్రతిస్పందన కోసం హామీ ఇవ్వదు."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "వివరణ"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "ఏమి జరిగిందో క్లుప్తంగా వివరించండి"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "సమస్యను రిపోర్ట్ చేయండి"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "సమర్పించు"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "మీ అభిప్రాయాన్ని అందించినందుకు ధన్యవాదాలు!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "సమస్య సమర్పించబడింది"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "వెబ్‌సైట్"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "సేవ్"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "సేవ్"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "బోర్డ్‌ని ఎంచుకోండి"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "బోర్డుకి సేవ్ చేయి"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "పిన్ సృష్టించబడింది"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "ఇందులో సేవ్ చేయబడింది"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "చూడండి"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "సేవ్"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "సేవ్ చేస్తోంది స్పిన్నర్"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "శోధించు"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "అన్నింటినీ ఎంచుకోండి"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "వెనుకకు"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "చిత్రం కర్సర్‌ను నిలిపివేయండి"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "పూర్తయింది"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "సెట్టింగ్‌లు"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "లాగ్ అవుట్ చేయి"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "సమస్యను రిపోర్ట్ చేయండి"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "యాక్సెస్‌ను ఉపసంహరించి, సైన్ అవుట్ చేయండి"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "సైన్ ఇన్ చేయండి"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "అధికారమివ్వండి"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "మీరు వెబ్‌సైట్‌ల నుండి ఆలోచనలను సులభంగా సేవ్ చేసుకోవడానికి Pinterest సేవ్ బ్రౌజర్ ఎక్స్‌టెన్షన్‌కు అధికారం ఇవ్వండి"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "మీ Pinterest ఖాతాను కనెక్ట్ చేయండి"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "మళ్లీ ప్రయత్నించండి"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "సమస్య ఉందా?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "ప్రామాణీకరణ ప్రోగ్రెస్ స్పిన్నర్"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "సృష్టించండి"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "ప్రముఖ ఎంపికలు"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "సందర్శించండి"
+   }
+}

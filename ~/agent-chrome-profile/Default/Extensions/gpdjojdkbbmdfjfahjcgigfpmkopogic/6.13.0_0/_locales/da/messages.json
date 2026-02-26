@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Gem på Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "Hemmelig"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "Tilføj sektion"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "Alle opslagstavler"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "Luk udvidelsen"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "Indstillinger"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "Du er ikke logget på Pinterest. Det kan vi gøre noget ved!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "Psst!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Tilbage til valg af opslagstavle"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "Opret"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "Opret en opslagstavle"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "Indtast højst 50 tegn"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "Navn på opslagstavle"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "Navn på opslagstavle"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "Angiv navn på opslagstavle"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "Der gik noget galt hos os"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "Hold opslagstavlen hemmelig"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "Kun du og dine samarbejdspartnere kan se opslagstavlen"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "Gem på opslagstavle"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Tilbage til valg af billede"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "Alle opslagstavler"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "Opret opslagstavle"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "Topvalg"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "Opret en opslagstavle for at fortsætte"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "Vælg en opslagstavle"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "Indlæser opslagstavler ..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "Hjul, der viser, at der gemmes"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "Gemt på"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "Se sektioner på opslagstavler"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "Fælles opslagstavle"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "Gem"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "Hemmelig opslagstavle"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "Tilbage til sektionsvalg"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "Opret"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "Opret en sektion"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "Indtast højst 50 tegn"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "Indtast sektionsnavn"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "Der gik noget galt hos os"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "Sektionsnavn"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "Sektionsnavn"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Tilbage til valg af opslagstavle"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "Tilføj sektion"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "Vælg en sektion"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "Opret ny"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "Vælg opslagstavle"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Gem en idé på Pinterest"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "Vælg op til tyve billeder"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "Vælg sektion"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "Annuller"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Gem på Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "Opret opslagstavle"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "Det er ikke tilladt at oprette pins fra dette website. Hvis det er en fejl, kan du indberette problemet."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "Åh nej ..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "Websitet tillader ikke, at du gemmer på Pinterest. Kontakt ejeren, hvis du har spørgsmål."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "Gem dine yndlingsidéer online, så du let kan vende tilbage til dem senere."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Pinterests Gem-knap"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Gem idéer på Pinterest."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Gem på Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "Skjul Gem-knap på billeder"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "Hjælp"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "Der blev ikke fundet nogen billeder at sætte op på siden"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Gem en idé på Pinterest"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "Vælg op til tyve billeder"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "Næste"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "Indberet et problem"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "Popover med vejledning til indstillinger"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "Du kan deaktivere svævende effekter og indberette fejl via indstillingerne"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "Log på"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "Opslagstavlen kunne ikke oprettes"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "Hjælp"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "Der er noget galt her. Tjek, at du er logget på Pinterest, og prøv igen."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "Ups!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "Siden kunne ikke gemmes"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "Næste"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "Det er ikke muligt at tilføje pins fra domænet. Kontakt websitets ejer, hvis du har spørgsmål."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "Nej"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "Ja"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "Skjul svævende Gem-knapper"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "Indstillinger for Gem-knappen"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "Gå tilbage til forrige skærm"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "Søg efter navn"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "Søg efter navn"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "Gemt på"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "Gemmer på"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "Der gik noget galt hos os"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "Visning"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Tilbage til indstillinger"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest kan ikke garantere, at du får svar på din besked."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "Beskrivelse"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "Beskriv kort, hvad der er sket"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "Rapportér et problem"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "Send"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "Tak for din feedback!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "Problemet er sendt"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "Website"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "Gem"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "Gem"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "Vælg en opslagstavle"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "Gem på opslagstavle"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "Pin oprettet"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "Gemt på"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "Visning"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "Gem"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "Hjul, der viser, at der gemmes"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "Søg"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "Vælg alle"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Tilbage"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "Deaktiver svævende effekter"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "OK"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "Indstillinger"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "Log af"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "Rapportér et problem"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "Tilbagekald adgang, og log af"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "Log på"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "Tillad"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Godkend Pinterests gem-browserudvidelse, så du nemt kan gemme idéer fra websites"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "Opret forbindelse til din Pinterest-konto"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "Prøv igen"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "Har du problemer? "
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "Spinner om status for godkendelse"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "Opret"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "Topvalg"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "Gå til"
+   }
+}

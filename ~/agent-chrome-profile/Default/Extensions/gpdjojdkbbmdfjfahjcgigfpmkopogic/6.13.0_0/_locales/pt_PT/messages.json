@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Guardar no Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "Secreto"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "Adicionar secção"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "Todos os álbuns"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "Fechar a extensão"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "Definições"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "Parece que não tens sessão iniciada no Pinterest. Vamos corrigir essa situação!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "Psst!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Voltar à seleção de álbuns"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "Criar"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "Criar um álbum"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "Não introduzas mais do que 50 caracteres"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "Nome do álbum"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "Nome do álbum"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "Escreve o nome do álbum"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "Algo correu mal"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "Tornar este álbum secreto"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "Só tu e os colaboradores podem ver este álbum"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "Guardar no álbum"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Voltar à seleção de imagens"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "Todos os álbuns"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "Criar álbum"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "Principais escolhas"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "Criar um álbum para continuar"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "Escolhe um álbum"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "A carregar álbuns..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "A guardar ícone de progresso"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "Guardado em"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "Ver secções do álbum"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "Álbum de colaboração"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "Guardar"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "Álbum secreto"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "Voltar à seleção da secção"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "Criar"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "Criar uma secção"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "Não introduzas mais do que 50 caracteres"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "Escreve o nome da secção"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "Algo correu mal"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "Nome da secção"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "Nome da secção"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Voltar à seleção de álbuns"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "Adicionar secção"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "Escolher uma secção"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "Criar novo"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "Escolher álbum"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Guarda uma ideia no Pinterest"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "Seleciona até vinte imagens"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "Escolher secção"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "Cancelar"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Guardar no Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "Criar álbum"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "Desculpa, mas não é possível criar Pins neste site. Denuncia um problema se achares que se trata de um erro."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "Oh não..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "Este site não permite guardar no Pinterest. Contacta o proprietário com as tuas questões."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "Guarda as tuas ideias favoritas online, para as veres mais tarde."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Botão Guardar do Pinterest"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Guarda ideias no Pinterest."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Guardar no Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "Ocultar botão Guardar em imagens"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "Ajuda"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "Nenhuma imagem publicável encontrada na página"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Guarda uma ideia no Pinterest"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "Seleciona até vinte imagens"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "Seguinte"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "Denunciar um erro"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "Janela pop-over de educação nas definições"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "Desativar sobreposição em imagem ou comunicar um erro nas definições"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "Iniciar sessão"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "Não foi possível criar um novo álbum"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "Obter ajuda"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "Ocorreu um problema. Verifica se iniciaste sessão no Pinterest e tenta novamente."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "Ups!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "Não foi possível guardar esta página"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "Seguinte"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "Desculpa, mas não é possível criar Pins com este domínio. Entra em contacto com o operador do site se tiveres alguma dúvida."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "Não"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "Sim"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "Ocultar os botões Guardar sobrepostos"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "Opções do botão Guardar"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "Voltar ao ecrã anterior"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "Pesquisar por nome"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "Pesquisar por nome"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "Guardado em"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "Guardar em"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "Algo correu mal"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "Ver"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Voltar às definições"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "O Pinterest não pode garantir uma resposta a esta mensagem."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "Descrição"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "Explica brevemente o que aconteceu"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "Denunciar um erro"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "Enviar"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "Agradecemos os teus comentários!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "Problema enviado"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "Website"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "Guardar"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "Guardar"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "Escolhe um álbum"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "Guardar no álbum"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "Pin criado"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "Guardado em"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "Ver"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "Guardar"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "A guardar ícone de progresso"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "Pesquisar"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "Selecionar todas"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Anterior"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "Desativar sobreposição em imagem"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "Concluído"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "Definições"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "Terminar sessão"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "Denunciar um erro"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "Revogar acesso e sair"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "Iniciar sessão"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "Autorizar"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Autoriza a extensão do browser do Guardar no Pinterest para guardares facilmente ideias de websites"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "Associa a tua conta do Pinterest"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "Tentar novamente"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "Estás com dificuldades? "
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "Ícone de progresso da autenticação"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "Criar"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "Principais escolhas"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "Visitar"
+   }
+}

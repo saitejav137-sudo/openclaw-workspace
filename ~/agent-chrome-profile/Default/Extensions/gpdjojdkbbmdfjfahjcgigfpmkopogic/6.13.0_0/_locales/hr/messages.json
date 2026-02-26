@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Spremi na Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "Tajna"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "Dodaj sekciju"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "Sve ploče"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "Zatvori proširenje"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "Postavke"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "Izgleda da niste prijavljeni na Pinterest. Popravimo to!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "Psst!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Natrag na odabir ploče"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "Izradi"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "Izradite ploču"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "Unesite najviše 50 znakova"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "Naziv ploče"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "Naziv ploče"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "Unesite naziv ploče"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "Nešto nije u redu s naše strane"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "Učinite ploču tajnom"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "Ploču možete vidjeti samo vi i suradnici"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "Spremi na ploču"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Natrag na odabir slike"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "Sve ploče"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "izradi ploču"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "Najbolji odabir"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "Izradite ploču za nastavak"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "Odaberi ploču"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "Učitavanje ploča..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "Spremanje kotača"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "Spremljeno na"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "Prikaži sekcije ploče"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "Suradnička ploča"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "Spremi"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "Tajna ploča"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "Natrag na odabir sekcije"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "Izradi"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "Izradite sekciju"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "Unesite najviše 50 znakova"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "Unesite naziv sekcije"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "Nešto nije u redu s naše strane"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "Naziv sekcije"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "Naziv sekcije"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Natrag na odabir ploče"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "Dodajte sekciju"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "Odaberi sekciju"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "Izradi novo"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "Odaberi ploču"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Spremite ideju na Pinterestu"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "Odaberite do dvadeset slika"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "Odaberi sekciju"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "Otkaži"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Spremi na Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "izradi ploču"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "Žao nam je, izrada pina nije dozvoljena na ovoj web-stranici! Prijavite problem ako smatrate da je došlo do greške."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "O ne..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "Ova web-stranica ne dozvoljava spremanje na Pinterest. Ako imate pitanja, obratite se njezinom vlasniku."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "Spremite svoje omiljene ideje kako biste im se kasnije mogli lako vratiti."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Gumb Spremi na Pinterestu"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Spremite ideje na Pinterestu."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Spremi na Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "Skrij gumb Spremi na slikama"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "Pomoć"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "Na stranici nisu pronađene slike koje se mogu pretvoriti u pin"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Spremite ideju na Pinterestu"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "Odaberite do dvadeset slika"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "Sljedeće"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "Prijavite problem"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "Postavke obrazovnog skočnog prozora"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "Onemogućite zadržavanje pokazivača iznad slike ili prijavite pogrešku u postavkama"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "Prijavite se"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "Nije moguće izraditi novu ploču"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "Potražite pomoć"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "Žao nam je, nešto nije u redu. Provjerite jeste li prijavljeni na Pinterest i pokušajte ponovno."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "Ups!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "Nije moguće spremiti ovu stranicu"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "Sljedeće"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "Žao nam je, označavanje pinom nije dopušteno s ove domene. Obratite se voditelju stranice ako imate pitanja."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "Ne"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "Da"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "Sakrij držanje iznad gumba Spremi"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "Opcije gumba Spremi"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "Natrag na prethodni zaslon"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "Pretraži prema nazivu"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "Pretraži prema nazivu"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "Spremljeno na"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "Sprema se:"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "Nešto nije u redu s naše strane"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "Prikaži"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Povratak na postavke"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest ne može jamčiti odgovor na tu poruku."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "Opis"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "Ukratko objasnite što se dogodilo"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "Prijavite problem"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "Pošalji"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "Hvala vam na povratnim informacijama!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "Problem je poslan"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "Web-stranica"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "Spremi"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "Spremi"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "Odaberite ploču"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "Spremi na ploču"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "Pin je izrađen"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "Spremljeno na"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "Prikaži"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "Spremi"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "Spremanje kotača"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "Pretraži"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "Odaberi sve"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Natrag"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "Onemogući zadržavanje pokazivača iznad slike"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "Gotovo"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "Postavke"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "Odjava"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "Prijavite problem"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "Opozovi pristup i odjavi se"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "Prijavite se"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "Autoriziraj"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Autoriziranje proširenja preglednika za spremanje na Pinterestu kako biste jednostavno mogli spremati ideje s web-stranica"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "Povežite svoj račun na Pinterestu"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "Pokušajte ponovno"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "Imate problema?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "Rotirajući krug napretka provjere autentičnosti"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "Izradi"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "Najbolji odabir"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "Posjeti"
+   }
+}

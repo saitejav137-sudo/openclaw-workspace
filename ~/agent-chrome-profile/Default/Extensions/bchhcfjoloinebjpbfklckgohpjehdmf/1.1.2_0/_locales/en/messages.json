@@ -1,0 +1,10 @@
+{
+   "extDescription": {
+      "description": "A short description of the extension.",
+      "message": "Automate your bulk video creation workflow on Meta AI. Save time and accelerate creativity!"
+   },
+   "extName": {
+      "description": "The name of the extension.",
+      "message": "Auto Meta - Automation for Meta AI"
+   }
+}

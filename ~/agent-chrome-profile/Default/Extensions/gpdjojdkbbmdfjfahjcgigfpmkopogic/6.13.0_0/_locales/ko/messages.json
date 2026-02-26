@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Pinterest에 저장"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "비밀 설정"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "보드 섹션 추가"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "모든 보드"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "확장 프로그램 닫기"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "설정"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "Pinterest에 로그인하지 않은 것 같습니다. 로그인하세요!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "잠깐!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "보드 선택으로 돌아가기"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "만들기"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "보드 만들기"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "글자 수는 50자 이하여야 합니다."
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "보드 이름"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "보드 이름"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "보드 이름을 입력하세요."
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "Pinterest 측에 오류가 발생했습니다."
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "이 보드를 비밀 보드로 설정하기"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "회원님과 참여자만 이 보드를 볼 수 있습니다."
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "보드에 저장"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "이미지 선택으로 돌아가기"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "모든 보드"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "보드 만들기"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "최고 인기 보드"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "계속하려면 보드를 만드세요."
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "보드를 선택하세요."
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "보드를 불러오는 중..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "스피너 저장 중"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "저장된 보드"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "보드 섹션 보기"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "협업 보드"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "저장"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "비밀 보드"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "섹션 선택으로 돌아가기"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "만들기"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "섹션을 만드세요."
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "글자 수는 50자 이하여야 합니다."
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "섹션 이름을 입력하세요."
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "Pinterest 측에 오류가 발생했습니다."
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "섹션 이름"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "섹션 이름"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "보드 선택으로 돌아가기"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "보드 섹션 추가"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "섹션 선택"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "새로 만들기"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "보드 선택"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Pinterest에 아이디어를 저장하세요."
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "이미지를 최대 20개까지 선택하세요."
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "보드 섹션 선택"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "취소"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Pinterest에 저장"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "보드 만들기"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "죄송합니다.  이 사이트에서는 핀 저장이 허용되지 않습니다! 오류라고 생각되는 경우 문제를 신고해 주세요."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "이런..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "이 사이트는 Pinterest에 저장하는 것을 허용하지 않습니다. 질문이 있다면 사이트의 소유자에게 연락하세요."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "나중에 쉽게 다시 찾을 수 있도록 온라인에 좋아하는 아이디어를 저장하세요."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Pinterest 저장 버튼"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Pinterest에 아이디어를 저장하세요."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Pinterest에 저장"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "이미지에서 저장 버튼 숨기기"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "도움말"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "페이지에 핀을 지정할 수 있는 이미지가 없습니다."
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Pinterest에 아이디어를 저장하세요."
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "이미지를 최대 20개까지 선택하세요."
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "다음"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "문제 신고"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "설정 교육 팝업"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "이미지 마우스 오버를 비활성화하거나 설정에서 버그를 신고하세요."
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "로그인"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "새 보드를 만들지 못했습니다."
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "도움 받기"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "죄송합니다. 문제가 발생했습니다. Pinterest에 로그인했는지 확인하고 다시 시도하세요."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "죄송합니다!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "이 페이지를 저장하지 못했습니다"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "다음"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "죄송합니다. 이 도메인에서는 핀하기가 허용되지 않습니다. 질문이 있으시면 사이트 운영자에게 문의하시기 바랍니다."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "아니요"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "예"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "마우스 오버 저장 버튼 숨기기"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "저장 버튼 옵션"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "이전 화면으로 돌아가기"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "이름으로 검색"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "이름으로 검색"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "저장된 보드"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "다음으로 저장"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "Pinterest 측에 오류가 발생했습니다."
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "보기"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "설정으로 돌아가기"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest가 이 메시지에 답변을 보내지 않을 수 있습니다."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "설명"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "어떤 일이 발생했는지 간략하게 설명해 주세요."
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "문제 신고"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "제출"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "소중한 의견 감사합니다!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "문제가 제출됨"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "웹사이트"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "저장"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "저장"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "보드 선택"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "보드에 저장"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "만든 핀"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "저장된 보드"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "보기"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "저장"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "스피너 저장 중"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "검색"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "모두 선택"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "돌아가기"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "이미지 마우스 오버 비활성화"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "완료"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "설정"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "로그아웃"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "문제 신고"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "액세스 권한 취소 및 로그아웃"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "로그인"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "승인"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "웹사이트에서 아이디어를 쉽게 저장할 수 있도록 Pinterest 저장 브라우저 확장 프로그램을 승인하세요."
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "Pinterest 계정 연결하기"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "다시 시도하기"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "문제가 있으신가요?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "인증 진행률 스피너"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "만들기"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "최고 인기 보드"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "방문하기"
+   }
+}

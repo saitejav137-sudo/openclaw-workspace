@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Pinterest-এ সংরক্ষণ করুন"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "গোপন"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "বিভাগ যোগ করুন"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "সমস্ত বোর্ড"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "এক্সটেনশন বন্ধ করুন"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "সেটিংস"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "মনে হচ্ছে আপনি Pinterest-এ সাইন ইন করেননি। আসুন সেটি ঠিক করা যাক!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "শ্‌শ্‌শ্‌ চুপ!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "বোর্ড নির্বাচনে ফিরে যান"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "তৈরি করুন"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "একটি বোর্ড তৈরি করুন"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "অনুগ্রহ করে 50টির বেশি অক্ষর লিখবেন না"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "বোর্ডের নাম"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "বোর্ডের নাম"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "বোর্ডের নাম লিখুন"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "আমাদের দিক থেকে কিছু সমস্যা হয়েছে"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "এই বোর্ডটিকে লুকান"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "শুধুমাত্র আপনি এবং সহযোগীরাই এই বোর্ডটি দেখতে পাবেন"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "বোর্ডে সংরক্ষণ করুন"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "ছবি নির্বাচনে ফিরে যান"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "সমস্ত বোর্ড"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "বোর্ড তৈরি"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "সেরা পছন্দ"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "চালিয়ে যেতে একটি বোর্ড তৈরি করুন"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "একটি বোর্ড বেছে নিন"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "বোর্ড লোড হচ্ছে..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "স্পিনার সংরক্ষণ করা হচ্ছে"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "এতে সংরক্ষণ করা হয়েছে"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "বোর্ডের বিভাগগুলি দেখুন"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "সহযোগিতার বোর্ড"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "সংরক্ষণ করুন"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "গোপন বোর্ড"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "বিভাগ নির্বাচনে ফিরে যান"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "তৈরি করুন"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "একটি বিভাগ তৈরি করুন"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "অনুগ্রহ করে 50টির বেশি অক্ষর লিখবেন না"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "বিভাগের নাম লিখুন"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "আমাদের দিক থেকে কিছু সমস্যা হয়েছে"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "বিভাগের নাম"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "বিভাগের নাম"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "বোর্ড নির্বাচনে ফিরে যান"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "বিভাগ যোগ করুন"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "একটি বিভাগ বেছে নিন"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "নতুন তৈরি করুন"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "বোর্ড বেছে নিন"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Pinterest-এ আইডিয়া সংরক্ষণ করুন"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "কুড়িটি পর্যন্ত ছবি বেছে নিন"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "বিভাগ বেছে নিন"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "বাতিল করুন"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Pinterest-এ সংরক্ষণ করুন"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "বোর্ড তৈরি"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "দুঃখিত, এই ডোমেনে পিন করা অনুমোদিত নয়! আপনি যদি এটিকে কোনও ত্রুটি বলে মনে করেন তবে অনুগ্রহ করে সমস্যা হিসাবে রিপোর্ট করুন।"
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "ওহো..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "এই সাইটটি Pinterest-এ সংরক্ষণ করার অনুমতি দেয় না। অনুগ্রহ করে যে কোনও প্রশ্নের জন্য এর মালিকের সাথে যোগাযোগ করুন।"
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "অনলাইনে আপনার পছন্দের আইডিয়াগুলি সংরক্ষণ করুন যাতে আপনি সহজেই পরে সেগুলি দেখতে পান।"
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Pinterest-এর সংরক্ষণ বোতাম"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Pinterest-এ আইডিয়া সংরক্ষণ করুন।"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Pinterest-এ সংরক্ষণ করুন"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "ছবিতে সেভ করার বোতাম লুকোন"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "সহায়তা"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "পেজে কোনও পিনযোগ্য ছবি পাওয়া যায়নি"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Pinterest-এ আইডিয়া সংরক্ষণ করুন"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "কুড়িটি পর্যন্ত ছবি বেছে নিন"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "পরবর্তী"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "কোনো সমস্যা রিপোর্ট করুন"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "সেটিংস শিক্ষা পপওভার"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "সেটিংস থেকে ইমেজ হোভার বন্ধ করুন বা বাগ রিপোর্ট করুন"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "সাইন ইন করুন"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "নতুন বোর্ড তৈরি করা যায়নি"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "সহায়তা নিন"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "দুঃখিত, এখানে কিছু একটা গন্ডগোল আছে। আপনি Pinterest-এ লগ ইন করে আছেন কি না অনুগ্রহ করে তা দেখে নিন এবং আবার চেষ্টা করুন।"
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "ওহো!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "এই পেজটি সংরক্ষণ করা যায়নি"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "পরবর্তী"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "দুঃখিত, এই ডোমেন থেকে পিন করা অনুমোদিত নয়। আপনার যদি কোনও প্রশ্ন থাকে তাহলে অনুগ্রহ করে সাইট অপারেটরের সঙ্গে যোগাযোগ করুন।"
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "না"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "হ্যাঁ"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "সংরক্ষণ বোতামের হোভার করা লুকিয়ে রাখুন"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "সংরক্ষণ বোতামের বিকল্প"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "আগের স্ক্রিনে ফিরে যান"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "নাম অনুসারে সার্চ করুন"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "নাম অনুসারে সার্চ করুন"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "এতে সংরক্ষণ করা হয়েছে"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "এতে সংরক্ষণ করা হচ্ছে"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "আমাদের দিক থেকে কিছু সমস্যা হয়েছে"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "দেখুন"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "সেটিংসে ফিরে যান"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest এই বার্তাটিতে কোনও উত্তর দেওয়ার গ্যারান্টি দেয় না।"
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "বিবরণ"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "কী ঘটেছে তা সংক্ষেপে ব্যাখ্যা করুন"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "কোনো সমস্যা রিপোর্ট করুন"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "জমা দিন"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "আপনার মতামতের জন্য ধন্যবাদ!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "সমস্যা জমা দেওয়া হয়েছে"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "ওয়েবসাইট"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "সংরক্ষণ করুন"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "সংরক্ষণ"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "একটি বোর্ড বেছে নিন"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "বোর্ডে সংরক্ষণ করুন"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "পিন তৈরি করা হয়েছে"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "এতে সংরক্ষণ করা হয়েছে"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "দেখুন"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "সংরক্ষণ করুন"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "স্পিনার সংরক্ষণ করা হচ্ছে"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "সার্চ করুন"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "সবকটি বেছে নিন"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "ফিরে যান"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "ইমেজ হোভার বন্ধ করুন"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "সম্পন্ন হয়েছে"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "সেটিংস"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "লগ আউট করুন"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "কোনো সমস্যা রিপোর্ট করুন"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "অ্যাক্সেস বাতিল করুন এবং সাইন আউট করুন"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "সাইন ইন করুন"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "অনুমোদিত"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Pinterest-কে ব্রাউজার এক্সটেনশন সংরক্ষণের অনুমতি দিন যাতে আপনি সহজেই ওয়েবসাইট থেকে আইডিয়া সংরক্ষণ করতে পারেন"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "আপনার Pinterest অ্যাকাউন্ট সংযুক্ত করুন"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "আবার চেষ্টা করুন"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "কোনও সমস্যা হচ্ছে?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "প্রমাণীকরণের প্রগতিসূচক স্পিনার"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "তৈরি করুন"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "সেরা পছন্দ"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "দেখুন"
+   }
+}

@@ -1,0 +1,29 @@
+{
+   "background": {
+      "service_worker": "flame-monkey.js"
+   },
+   "content_scripts": [ {
+      "css": [ "naptha.css" ],
+      "js": [ "naptha-wick.js" ],
+      "matches": [ "\u003Call_urls>" ]
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+   },
+   "description": "Highlight, copy, edit, and translate text from any image on the web.",
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "icon.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlrs2ByK5WDD9ewjrspsIsg7bTChRzcyD7HDTlPluLwl2cW6TT+GJkP3o/MF+AY8zmt3j7mzFxzkre+izXe+ZYM3Y++GzhcWXzF4jCNx+A4aqb2rVbID97dmhT7ROyHlQSKBYym8FW3FcTfpdyaqRp8V/GrU27eX3oKUoRUjccE1rSRg0Swhp5Ri8GX3AI2bt5FSta4QHeSuqDZUyOOBG3LL0CWp9uLB/YiulBq3D3ZVknZGludSz8j2ZlmT5NXlNcNYz6trqQCKQOphP4e0nAVjjhed8PyhVuT5gHwbgVVlJwZ/aYKxGhLKwrGle1kc2anFk7x5klxRcW/kYUaXjywIDAQAB",
+   "manifest_version": 3,
+   "name": "Project Naptha",
+   "permissions": [ "storage", "tts", "clipboardRead", "clipboardWrite" ],
+   "short_name": "Naptha",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.9.7",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "swt-worker.js", "mask-worker.js", "inpaint-worker.js", "common-worker.js", "eng.traineddata.gz" ]
+   } ]
+}

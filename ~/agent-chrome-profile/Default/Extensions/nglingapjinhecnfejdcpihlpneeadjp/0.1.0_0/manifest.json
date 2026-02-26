@@ -1,0 +1,33 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "icons/icon128.png",
+         "16": "icons/icon16.png",
+         "32": "icons/icon32.png",
+         "48": "icons/icon48.png"
+      },
+      "default_title": "Clawdbot Browser Relay (click to attach/detach)"
+   },
+   "background": {
+      "service_worker": "background.js",
+      "type": "module"
+   },
+   "description": "Attach OpenClaw (MoltBot & ClawdBot) to your existing Chrome tab via a local CDP relay server.",
+   "host_permissions": [ "http://127.0.0.1/*", "http://localhost/*" ],
+   "icons": {
+      "128": "icons/icon128.png",
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmIGX0biTb5ChvtsiVWXAh70JmNJsa/XN+J9O7P30tqN++1sFBlDTYmiOhiqHAEyRno6C3HTzgScFhcGwEHFm5zDuNnuiAwnmJ4AGy+z7hCbFhmiNDkVf9893rOYDgzSbfc1gZjSHqnuTmNSyzZkMpyfbXjnjvaFialxx8jlV2xw9QVFoAf924moVzRFzHJILhfuSNmMpS4oWKw4FeEyf8HpV+tMD/5uucr2Jza9VpPPqLUS2drJ4c+Q0Sj+6LYoXQe9FFH9DWdyFllc1b8JpfOOOnimVRfd5ug575IVPVkyTSnKzQIidufTcWxtHnO7WNRbfDioX1qDFNP7NXF9KbwIDAQAB",
+   "manifest_version": 3,
+   "name": "OpenClaw Browser Relay",
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "options.html"
+   },
+   "permissions": [ "debugger", "tabs", "activeTab", "storage" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.1.0"
+}

@@ -1,0 +1,6 @@
+2026/02/22-08:28:49.555 1dc9c Creating DB /home/saiteja_v137/Desktop/~/agent-chrome-profile/Default/IndexedDB/chrome-extension_bgnkhhnnamicmpeenaelnjfhikgbkllg_0.indexeddb.leveldb since it was missing.
+2026/02/22-08:28:49.559 1dc9c Reusing MANIFEST /home/saiteja_v137/Desktop/~/agent-chrome-profile/Default/IndexedDB/chrome-extension_bgnkhhnnamicmpeenaelnjfhikgbkllg_0.indexeddb.leveldb/MANIFEST-000001
+2026/02/22-08:28:49.566 1dc9b Level-0 table #5: started
+2026/02/22-08:28:49.568 1dc9b Level-0 table #5: 643 bytes OK
+2026/02/22-08:28:49.569 1dc9b Delete type=0 #3
+2026/02/22-08:28:49.570 1dca5 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)

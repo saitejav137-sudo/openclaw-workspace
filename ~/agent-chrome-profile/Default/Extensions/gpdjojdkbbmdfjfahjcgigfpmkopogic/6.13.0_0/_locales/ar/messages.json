@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "حفظ على Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "سري"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "إضافة قسم"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "كل اللوحات"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "إغلاق الملحق"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "الإعدادات"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "يبدو أنك لست قيد تسجيل الدخول إلى Pinterest. دعنا نصلح هذا!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "لحظة!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "العودة إلى تحديد اللوحة"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "إنشاء"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "إنشاء لوحة"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "يُرجى إدخال ما لا يزيد عن 50 حرفًا"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "اسم اللوحة"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "اسم اللوحة"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "أدخل اسم اللوحة"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "حدث خطأ ما من جانبنا"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "اجعل هذه اللوحة سرية"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "فقط أنت والمتعاونين يمكنكم رؤية هذه اللوحة"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "الحفظ إلى لوحة"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "رجوع إلى تحديد الصورة"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "كل اللوحات"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "إنشاء لوحة"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "أفضل الخيارات"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "إنشاء لوحة للمتابعة"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "اختر لوحة"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "جارٍ تحميل اللوحات..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "جارٍ حفظ أداة الانتقاء"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "تم الحفظ في"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "عرض أقسام اللوحة"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "اللوحة التعاونية"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "حفظ"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "لوحة سرية"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "الرجوع إلى تحديد القسم"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "إنشاء"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "إنشاء القسم"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "يُرجى إدخال ما لا يزيد عن 50 حرفًا"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "أدخل اسم القسم"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "حدث خطأ ما من جانبنا"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "اسم القسم"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "اسم القسم"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "العودة إلى تحديد اللوحة"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "إضافة قسم"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "اختيار قسم"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "إنشاء جديد"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "اختيار لوحة"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "حفظ الأفكار على Pinterest"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "حدد ما يصل إلى عشرين صورة"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "اختيار قسم"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "إلغاء"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "حفظ على Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "إنشاء لوحة"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "عذرًا، لا يُسمح بتثبيت المنشورات في هذا الموقع! يرجى الإبلاغ عن مشكلة إذا كنت تشعر بحدوث خطأ."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "أوه، لا..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "لا يسمح هذا الموقع بالحفظ على Pinterest. يرجى التواصل مع المالك بخصوص أي أسئلة."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "احفظ أفكارك المفضلة على الإنترنت حتى يمكنك العودة إليها لاحقًا بسهولة."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "الزر \"حفظ\" في Pinterest"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "حفظ الأفكار إلى Pinterest."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "حفظ على Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "إخفاء زر الحفظ على الصور"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "المساعدة"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "لم يتم العثور على صور يمكن تثبيتها في الصفحة"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "حفظ الأفكار على Pinterest"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "حدد ما يصل إلى عشرين صورة"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "التالي"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "الإبلاغ عن مشكلة"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "النافذة المنبثقة لتعليم الإعدادات"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "تعطيل التمرير فوق الصورة أو الإبلاغ عن خطأ من الإعدادات"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "تسجيل الدخول"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "تعذَّر إنشاء لوحة جديدة"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "احصل على المساعدة"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "عذرًا، يوجد خطأ ما هنا. يُرجى التحقق من تسجيل دخولك إلى Pinterest وحاول مجددًا."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "عفوًا!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "تعذَّر حفظ هذه الصفحة"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "التالي"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "عذرًا، لا يُسمح بتثبيت المنشورات من هذا النطاق. يُرجى التواصل مع مسؤول الموقع إذا كان لديك أي أسئلة."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "لا"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "نعم"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "إخفاء أزرار \"الحفظ\" المتنقلة"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "خيارات الزر \"حفظ\""
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "العودة إلى الشاشة السابقة"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "بحث بالاسم"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "بحث بالاسم"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "تم الحفظ في"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "جارٍ الحفظ إلى"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "حدث خطأ ما من جانبنا"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "عرض"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "العودة إلى الإعدادات"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "لا تضمن Pinterest الرد على هذه الرسالة."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "الوصف"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "اشرح ما حدث بإيجاز"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "الإبلاغ عن مشكلة"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "إرسال"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "شكرًا لك على ملاحظاتك!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "تم إرسال المشكلة"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "موقع الويب"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "حفظ"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "حفظ"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "اختيار لوحة"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "الحفظ إلى لوحة"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "تم إنشاء المنشور"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "تم الحفظ في"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "عرض"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "حفظ"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "جارٍ حفظ أداة الانتقاء"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "بحث"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "تحديد الكل"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "عودة"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "تعطيل التمرير فوق الصورة"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "تم"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "الإعدادات"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "تسجيل الخروج"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "الإبلاغ عن مشكلة"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "إلغاء الوصول وتسجيل الخروج"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "تسجيل الدخول"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "تفويض"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "قم بتفويض ملحق حفظ في متصفح Pinterest حتى تتمكن من حفظ الأفكار بسهولة من مواقع الويب"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "ربط حساب Pinterest الخاص بك"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "حاول مرة أخرى"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "هل تواجهك مشكلة؟"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "أداة انتقاء تقدم المصادقة"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "إنشاء"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "أفضل الخيارات"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "زيارة"
+   }
+}

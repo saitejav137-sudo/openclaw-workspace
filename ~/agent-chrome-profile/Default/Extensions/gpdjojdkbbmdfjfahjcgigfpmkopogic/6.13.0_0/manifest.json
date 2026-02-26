@@ -1,0 +1,50 @@
+{
+   "action": {
+      "default_icon": {
+         "19": "icons/icon_toolbar.png",
+         "38": "icons/icon_toolbar@2x.png"
+      },
+      "default_title": "__MSG_actionTitle__"
+   },
+   "background": {
+      "service_worker": "backgroundScript.js",
+      "type": "module"
+   },
+   "content_scripts": [ {
+      "allFrames": false,
+      "js": [ "contentScript.js" ],
+      "matches": [ "*://*/*" ]
+   } ],
+   "content_security_policy": {
+      "img-src": "self"
+   },
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "enabled": true,
+         "id": "ruleset_1",
+         "path": "assets/rules.json"
+      } ]
+   },
+   "default_locale": "en",
+   "description": "__MSG_extensionDescription__",
+   "host_permissions": [ "*://*/*", "\u003Call_urls>" ],
+   "icons": {
+      "128": "icons/icon_128.png",
+      "140": "icons/icon_140.png",
+      "16": "icons/icon_16.png",
+      "256": "icons/icon_256.png",
+      "48": "icons/icon_48.png"
+   },
+   "incognito": "split",
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDB95q2hyt49ZDuVnYI91XaZhqQkbXu0X3fzoNxPxhFbfqGKwtts90LJ7lD5DCIfnBg8WGFhp3eW4GxOglAKrnksmJoyAD5PnSAufx8fD3trZvo/ZAqFx1x5Xm3Rm34EgvVXdralgHSYiqcEU/FX3kYnLLhr2TS4lcrsn1KZd/lcQIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_extensionName__",
+   "permissions": [ "contextMenus", "cookies", "storage", "activeTab", "declarativeNetRequest" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "6.13.0",
+   "web_accessible_resources": [ {
+      "matches": [ "*://*/*" ],
+      "resources": [ "index.html", "style.css" ],
+      "use_dynamic_url": true
+   } ]
+}

@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Meta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <style>
+    @keyframes move-stars-slow {
+      from {
+        background-position-x: 0;
+      }
+
+      to {
+        background-position-x: -10000px;
+      }
+    }
+
+    @keyframes move-stars-fast {
+      from {
+        background-position-x: 0;
+      }
+
+      to {
+        background-position-x: -10000px;
+      }
+    }
+
+    @keyframes shooting-star {
+      0% {
+        transform: translate(450px, -50px) scale(0.5);
+        opacity: 1;
+      }
+
+      70% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-450px, 450px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    @keyframes pulse-glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 8px rgba(99, 179, 237, 0.3);
+      }
+
+      50% {
+        box-shadow: 0 0 16px rgba(99, 179, 237, 0.6);
+      }
+    }
+
+    @keyframes icon-pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+    }
+
+    @keyframes icon-shake {
+
+      0%,
+      100% {
+        transform: rotate(0deg);
+      }
+
+      25% {
+        transform: rotate(-8deg);
+      }
+
+      75% {
+        transform: rotate(8deg);
+      }
+    }
+
+    @keyframes progress-glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 6px rgba(99, 179, 237, 0.3);
+      }
+
+      50% {
+        box-shadow: 0 0 14px rgba(167, 139, 250, 0.5);
+      }
+    }
+
+    @keyframes dot-pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.6;
+        transform: scale(0.85);
+      }
+    }
+
+    :root {
+      --bg-color: #0f1724;
+      --text-color: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --primary-color: #63b3ed;
+      --primary-dark: #4299e1;
+      --accent-color: #a78bfa;
+      --secondary-color: rgba(30, 41, 59, 0.7);
+      --success-color: #68d391;
+      --warning-color: #f6ad55;
+      --error-color: #fc8181;
+      --border-color: rgba(148, 163, 184, 0.15);
+      --glass-bg: rgba(15, 23, 42, 0.6);
+      --glass-border: rgba(148, 163, 184, 0.12);
+      --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+      --border-radius: 12px;
+      --border-radius-lg: 16px;
+      --font-family: 'Nunito', sans-serif;
+      --font-size-sm: 0.8rem;
+      --font-size-base: 0.9rem;
+      --font-size-md: 1rem;
+    }
+
+    html {
+      font-size: 14px;
+    }
+
+    body {
+      width: 450px;
+      color: var(--text-color);
+      font-family: var(--font-family);
+      padding: 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      position: relative;
+      background: linear-gradient(135deg, #0f1724 0%, #1a1f3a 50%, #0f1724 100%);
+      overflow: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      z-index: 0;
+      background-repeat: repeat;
+    }
+
+    body::before {
+      background-image: radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.4), transparent),
+        radial-gradient(1px 1px at 40px 80px, rgba(255, 255, 255, 0.3), transparent);
+      background-size: 200px 200px;
+      animation: move-stars-slow 200s linear infinite;
+    }
+
+    body::after {
+      background-image: radial-gradient(1.5px 1.5px at 50px 50px, rgba(255, 255, 255, 0.5), transparent),
+        radial-gradient(2px 2px at 180px 100px, rgba(255, 255, 255, 0.3), transparent);
+      background-size: 250px 250px;
+      animation: move-stars-fast 100s linear infinite;
+    }
+
+    .shooting-star {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 3px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px 2px white;
+      opacity: 0;
+      animation: shooting-star 15s ease-in-out 7s infinite;
+    }
+
+    /* ═══ MAIN INTERFACE ═══ */
+    #main-interface {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: bottom;
+    }
+
+    /* ═══ COMPACT HEADER ═══ */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .header img {
+      width: 34px;
+      height: 34px;
+      filter: drop-shadow(0 0 6px rgba(99, 179, 237, 0.4));
+    }
+
+    .header .title-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header .tool-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #63b3ed, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header .author-name {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    .author-name a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .author-name a:hover {
+      color: var(--primary-color);
+    }
+
+    .donate-link {
+      margin-left: auto;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      color: var(--warning-color);
+      background: rgba(246, 173, 85, 0.1);
+      border: 1px solid rgba(246, 173, 85, 0.2);
+      border-radius: 20px;
+      transition: all 0.3s;
+      white-space: nowrap;
+      font-size: var(--font-size-sm);
+    }
+
+    .donate-link:hover {
+      color: #1a202c;
+      background: linear-gradient(135deg, #f6ad55, #ed8936);
+      border-color: transparent;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(246, 173, 85, 0.3);
+    }
+
+    .donate-icon {
+      font-size: 1.2em;
+    }
+
+    .donate-text {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+    }
+
+    .header-lang-select {
+      width: auto !important;
+      min-width: 0;
+      padding: 4px 6px;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      border-radius: 8px;
+      margin-bottom: 0;
+      background: var(--secondary-color);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ═══ WRONG PAGE ═══ */
+    #wrong-page-interface {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100%;
+      gap: 15px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+      background: rgba(15, 23, 36, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    #wrong-page-interface p {
+      color: var(--text-color);
+      font-size: var(--font-size-base);
+    }
+
+    /* ═══ FORM ELEMENTS ═══ */
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+    }
+
+    textarea,
+    input,
+    select,
+    button {
+      font-family: var(--font-family);
+    }
+
+    textarea,
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      background: var(--secondary-color);
+      border: 1px solid var(--glass-border);
+      color: var(--text-color);
+      border-radius: var(--border-radius);
+      padding: 9px 12px;
+      box-sizing: border-box;
+      margin-bottom: 8px;
+      font-size: var(--font-size-base);
+      backdrop-filter: blur(4px);
+      transition: all 0.2s;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.2), 0 0 12px rgba(99, 179, 237, 0.1);
+    }
+
+    button {
+      box-sizing: border-box;
+      background: var(--secondary-color);
+      color: var(--text-color);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius);
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(148, 163, 184, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    /* ═══ PILL TABS ═══ */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+      padding: 3px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--glass-border);
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 7px 6px;
+      border: none;
+      border-radius: var(--border-radius);
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-button .material-symbols-outlined {
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+
+    .tab-button:hover:not(.active) {
+      color: var(--text-color);
+      background: rgba(99, 179, 237, 0.08);
+    }
+
+    .tab-button:hover:not(.active) .material-symbols-outlined {
+      color: var(--primary-color);
+    }
+
+    .tab-button.active {
+      color: white;
+      background: linear-gradient(135deg, rgba(99, 179, 237, 0.25), rgba(167, 139, 250, 0.2));
+      border: 1px solid rgba(99, 179, 237, 0.3);
+      box-shadow: 0 0 12px rgba(99, 179, 237, 0.15);
+    }
+
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      border-radius: 2px;
+    }
+
+    .tab-button.active .material-symbols-outlined {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      filter: drop-shadow(0 0 4px rgba(99, 179, 237, 0.5));
+    }
+
+    .tab-content {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    #content-control.active {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #content-history.active {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* ═══ GLASS CARDS ═══ */
+    #imageModeContainer,
+    #promptContainer,
+    .status-area,
+    .settings-grid {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-lg);
+      padding: 12px 14px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--glass-shadow);
+      margin-bottom: 10px;
+    }
+
+    /* ═══ IMAGE MODE ═══ */
+    #imageModeContainer {
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .image-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    #uploadImageButton {
+      flex: 1;
+      margin-bottom: 0;
+      min-width: 0;
+      height: 34px;
+      padding: 0 12px;
+      background: linear-gradient(135deg, rgba(99, 179, 237, 0.1), rgba(167, 139, 250, 0.08));
+      border: 1px solid rgba(99, 179, 237, 0.2);
+      transition: all 0.3s;
+    }
+
+    #uploadImageButton:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(99, 179, 237, 0.2), rgba(167, 139, 250, 0.15));
+      border-color: rgba(99, 179, 237, 0.4);
+      box-shadow: 0 0 12px rgba(99, 179, 237, 0.15);
+    }
+
+    #uploadImageButton .material-symbols-outlined {
+      font-size: 1rem;
+      transition: transform 0.3s;
+    }
+
+    #uploadImageButton:hover .material-symbols-outlined {
+      transform: translateY(-1px);
+    }
+
+    #generationModeSelector {
+      flex: none;
+      width: auto;
+      margin-bottom: 0;
+      min-width: 0;
+      height: 34px;
+      padding: 0 12px;
+      background: linear-gradient(135deg, rgba(99, 179, 237, 0.15), rgba(167, 139, 250, 0.1));
+      border: 1px solid rgba(99, 179, 237, 0.3);
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    #aspectRatioSelector {
+      flex: 0 0 70px;
+      margin-bottom: 0;
+    }
+
+    #imageFileSummary {
+      display: none;
+      font-size: var(--font-size-base);
+      color: var(--warning-color);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .summary-controls-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .icon-button {
+      padding: 5px;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+      line-height: 1;
+      border-radius: 8px;
+    }
+
+    .icon-button .material-symbols-outlined {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    #clearImagesButton {
+      background: rgba(252, 129, 129, 0.1);
+      border: 1px solid rgba(252, 129, 129, 0.2);
+      color: var(--error-color);
+    }
+
+    #clearImagesButton:hover:not(:disabled) {
+      background: rgba(252, 129, 129, 0.2);
+      border-color: var(--error-color);
+    }
+
+    /* ═══ PROMPT SECTION ═══ */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .section-title {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-right: 8px;
+    }
+
+    .section-header .sample-link {
+      font-size: var(--font-size-sm);
+      color: var(--warning-color);
+      text-decoration: none;
+      margin-right: auto;
+      white-space: nowrap;
+    }
+
+    .section-header .sample-link:hover {
+      text-decoration: underline;
+    }
+
+    #uploadPromptButton {
+      font-size: var(--font-size-sm);
+      padding: 4px 8px;
+    }
+
+    #promptContainer {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #prompts {
+      background: rgba(0, 0, 0, 0.35);
+      flex: 1;
+      min-height: 80px;
+      resize: none;
+      margin-bottom: 0;
+      border: 1px solid var(--glass-border);
+      font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    #prompts:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.15), 0 0 20px rgba(99, 179, 237, 0.1), inset 0 0 30px rgba(99, 179, 237, 0.03);
+    }
+
+    #prompts::placeholder {
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      letter-spacing: 0;
+    }
+
+    /* ═══ ANIMATED PROGRESS & STATUS ═══ */
+    .status-area {
+      padding: 10px 14px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    #progressBar {
+      width: 100%;
+      height: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      appearance: none;
+      -webkit-appearance: none;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+      border: none;
+      transition: box-shadow 0.3s;
+    }
+
+    #progressBar[value]:not([value="0"]) {
+      animation: progress-glow 2s ease-in-out infinite;
+    }
+
+    #progressBar::-webkit-progress-bar {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+    }
+
+    #progressBar::-webkit-progress-value {
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-color));
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: shimmer 2s linear infinite;
+      transition: width 0.4s ease;
+    }
+
+    #liveStatus {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #liveStatus::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .status-area[data-status="info"] #liveStatus::before {
+      background: var(--primary-color);
+      animation: dot-pulse 2s ease-in-out infinite;
+    }
+
+    .status-area[data-status="success"] #liveStatus::before {
+      background: var(--success-color);
+      box-shadow: 0 0 6px rgba(104, 211, 145, 0.5);
+    }
+
+    .status-area[data-status="error"] #liveStatus::before {
+      background: var(--error-color);
+      box-shadow: 0 0 6px rgba(252, 129, 129, 0.5);
+    }
+
+    .status-area[data-status="warn"] #liveStatus::before {
+      background: var(--warning-color);
+      animation: dot-pulse 1.5s ease-in-out infinite;
+    }
+
+    /* ═══ GRADIENT ACTION BUTTONS ═══ */
+    .action-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+      align-items: stretch;
+      flex-shrink: 0;
+    }
+
+    #mainActionButton {
+      background: linear-gradient(135deg, #4299e1, #667eea, #764ba2);
+      background-size: 200% 200%;
+      border: none;
+      color: white;
+      font-weight: 700;
+      grid-column: 1 / 2;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #mainActionButton::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #mainActionButton:hover:not(:disabled)::before {
+      opacity: 1;
+    }
+
+    #mainActionButton:hover:not(:disabled) {
+      background-position: 100% 0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+    }
+
+    #mainActionButton:hover:not(:disabled) .material-symbols-outlined {
+      animation: icon-pulse 0.6s ease-in-out;
+    }
+
+    #mainActionButton:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+    }
+
+    #stopButton {
+      background: linear-gradient(135deg, #fc8181, #e53e3e);
+      border: none;
+      color: white;
+      font-weight: 700;
+      grid-column: 2 / 3;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #stopButton::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #stopButton:hover:not(:disabled)::before {
+      opacity: 1;
+    }
+
+    #stopButton:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+    }
+
+    #stopButton:hover:not(:disabled) .material-symbols-outlined {
+      animation: icon-shake 0.4s ease-in-out;
+    }
+
+    #stopButton:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+    }
+
+    /* ═══ LOG DISPLAY ═══ */
+    #logDisplay,
+    #failedPromptsDisplay {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--border-radius);
+      padding: 10px;
+      font-size: 0.82rem;
+      border: 1px solid var(--glass-border);
+      overflow-y: auto;
+      backdrop-filter: blur(4px);
+    }
+
+    #logDisplay {
+      flex: 1;
+      min-height: 80px;
+      resize: none;
+    }
+
+    #failedPromptsDisplay {
+      min-height: 50px;
+      max-height: 100px;
+    }
+
+    /* ═══ SETTINGS GRID ═══ */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .settings-grid label {
+      margin-bottom: 0;
+      text-align: right;
+    }
+
+    .settings-grid .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .settings-grid .unit,
+    .settings-grid [data-lang-key="to_label"] {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+    }
+
+    .settings-grid input[type="number"] {
+      text-align: center;
+    }
+
+    .settings-grid .input-short {
+      width: 65px;
+    }
+
+    .settings-grid select {
+      width: auto;
+      min-width: 150px;
+    }
+
+    .settings-subheader {
+      grid-column: 1 / -1;
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: capitalize;
+      margin-top: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--glass-border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+
+    .settings-subheader:hover {
+      opacity: 0.8;
+    }
+
+    .settings-subheader::before {
+      content: '▾';
+      font-size: 0.75rem;
+      transition: transform 0.3s;
+      -webkit-text-fill-color: var(--primary-color);
+    }
+
+    .settings-subheader.collapsed::before {
+      transform: rotate(-90deg);
+    }
+
+    .settings-grid #openDownloadsSettingsLink {
+      color: var(--warning-color);
+      text-decoration: none;
+    }
+
+    .settings-grid #openDownloadsSettingsLink:hover {
+      text-decoration: underline;
+    }
+
+    .settings-grid .hint-text {
+      grid-column: 1 / -1;
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: -5px;
+      padding: 8px 10px;
+      background: rgba(99, 179, 237, 0.05);
+      border-radius: 8px;
+      border-left: 2px solid var(--primary-color);
+    }
+
+    /* ═══ TOGGLE SWITCH ═══ */
+    .settings-grid input[type=checkbox] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 38px;
+      height: 20px;
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s;
+      vertical-align: middle;
+      margin: 0;
+    }
+
+    .settings-grid input[type=checkbox]::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .settings-grid input[type=checkbox]:checked {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    }
+
+    .settings-grid input[type=checkbox]:checked::before {
+      transform: translateX(18px);
+    }
+
+    /* ═══ TOOL CARDS ═══ */
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tool-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius);
+      padding: 14px;
+      text-decoration: none;
+      color: var(--text-color);
+      transition: all 0.25s;
+      backdrop-filter: blur(8px);
+    }
+
+    .tool-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      border-color: rgba(99, 179, 237, 0.3);
+      background: rgba(99, 179, 237, 0.05);
+    }
+
+    .tool-card-icon {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .tool-card-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tool-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .tool-card-desc {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ═══ GUIDE BUTTONS ═══ */
+    .guide-button {
+      background: var(--secondary-color);
+      color: var(--warning-color);
+      border: 1px solid rgba(246, 173, 85, 0.2);
+      border-radius: var(--border-radius);
+      padding: 5px 14px;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+
+    .guide-button:hover {
+      background: rgba(246, 173, 85, 0.15);
+      border-color: var(--warning-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(246, 173, 85, 0.15);
+    }
+
+    /* ═══ SCROLLBAR ═══ */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shooting-star"></div>
+  <div id="wrong-page-interface">
+    <span class="material-symbols-outlined" style="font-size: 48px;">wrong_location</span>
+    <p id="wrong-page-message" data-lang-key="wrong_page_message">Tool chỉ chạy trên trang Meta AI Media.<br>Vui lòng
+      điều hướng đến trang đó.</p>
+    <button id="navigateToFlowButton"><span class="material-symbols-outlined">link</span> <span
+        data-lang-key="go_to_meta">Chuyển đến Meta AI</span></button>
+  </div>
+  <div id="main-interface">
+    <div class="header">
+      <img src="images/logo.png" data-lang-title="logo_alt_text" alt="Logo">
+      <div class="title-group">
+        <h3 class="tool-name">Auto Meta</h3>
+        <p class="author-name" id="author-info"></p>
+      </div>
+      <a href="#" id="donate-link-anchor" target="_blank" rel="noopener noreferrer" class="donate-link"
+        data-lang-title="donate_title">
+        <span class="donate-icon">☕️</span>
+        <span class="donate-text" data-lang-key="buy_me_a_coffee">Buy Me a Coffee</span>
+      </a>
+      <select id="languageSelector" class="header-lang-select">
+        <option value="vi">VI</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="control"><span class="material-symbols-outlined">play_circle</span>
+        <span data-lang-key="tab_control">Điều Khiển</span></button>
+      <button class="tab-button" data-tab="settings"><span class="material-symbols-outlined">settings</span> <span
+          data-lang-key="tab_settings">Cài Đặt</span></button>
+      <button class="tab-button" data-tab="history"><span class="material-symbols-outlined">history</span> <span
+          data-lang-key="tab_history">Lịch Sử</span></button>
+      <button class="tab-button" data-tab="tools"><span class="material-symbols-outlined">extension</span> <span
+          data-lang-key="tab_tools">Tools Khác</span></button>
+    </div>
+    <div class="tab-content">
+      <div id="content-control" class="tab-pane active">
+
+        <div id="imageModeContainer">
+          <div class="image-upload-row">
+            <select id="generationModeSelector" data-lang-title="generation_mode_label">
+              <option value="video" data-lang-key="mode_video">Tạo Video</option>
+              <option value="image" data-lang-key="mode_image">Tạo Ảnh</option>
+            </select>
+
+            <button id="uploadImageButton">
+              <span class="material-symbols-outlined">upload_file</span>
+              <span data-lang-key="select_images_button">Chọn ảnh (nhiều ảnh)</span>
+            </button>
+
+            <select id="aspectRatioSelector" data-lang-title="aspect_ratio_label" style="display: none;">
+              <option value="1:1">1:1</option>
+              <option value="9:16">9:16</option>
+              <option value="16:9">16:9</option>
+            </select>
+
+            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+
+            <div class="summary-controls-wrapper">
+              <p id="imageFileSummary">
+                <span data-lang-key="images_selected">Đã chọn:</span> <span id="imageCount">0</span>
+              </p>
+              <button id="clearImagesButton" class="icon-button" data-lang-title="clear_images_title">
+                <span class="material-symbols-outlined">delete_sweep</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="promptContainer">
+          <div class="section-header">
+            <span class="section-title" id="promptListTitle" data-lang-key="prompt_list">Danh sách prompt</span>
+            <a href="https://gist.githubusercontent.com/duckmartians/3038bf3fc11dcce3f6b363e6c5c6c73a/raw/demo_prompt.txt"
+              target="_blank" rel="noopener noreferrer" id="sampleTxtLink" class="sample-link"
+              data-lang-key="sample_file_link">(File mẫu .txt)</a>
+            <button id="uploadPromptButton"><span class="material-symbols-outlined">upload_file</span><span
+                data-lang-key="import_from_file">Nhập từ file (.txt)</span></button>
+          </div>
+          <input type="file" id="fileInput" accept=".txt" style="display: none;">
+          <textarea id="prompts" data-lang-placeholder="prompt_placeholder"
+            placeholder="Nhập một hoặc nhiều prompt. Mỗi prompt cách nhau bằng một dòng trống.&#10;Tool sẽ lấy lần lượt 1 ảnh và 1 prompt.&#10;Nếu danh sách prompt ngắn hơn danh sách ảnh, prompt sẽ được dùng lặp lại."></textarea>
+        </div>
+
+        <div class="status-area">
+          <progress id="progressBar" value="0" max="100"></progress>
+          <div id="liveStatus" data-lang-key="status_ready">Sẵn sàng</div>
+        </div>
+
+        <div class="action-controls">
+          <button id="mainActionButton" data-lang-title="start_button_title">
+            <span class="material-symbols-outlined">play_arrow</span> <span data-lang-key="start_button">Bắt đầu</span>
+          </button>
+          <button id="stopButton" data-lang-title="stop_button_title" disabled>
+            <span class="material-symbols-outlined">stop</span> <span data-lang-key="stop_button">Dừng</span>
+          </button>
+        </div>
+
+        <div style="margin-top: auto; flex-shrink: 0;">
+          <div class="settings-subheader" data-lang-key="subheader_help" style="margin-top: 0; margin-bottom: 10px;">
+            Hướng dẫn sử dụng / User Manual
+          </div>
+          <div class="control-group" style="display: flex; gap: 15px; justify-content: center; margin-bottom: 10px;">
+            <a href="https://github.com/duckmartians/Auto-MetaAI/blob/main/README_vi.md" target="_blank"
+              rel="noopener noreferrer" class="guide-button">
+              Tiếng Việt
+            </a>
+            <a href="https://github.com/duckmartians/Auto-MetaAI/blob/main/README.md" target="_blank"
+              rel="noopener noreferrer" class="guide-button">
+              English
+            </a>
+          </div>
+        </div>
+
+      </div>
+      <div id="content-settings" class="tab-pane">
+        <div class="settings-grid">
+          <div class="settings-subheader" data-lang-key="subheader_general_settings">Cài đặt Chung</div>
+
+          <label for="startFromInput">Bắt đầu từ Ảnh số:</label>
+          <div class="control-group"><input type="number" id="startFromInput" value="1" min="1"
+              class="input-short"><span class="unit" data-lang-key="unit_number">số</span></div>
+
+          <label data-lang-key="initial_wait_time_label">Thời gian chờ tạo video (giây):</label>
+          <div class="control-group"><input type="number" id="minInitialWaitTime" value="10" min="1"
+              class="input-short"><span data-lang-key="to_label">đến</span><input type="number" id="maxInitialWaitTime"
+              value="20" min="1" class="input-short"></div>
+
+
+
+
+          <div class="settings-subheader" data-lang-key="subheader_download_settings">Cài đặt Tải xuống</div>
+          <label for="autoDownloadCheckbox" data-lang-key="auto_download_label">Tự động tải video:</label>
+          <div class="control-group">
+            <input type="checkbox" id="autoDownloadCheckbox">
+
+            <a href="#" id="openDownloadsSettingsLink" data-lang-key="downloads_settings_link"
+              style="margin-left: 5px;">Cấu hình thư mục</a>
+          </div>
+          <div class="hint-text" data-lang-key="downloads_settings_hint">
+            Mẹo: Tắt 'Hỏi vị trí lưu...' trong cài đặt tải xuống của trình duyệt để tải tự động không bị gián đoạn.
+          </div>
+        </div>
+      </div>
+      <div id="content-history" class="tab-pane">
+        <div class="section-header" style="flex-shrink: 0;"><span class="section-title" data-lang-key="log_title">Log
+            chi tiết</span></div>
+        <div id="logDisplay"></div>
+      </div>
+      <div id="content-tools" class="tab-pane">
+        <div class="section-header">
+          <span class="section-title" data-lang-key="other_tools_header">Khám phá Tools Khác</span>
+        </div>
+        <div class="tool-list">
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="sidepanel.js"></script>
+</body>
+
+</html>

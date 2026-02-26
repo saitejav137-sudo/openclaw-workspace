@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Pinterest पर सेव करें"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "सीक्रेट"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "अनुभाग जोड़ें"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "सभी बोर्ड"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "एक्सटेंशन बंद करें"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "सेटिंग"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "ऐसा लगता है कि आपने Pinterest में साइन इन नहीं किया है। आइए, इसे ठीक करें!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "श्श्श्श!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "बोर्ड चयन पर वापस जाएँ"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "बनाएँ"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "एक बोर्ड बनाएँ"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "कृपया 50 वर्णों से ज़्यादा दर्ज न करें"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "बोर्ड का नाम"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "बोर्ड का नाम"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "बोर्ड का नाम डालें"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "हमारी ओर से कुछ गड़बड़ी हुई है"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "इस बोर्ड को गुप्त रखें"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "इस बोर्ड को सिर्फ़ आप और सहयोगकर्ता देख पाएँगे"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "बोर्ड पर सेव करें"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "छवि चयन पर वापस जाएँ"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "सभी बोर्ड"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "बोर्ड बनाएँ"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "मुख्य पसंद"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "जारी रखने के लिए एक बोर्ड बनाएँ"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "कोई बोर्ड चुनें"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "बोर्ड लोड हो रहे हैं..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "सेव करने वाला स्पिनर"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "इस पर सेव की गई"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "बोर्ड अनुभाग देखें"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "सहयोगपूर्ण बोर्ड"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "सेव करें"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "गुप्त बोर्ड"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "अनुभाग चयन पर वापस जाएँ"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "बनाएँ"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "अनुभाग बनाएँ"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "कृपया 50 वर्णों से ज़्यादा दर्ज न करें"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "अनुभाग का नाम डालें"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "हमारी ओर से कुछ गड़बड़ी हुई है"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "अनुभाग का नाम"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "अनुभाग का नाम"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "बोर्ड चयन पर वापस जाएँ"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "अनुभाग जोड़ें"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "कोई अनुभाग चुनें"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "नया बनाएँ"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "बोर्ड चुनें"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Pinterest पर कोई आइडिया सेव करें"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "बीस छवियाँ तक चुनें"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "अनुभाग चुनें"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "रद्द करें"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Pinterest पर सेव करें"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "बोर्ड बनाएँ"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "क्षमा करें, इस साइट पर पिन करने की अनुमति नहीं है! अगर आपको लगता है कि इसमें कोई त्रुटि है, तो कृपया समस्या की रिपोर्ट करें।"
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "अरे नहीं..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "यह साइट Pinterest पर सेव करने की अनुमति नहीं देती है। सवालों के लिए साइट के स्वामी से संपर्क करें।"
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "अपने पसंदीदा विचारों को ऑनलाइन सेव करें ताकि आप उन्हें बाद में आसानी से देख सके।"
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Pinterest सेव बटन"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Pinterest पर विचार सेव करें।"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Pinterest पर सेव करें"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "छवियों पर सेव करें बटन छिपाएँ"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "मदद"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "पेज पर कोई पिन करने योग्य छवि नहीं मिली"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Pinterest पर कोई विचार सेव करें"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "बीस छवियाँ तक चुनें"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "आगे"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "समस्या की रिपोर्ट करें"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "सेटिंग शिक्षा पॉपओवर"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "छवि पर होवर करना अक्षम करें या सेटिंग से बग की रिपोर्ट करें"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "साइन इन करें"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "नया बोर्ड नहीं बनाया जा सका"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "सहायता प्राप्त करें"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "क्षमा करें, यहाँ कुछ ठीक नहीं है। कृपया जाँच करें कि आप Pinterest में लॉग इन हैं और फिर से कोशिश करें।"
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "ओह!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "यह पेज सेव नहीं किया जा सका"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "आगे"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "क्षमा करें, इस डोमेन से पिन करने की अनुमति नहीं है। अगर आपके कोई प्रश्न हैं, तो कृपया साइट ऑपरेटर से संपर्क करें।"
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "नहीं"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "हाँ"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "सेव बटन पर होवर करना छुपाएँ"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "सेव बटन के विकल्प"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "पिछली स्क्रीन पर वापस जाएँ"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "नाम से खोजें"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "नाम से खोजें"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "इस पर सेव की गई"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "इसमें सेव कर रहे हैं"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "हमारी ओर से कुछ गड़बड़ी हुई है"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "देखें"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "सेटिंग पर वापस जाएँ"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest इस संदेश का जवाब देने की गारंटी नहीं दे सकता है।"
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "विवरण"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "संक्षेप में बताएँ कि क्या हुआ"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "समस्या की रिपोर्ट करें"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "सबमिट करें"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "आपके फ़ीडबैक के लिए धन्यवाद!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "समस्या सबमिट की गई"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "वेबसाइट"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "सेव करें"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "सेव करें"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "कोई बोर्ड चुनें"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "बोर्ड पर सेव करें"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "पिन बनाई गई"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "इस पर सेव की गई"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "देखें"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "सेव करें"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "सेवा करने वाला स्पिनर"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "खोजें"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "सभी का चयन करें"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "पीछे जाएँ"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "छवि पर होवर करना अक्षम करें"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "हो गया"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "सेटिंग"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "लॉग आउट करें"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "समस्या की रिपोर्ट करें"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "पहुँच रद्द करें और साइन आउट करें"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "साइन इन करें"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "अधिकृत करें"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Pinterest सेव करें ब्राउज़र एक्सटेंशन को अधिकृत करें ताकि आप आसानी से वेबसाइट से सुझाव सेव कर सकें"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "अपना Pinterest खाता कनेक्ट करें"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "दुबारा कोशिश करें"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "परेशानी हो रही है?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "प्रमाणीकरण प्रगति स्पिनर"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "बनाएँ"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "मुख्य पसंद"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "विज़िट करें"
+   }
+}

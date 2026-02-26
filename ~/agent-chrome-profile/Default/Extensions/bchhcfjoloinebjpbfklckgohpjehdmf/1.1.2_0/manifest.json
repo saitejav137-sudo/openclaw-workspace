@@ -1,0 +1,29 @@
+{
+   "action": {
+      "default_title": "Open Auto Meta"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "default_locale": "en",
+   "description": "__MSG_extDescription__",
+   "host_permissions": [ "https://www.meta.ai/*" ],
+   "icons": {
+      "128": "images/icon128.png",
+      "16": "images/icon16.png",
+      "48": "images/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwcrZrAAGyqgxt2CEVHztpwTSQqUyIHbxQbZDKsPdc7U2xGs5juzMvJPs/QqQVLy5wheHF0THGk5X6yFbli2ZPNdqQzTbxYMj97Hjoi2vMh0MQIAGOPPbjtOlHXlqCyVgz+rFnGbEOIN+W2gYOP107blZHrjiWxIGb8sj97gv7Hp9ObhrCQ+ajjChFfQ1469OLAZegxz7v3LCJQTxDZ+engZRCgpkR3PWSzIZu02p5tQoHzXHvgkThcFK1LnFNJOO+W2rXMlqW+1bJroxlXVaTG++AN9gUqrDE6xiwGU0jsnpxmTuAKSBNu2RmfnbcV7Gp2+h//307e45aOIij+fW1QIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_extName__",
+   "permissions": [ "sidePanel", "activeTab", "scripting", "storage", "tabs", "downloads" ],
+   "side_panel": {
+      "default_path": "sidepanel.html"
+   },
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.1.2",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "images/logo.png" ]
+   } ]
+}

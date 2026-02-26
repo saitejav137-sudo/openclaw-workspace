@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "שמרו ב-Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "סודי"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "הוספת מקטע"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "כל הלוחות"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "סגרו את התוסף"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "הגדרות"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "נראה שאתם לא מחוברים ל-Pinterest. בואו נתקן את זה!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "פססטט..."
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "חזרה לבחירת הלוח"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "יצירה"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "צרו לוח"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "הזינו עד 50 תווים"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "שם לוח"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "שם לוח"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "הזינו שם לוח"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "משהו השתבש בצד שלנו"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "הפכו לוח זה לסודי"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "רק אתם ומשתפי פעולה יראו את הלוח הזה"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "שמירה בלוח"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "חזרה לבחירת תמונות"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "כל הלוחות"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "צרו לוח"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "הבחירות המובילות"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "צרו לוח כדי להמשיך"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "בחרו לוח"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "טוען לוחות..."
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "שומר ספינר"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "נשמר ב-"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "הציגו מקטעי לוח"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "לוח משותף"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "שמירה"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "לוח סודי"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "חזרה לבחירת מקטע"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "יצירה"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "יצירת מקטע"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "הזינו עד 50 תווים"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "הזינו שם מקטע"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "משהו השתבש בצד שלנו"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "שם מקטע"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "שם המקטע"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "חזרה לבחירת הלוח"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "הוספת מקטע"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "בחירת מקטע"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "צרו חדש"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "בחרו לוח"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "שמרו רעיון ב-Pinterest"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "בחרו עד עשרים תמונות"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "בחירת מקטע"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "ביטול"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "שמרו ב-Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "צרו לוח"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "מצטערים, לא ניתן לבצע הצמדה באתר הזה! דווחו על בעיה אם אתם חושבים שזו שגיאה."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "אוי לא..."
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "אתר זה לא מאפשר שמירה ב-Pinterest. צרו קשר עם הבעלים לכל שאלה."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "שמרו את הרעיונות המועדפים עליכם באופן מקוון כדי שתוכלו לחזור אליהם בקלות בהמשך."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "הלחצן Pinterest Save"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "שמרו רעיונות ב-Pinterest"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "שמרו ב-Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "הסתרת לחצן 'שמירה' בתמונות"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "עזרה"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "לא נמצאו תמונות שאפשר להצמיד בדף"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "שמרו רעיון ב-Pinterest"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "בחרו עד עשרים תמונות"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "הבא"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "דווחו על בעיה"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "חלון מוקפץ חינוכי להגדרות"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "השביתו את ריחוף התמונה או דווחו על באג מ'הגדרות'"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "היכנסו"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "לא ניתן ליצור לוח חדש"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "קבלת עזרה"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "מצטערים, משהו לא בסדר. בדקו שאתם מחוברים ל-Pinterest ונסו שוב."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "אופס!"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "לא ניתן לשמור דף זה"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "הבא"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "מצטערים, לא ניתן לבצע הצמדה מתוך תחום זה. צרו קשר עם מפעיל האתר אם יש לכם שאלות."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "לא"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "כן"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "הסתירו ריחוף מעל לחצני 'שמירה'"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "אפשרויות הלחצן 'שמירה'"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "חזרה למסך הקודם"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "חיפוש לפי שם"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "חיפוש לפי שם"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "נשמר ב-"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "נשמר ב"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "משהו השתבש בצד שלנו"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "הצגה"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "חזרה להגדרות"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Pinterest לא יכולה להבטיח תגובה להודעה זו."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "תיאור"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "הסבירו בקצרה מה קרה"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "דווחו על בעיה"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "שליחה"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "תודה על המשוב!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "הבעיה נשלחה"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "אתר"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "שמירה"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "שמירה"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "בחרו לוח"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "שמירה בלוח"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "ה-Pin נוצר"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "נשמר ב-"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "הצגה"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "שמירה"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "שמירת הספינר"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "חיפוש"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "בחירת הכול"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "חזרה"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "השבתת ריחוף תמונה"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "בוצע"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "הגדרות"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "להתנתק"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "דווחו על בעיה"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "בטלו גישה והתנתקו"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "היכנסו"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "אישור"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "אשרו את תוסף Pinterest Save לדפדפן כדי שתוכלו לשמור בקלות רעיונות מאתרים"
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "התחברו לחשבון Pinterest שלכם"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "נסו שוב"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "נתקלתם בבעיה?"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "ספינר עיבוד האימות"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "יצירה"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "הבחירות המובילות"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "ביקור"
+   }
+}

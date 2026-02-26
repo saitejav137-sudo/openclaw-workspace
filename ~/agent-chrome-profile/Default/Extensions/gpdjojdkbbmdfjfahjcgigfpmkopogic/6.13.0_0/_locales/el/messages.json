@@ -1,0 +1,498 @@
+{
+   "actionTitle": {
+      "description": "Title of the Pinterest action button.",
+      "message": "Αποθήκευση στο Pinterest"
+   },
+   "addFormSecretLabel": {
+      "description": "label over secret/not-secret switch",
+      "message": "Κρυφό"
+   },
+   "addSection": {
+      "description": "label to add section",
+      "message": "Προσθήκη ενότητας"
+   },
+   "allBoards": {
+      "description": "interstitial header in board list",
+      "message": "Όλοι οι πίνακες"
+   },
+   "appHeadercloseButtonaccessibilityLabel": {
+      "description": "Accessibility label for extension close button",
+      "message": "Κλείσιμο επέκτασης"
+   },
+   "appHeaderpinterestLogoaccessibilityLabel": {
+      "description": "Accessibility label for Pinterest logo",
+      "message": "Pinterest"
+   },
+   "appHeadersettingsButtonaccessibilityLabel": {
+      "description": "Accessibility label for settings button",
+      "message": "Ρυθμίσεις"
+   },
+   "authHelpBody": {
+      "description": "If you're not signed in, here's what we'll do when you click the button below",
+      "message": "Όπως φαίνεται, δεν έχετε συνδεθεί στο Pinterest. Ας το διορθώσουμε!"
+   },
+   "authHelpHead": {
+      "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!",
+      "message": "Προσοχή!"
+   },
+   "boardCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Επιστροφή στην επιλογή πίνακα"
+   },
+   "boardCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board",
+      "message": "Δημιουργία"
+   },
+   "boardCreatePageheading": {
+      "description": "Heading on the page that shows the board creation interface",
+      "message": "Δημιουργία πίνακα"
+   },
+   "boardCreatePagenameFieldmaxLengthError": {
+      "description": "New board name validation error",
+      "message": "Πληκτρολογήστε έως 50 χαρακτήρες"
+   },
+   "boardCreatePagenameTextFieldheading": {
+      "description": "Label for new board name text field",
+      "message": "Όνομα πίνακα"
+   },
+   "boardCreatePagenameTextFieldlabel": {
+      "description": "Label for new board name text field",
+      "message": "Όνομα πίνακα"
+   },
+   "boardCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board name text field",
+      "message": "Εισαγάγετε το όνομα του πίνακα"
+   },
+   "boardCreatePagesaveErrortext": {
+      "description": "Board save error text",
+      "message": "Προέκυψε σφάλμα από την πλευρά μας"
+   },
+   "boardCreatePagesecretSwitchheading": {
+      "description": "Label text for a switch to make new board secret",
+      "message": "Μετατροπή του πίνακα σε μυστικό"
+   },
+   "boardCreatePagesecretSwitchinfo": {
+      "description": "Info text for a switch to make new board secret",
+      "message": "Μόνο εσείς και οι συνεργάτες σας θα βλέπετε αυτόν τον πίνακα"
+   },
+   "boardPickerOpenerLabel": {
+      "description": "Label in inline board picker",
+      "message": "Αποθήκευση σε πίνακα"
+   },
+   "boardPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Επιστροφή στην επιλογή εικόνας"
+   },
+   "boardPickerPagecreateBoardallBoardHeading": {
+      "description": "Heading for a setion listing all user's boards",
+      "message": "Όλοι οι πίνακες"
+   },
+   "boardPickerPagecreateBoardbutton": {
+      "description": "Button text to create new board",
+      "message": "Δημιουργία πίνακα"
+   },
+   "boardPickerPagecreateBoardtopChoiceHeading": {
+      "description": "Heading for a setion listing top choices for user's board selection",
+      "message": "Δημοφιλείς επιλογές"
+   },
+   "boardPickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no boards are present",
+      "message": "Δημιουργήστε έναν πίνακα για να συνεχίσετε"
+   },
+   "boardPickerPageheading": {
+      "description": "Heading on the page that shows the board picker interface",
+      "message": "Επιλέξτε έναν πίνακα"
+   },
+   "boardPickerPageheadingloading": {
+      "description": "Heading on the page that shows that boards are loading",
+      "message": "Φόρτωση πινάκων…"
+   },
+   "boardPickerPagespinneraccessibility": {
+      "description": "Accessibility label on a Board loading spinner animation icon",
+      "message": "Εικονίδιο αποθήκευσης"
+   },
+   "boardPickerSuccessLabel": {
+      "description": "Label in inline board picker after pin creation",
+      "message": "Αποθηκεύτηκε σε"
+   },
+   "boardRepboardSectionsIconaccessibilityLabel": {
+      "description": "Accessibility label on button that shows board sections",
+      "message": "Προβολή ενοτήτων πίνακα"
+   },
+   "boardRepcollaborativeBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on an icon indicating a collaborative board",
+      "message": "Συνεργατικός πίνακας"
+   },
+   "boardRepsaveButtontext": {
+      "description": "Text on a button that saves a new Pin to user's profile",
+      "message": "Αποθήκευση"
+   },
+   "boardRepsecretBoardIconaccessibilityLabel": {
+      "description": "Accessibility label on a lock icon for a secret board",
+      "message": "Μυστικός πίνακας"
+   },
+   "boardSectionCreatePagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on Pinterest logo hover",
+      "message": "Επιστροφή στην επιλογή ενότητας"
+   },
+   "boardSectionCreatePagecreateButtontext": {
+      "description": "Text on a button that creates new board section",
+      "message": "Δημιουργία"
+   },
+   "boardSectionCreatePageheading": {
+      "description": "Heading on the page that shows the board section creation interface",
+      "message": "Δημιουργία ενότητας"
+   },
+   "boardSectionCreatePagenameFieldmaxLengthError": {
+      "description": "Error for when the new board section name is too long",
+      "message": "Πληκτρολογήστε έως 50 χαρακτήρες"
+   },
+   "boardSectionCreatePagenameTextFieldplaceholder": {
+      "description": "Placeholder text for new board section name text field",
+      "message": "Εισαγωγή ονόματος ενότητας"
+   },
+   "boardSectionCreatePagesaveErrortext": {
+      "description": "Board section save error text",
+      "message": "Προέκυψε σφάλμα από την πλευρά μας"
+   },
+   "boardSectionCreatePagetitleTextFieldheading": {
+      "description": "Label for new board section name text field",
+      "message": "Όνομα ενότητας"
+   },
+   "boardSectionCreatePagetitleTextFieldlabel": {
+      "description": "Label for new board section name text field",
+      "message": "Όνομα ενότητας"
+   },
+   "boardSectionPickerPagebackButtontootlipText": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Επιστροφή στην επιλογή πίνακα"
+   },
+   "boardSectionPickerPagecreateSectionbutton": {
+      "description": "Create board section button text",
+      "message": "Προσθήκη ενότητας"
+   },
+   "boardSectionPickerPageheading": {
+      "description": "Heading on the page that shows the board section picker interface",
+      "message": "Επιλογή ενότητας"
+   },
+   "buttonIconWithTextaddIconaccessibilityLabel": {
+      "description": "Accessibility label on a plus icon button",
+      "message": "Δημιουργία νέων"
+   },
+   "chooseBoard": {
+      "description": "main header in Save form",
+      "message": "Επιλογή πίνακα"
+   },
+   "choosePinMultiSelectHeader": {
+      "description": "New header message in the image picker overlay",
+      "message": "Αποθηκεύστε μια ιδέα στο Pinterest"
+   },
+   "choosePinSelectAllSubHeader": {
+      "description": "Subheader in the image picker overlay",
+      "message": "Επιλέξτε μέχρι είκοσι εικόνες"
+   },
+   "chooseSection": {
+      "description": "label for board sections",
+      "message": "Επιλογή ενότητας"
+   },
+   "closeAddForm": {
+      "description": "cancel create",
+      "message": "Ακύρωση"
+   },
+   "contextMenuSaveActionText": {
+      "description": "Context menu Save action name.",
+      "message": "Αποθήκευση στο Pinterest"
+   },
+   "createBoard": {
+      "description": "header in Create form",
+      "message": "Δημιουργία πίνακα"
+   },
+   "errorPagebannedDomaintext": {
+      "description": "Error message for when Pinterest prevents pinning on a domain",
+      "message": "Δυστυχώς, δεν επιτρέπεται το καρφίτσωμα από αυτόν τον τομέα! Αν πιστεύετε ότι πρόκειται για σφάλμα, αναφέρετε ένα πρόβλημα."
+   },
+   "errorPageheadingtext": {
+      "description": "Heading text for the error page",
+      "message": "Δυστυχώς,"
+   },
+   "errorPagenoPinDomaintext": {
+      "description": "Error message for when domain owner prevents pinning on their domain",
+      "message": "αυτός ο ιστότοπος δεν επιτρέπει την αποθήκευση στο Pinterest. Αν έχετε ερωτήσεις, επικοινωνήστε με τον κάτοχο."
+   },
+   "extDescription": {
+      "description": "The extension's description, seen in gallery and extensions page",
+      "message": "Αποθηκεύστε τις αγαπημένες σας ιδέες online, έτσι ώστε να μπορείτε να τις δείτε αργότερα."
+   },
+   "extName": {
+      "description": "The extension's title, seen in gallery and extensions page",
+      "message": "Κουμπί «Αποθήκευση» του Pinterest"
+   },
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Αποθηκεύστε μια ιδέα στο Pinterest."
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Αποθήκευση στο Pinterest"
+   },
+   "extensionSetting_hideHoverButtons": {
+      "description": "User setting to disable Save hover button on images",
+      "message": "Απόκρυψη του κουμπιού αποθήκευσης σε εικόνες"
+   },
+   "help": {
+      "description": "Get help after a Pin create failure",
+      "message": "Βοήθεια"
+   },
+   "imagePickerPageemptyStateheading": {
+      "description": "Text displayed in empty state when no images are present",
+      "message": "Δεν βρέθηκαν εικόνες με δυνατότητα pin στη σελίδα"
+   },
+   "imagePickerPageheading": {
+      "description": "Heading on the page that shows all scraped images from a page",
+      "message": "Αποθηκεύστε μια ιδέα στο Pinterest"
+   },
+   "imagePickerPageinfoPrompt": {
+      "description": "Additional info text on the page that shows all scraped images from a page",
+      "message": "Επιλέξτε μέχρι είκοσι εικόνες"
+   },
+   "imagePickerPagenextButtontext": {
+      "description": "Button text that goes from image selection to picking a board",
+      "message": "Επόμενο"
+   },
+   "imagePickerPagereportBugButtontext": {
+      "description": "Button text that goes to the report bug page",
+      "message": "Αναφορά προβλήματος"
+   },
+   "imagePickerPagesettingsEduaccessibilityLabel": {
+      "description": "Accessibility for settings education popover",
+      "message": "Αναδυόμενο παράθυρο εκπαίδευσης ρυθμίσεων"
+   },
+   "imagePickerPagesettingsEducontent": {
+      "description": "Settings education popover message content",
+      "message": "Απενεργοποίηση κατάδειξης εικόνας ή αναφορά σφάλματος από τις ρυθμίσεις"
+   },
+   "imagePickerPagesignIntext": {
+      "description": "Button text that goes to the Sign In page",
+      "message": "Σύνδεση"
+   },
+   "msgBoardFail": {
+      "description": "board create fail",
+      "message": "Δεν ήταν δυνατή η δημιουργία νέου πίνακα"
+   },
+   "msgHelp": {
+      "description": "get help button",
+      "message": "Λήψη βοήθειας"
+   },
+   "msgLoginFail": {
+      "description": "Message shown when someone's login changes while the board picker is open",
+      "message": "Λυπούμαστε, αλλά κάτι μοιάζει να μην είναι σωστό. Βεβαιωθείτε ότι έχετε συνδεθεί στο Pinterest και προσπαθήστε ξανά."
+   },
+   "msgOops": {
+      "description": "error header",
+      "message": "Δυστυχώς,"
+   },
+   "msgPinFail": {
+      "description": "pin create fail",
+      "message": "Δεν ήταν δυνατή η αποθήκευση αυτής της σελίδας"
+   },
+   "nextAction": {
+      "description": "Press this button to go to the Create view when multiple images are selected",
+      "message": "Επόμενο"
+   },
+   "noPinDomain": {
+      "description": "The default message we alert when someone tries to use the browser button on a forbidden domain",
+      "message": "Δυστυχώς, δεν επιτρέπεται το καρφίτσωμα από αυτόν τον τομέα. Επικοινωνήστε με τον διαχειριστή της ιστοσελίδας αν έχετε ερωτήσεις."
+   },
+   "optNo": {
+      "description": "switch option no",
+      "message": "Όχι"
+   },
+   "optYes": {
+      "description": "switch option yes",
+      "message": "Ναι"
+   },
+   "optionHide": {
+      "description": "Text next to the checkbox that turns off hoverbuttons",
+      "message": "Απόκρυψη των κουμπιών αποθήκευσης κατά τη μετακίνηση πάνω από εικόνες"
+   },
+   "optionTitle": {
+      "description": "Title for the Options page",
+      "message": "Επιλογές κουμπιού «Αποθήκευση»"
+   },
+   "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+      "description": "Accessibility label for back button",
+      "message": "Μετάβαση στο προηγούμενο βήμα"
+   },
+   "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+      "description": "Accessibility label on a search field",
+      "message": "Αναζήτηση με βάση το όνομα"
+   },
+   "pageHeadingWithSearchsearchFieldplaceholder": {
+      "description": "Placeholder text on a search field",
+      "message": "Αναζήτηση με βάση το όνομα"
+   },
+   "pinCreatePageheadingDonetext": {
+      "description": "Pin create page heading text when saving is complete. This text is followed by a board name",
+      "message": "Αποθηκεύτηκε σε"
+   },
+   "pinCreatePageheadingInProgresstext": {
+      "description": "Pin create page heading text when saving is in progress. This text is followed by a board name",
+      "message": "Αποθήκευση σε"
+   },
+   "pinCreatePagesaveErrortext": {
+      "description": "Pin create error text",
+      "message": "Προέκυψε σφάλμα από την πλευρά μας"
+   },
+   "pinCreatePageviewButtontext": {
+      "description": "Text on a button that opens newly created Pin page",
+      "message": "Προβολή"
+   },
+   "reportBugback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Επιστροφή στις ρυθμίσεις"
+   },
+   "reportBugdescriptionHelpText": {
+      "description": "Help text for description input field explaining that there will be no response",
+      "message": "Το Pinterest δεν μπορεί να εγγυηθεί ότι θα λάβετε απάντηση σε αυτό το μήνυμα."
+   },
+   "reportBugdescriptionLabel": {
+      "description": "Label for description input field",
+      "message": "Περιγραφή"
+   },
+   "reportBugdescriptionPlaceholder": {
+      "description": "Placeholder text for description input field",
+      "message": "Εξηγήστε εν συντομία τι συνέβη"
+   },
+   "reportBugheading": {
+      "description": "Heading on the report bug page",
+      "message": "Αναφορά προβλήματος"
+   },
+   "reportBugsubmitButton": {
+      "description": "Button text to submit bug report",
+      "message": "Υποβολή"
+   },
+   "reportBugsubmitSuccessdetailText": {
+      "description": "Detail text on successful report bug toast",
+      "message": "Ευχαριστούμε για τα σχόλιά σας!"
+   },
+   "reportBugsubmitSuccessheading": {
+      "description": "Heading on successful report bug toast",
+      "message": "Το πρόβλημα υποβλήθηκε"
+   },
+   "reportBugwebsiteLabel": {
+      "description": "Label for website input field",
+      "message": "Ιστότοπος"
+   },
+   "saveAction": {
+      "description": "Appears wherever we show a Save button or menu prompt",
+      "message": "Αποθήκευση"
+   },
+   "saveButtonText": {
+      "description": "Save button text.",
+      "message": "Αποθήκευση"
+   },
+   "savePickerboardDropdownIconaccessibilityLabel": {
+      "description": "Accessibility label on a board picker dropdown arrow",
+      "message": "Επιλογή πίνακα"
+   },
+   "savePickerboardDropdownIconheading": {
+      "description": "Heading on a board picker dropdown",
+      "message": "Αποθήκευση σε πίνακα"
+   },
+   "savePickerpinCreationSuccessIconaccessibilityLabel": {
+      "description": "Accessibility label for an icon indicating successful Pin creation",
+      "message": "Το pin δημιουργήθηκε"
+   },
+   "savePickerpinCreationSuccesshading": {
+      "description": "Heading tell the user where their Pin has been saved. This is followed by the board name",
+      "message": "Αποθηκεύτηκε σε"
+   },
+   "savePickerpinCreationSuccessviewButton": {
+      "description": "Button text to view newly created pin",
+      "message": "Προβολή"
+   },
+   "savePickersaveButtontext": {
+      "description": "Text on a button to create a Pin",
+      "message": "Αποθήκευση"
+   },
+   "savePickerspinneraccessibilityLabel": {
+      "description": "Accessibility label on a Pin creation spinner animation icon",
+      "message": "Εικονίδιο αποθήκευσης"
+   },
+   "searchAction": {
+      "description": "Appears in the right-click-to-search menu item",
+      "message": "Αναζήτηση"
+   },
+   "selectAll": {
+      "description": "Text next to the checkbox that selects all images on the grid",
+      "message": "Επιλογή όλων"
+   },
+   "settingsPageback": {
+      "description": "Text in tooltip that shows up on back button hover",
+      "message": "Επιστροφή"
+   },
+   "settingsPagedisableHover": {
+      "description": "Settings toggle for disabling image hover mode",
+      "message": "Απενεργοποίηση κατάδειξης εικόνας"
+   },
+   "settingsPagedoneButton": {
+      "description": "Button text to leave settings",
+      "message": "Τέλος"
+   },
+   "settingsPageheading": {
+      "description": "Heading on the settings page",
+      "message": "Ρυθμίσεις"
+   },
+   "settingsPagelogOut": {
+      "description": "Settings link to logout for non-Safari browsers",
+      "message": "Αποσύνδεση"
+   },
+   "settingsPagereportBug": {
+      "description": "Settings link to report bug page",
+      "message": "Αναφορά προβλήματος"
+   },
+   "settingsPagerevokeAccess": {
+      "description": "Settings link to revoke app access and sign out",
+      "message": "Ανάκληση πρόσβασης και αποσύνδεση"
+   },
+   "signIn": {
+      "description": "Click this button to sign in on Pinterest",
+      "message": "Σύνδεση"
+   },
+   "signInPageauthorizeButtontext": {
+      "description": "Button for user authorization",
+      "message": "Εξουσιοδότηση"
+   },
+   "signInPageconnectDescriptiontext": {
+      "description": "Description of the sign in page",
+      "message": "Εξουσιοδοτήστε την επέκταση αποθήκευσης προγράμματος περιήγησης του Pinterest, ώστε να μπορείτε να αποθηκεύετε εύκολα ιδέες από ιστότοπους."
+   },
+   "signInPageconnectHeadingtext": {
+      "description": "Sign in page heading",
+      "message": "Σύνδεση λογαριασμού Pinterest"
+   },
+   "signInPageretryButtontext": {
+      "description": "Button for retrying authorization",
+      "message": "Δοκιμάστε ξανά"
+   },
+   "signInPageretryHeadingtext": {
+      "description": "Heading for authorization retry state",
+      "message": "Αντιμετωπίζετε κάποιο πρόβλημα;"
+   },
+   "signInPagespinneraccessibilityLabel": {
+      "description": "Accessibility label on a user authentication progress spinner animation icon",
+      "message": "Επιλογέας προόδου ελέγχου ταυτότητας"
+   },
+   "submitAddForm": {
+      "description": "create new board",
+      "message": "Δημιουργία"
+   },
+   "topChoices": {
+      "description": "interstitial header in board list",
+      "message": "Δημοφιλείς επιλογές"
+   },
+   "visitButton": {
+      "description": "Pin create success button to visit pin",
+      "message": "Μετάβαση"
+   }
+}

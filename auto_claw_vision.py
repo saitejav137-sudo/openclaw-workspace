@@ -1645,6 +1645,152 @@ class TelegramBot:
             print(f"[Telegram] Updates error: {e}")
         return []
 
+    def handle_commands(self, text: str) -> str:
+        """Handle bot commands and return response"""
+        import auto_claw_vision
+        text = text.strip()
+
+        # Handle !! prefix commands
+        if text.startswith("!!"):
+            cmd = text[2:].strip().lower()
+        else:
+            cmd = text.lower()
+
+        # Get access to the global vision_server instance
+        vision_server = getattr(auto_claw_vision, 'vision_server', None)
+
+        if cmd == "help" or cmd == "start":
+            return """🤖 OpenClaw Bot Commands:
+
+!!status - System status
+!!agents - List active agents
+!!memory - Memory stats
+!!cost - Cost tracking
+!!tools - Available tools
+!!marketplace - Agent marketplace
+!!heal - Self-healing check
+!!restart - Restart automation
+!!help - Show this help"""
+
+        elif cmd == "status":
+            if vision_server:
+                stats = {
+                    "mode": vision_server.mode,
+                    "action": vision_server.action,
+                    "triggers": vision_server.trigger_count,
+                    "polling": vision_server.config.polling
+                }
+                return f"📊 Status: {stats}"
+            return "📊 System running"
+
+        elif cmd == "agents":
+            if vision_server and hasattr(vision_server, 'agent_supervisor'):
+                agents = vision_server.agent_supervisor.list_agents()
+                if agents:
+                    return "🤖 Active Agents:\n" + "\n".join(f"- {a['name']}" for a in agents)
+                return "🤖 No active agents"
+            return "🤖 Agent system not available"
+
+        elif cmd == "memory":
+            if vision_server and hasattr(vision_server, 'memory'):
+                short = len(vision_server.memory.short_term)
+                long = len(vision_server.memory.long_term)
+                epi = len(vision_server.memory.episodic) if hasattr(vision_server.memory, 'episodic') else 0
+                return f"🧠 Memory: Short={short}, Long={long}, Episodic={epi}"
+            return "🧠 Memory system not available"
+
+        elif cmd == "cost":
+            if vision_server and hasattr(vision_server, 'cost_tracker'):
+                stats = vision_server.cost_tracker.get_stats()
+                return f"💰 Total Cost: ${stats.get('total_cost', 0):.4f}"
+            return "💰 Cost tracker not available"
+
+        elif cmd == "tools":
+            if vision_server and hasattr(vision_server, 'tool_registry'):
+                tools = vision_server.tool_registry.list_tools()
+                if tools:
+                    return "🔧 Tools:\n" + "\n".join(f"- {t}" for t in tools[:10])
+                return "🔧 No tools registered"
+            return "🔧 Tool registry not available"
+
+        elif cmd == "marketplace":
+            if vision_server and hasattr(vision_server, 'agent_marketplace'):
+                agents = vision_server.agent_marketplace.list_agents()
+                if agents:
+                    return "🛒 Marketplace Agents:\n" + "\n".join(f"- {a['name']}" for a in agents[:5])
+                return "🛒 No marketplace agents"
+            return "🛒 Marketplace not available"
+
+        elif cmd == "heal":
+            if vision_server and hasattr(vision_server, 'self_healer'):
+                issues = vision_server.self_healer.heal()
+                if issues:
+                    return f"🔧 Fixed: {', '.join(issues)}"
+                return "🔧 All systems healthy"
+            return "🔧 Self-healer not available"
+
+        elif cmd == "restart":
+            # Signal restart
+            if vision_server:
+                threading.Thread(target=self._do_restart, args=(vision_server,)).start()
+                return "🔄 Restarting automation..."
+            return "❌ Cannot restart"
+
+        else:
+            return f"Unknown command: {cmd}\nUse !!help for available commands"
+
+    def _do_restart(self, vision_server):
+        """Perform restart in background"""
+        try:
+            time.sleep(1)
+            vision_server.should_stop = True
+        except:
+            pass
+
+    def start_command_listener(self, vision_server=None):
+        """Start polling for commands"""
+        if not self.enabled:
+            return
+
+        # Store vision_server globally for command handler
+        import auto_claw_vision
+        auto_claw_vision.vision_server = vision_server
+
+        def listener():
+            offset = 0
+            print("[DEBUG] Starting command listener...")
+            print("[Telegram] Command listener started")
+
+            while True:
+                try:
+                    updates = self.get_updates(offset)
+                    if not updates:
+                        continue
+
+                    for update in updates:
+                        try:
+                            offset = update.get("update_id", offset) + 1
+                            message = update.get("message", {})
+                            text = message.get("text", "")
+
+                            if text:
+                                print(f"[Telegram] Command: {text}")
+                                response = self.handle_commands(text)
+                                if response:
+                                    self.send_message(response)
+
+                        except Exception as e:
+                            print(f"[Telegram] Update error: {e}")
+                            continue
+
+                except Exception as e:
+                    print(f"[Telegram] Listener error: {e}")
+                    time.sleep(5)
+
+        thread = threading.Thread(target=listener, daemon=True)
+        thread.start()
+        print("[DEBUG] Command listener started")
+
 
 # ============== gRPC API ==============
 
@@ -2095,6 +2241,8 @@ class VisionHTTPServer:
                 self.telegram_bot = TelegramBot()
                 if self.telegram_bot.enabled:
                     print(f"[Telegram] Enabled: {self.telegram_bot.chat_id}")
+                    # Start command listener
+                    self.telegram_bot.start_command_listener(self)
                 else:
                     print("[Telegram] Not configured")
             except Exception as e:

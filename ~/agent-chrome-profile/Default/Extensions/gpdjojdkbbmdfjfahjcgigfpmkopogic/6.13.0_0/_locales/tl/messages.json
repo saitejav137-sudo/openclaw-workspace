@@ -1,0 +1,498 @@
+{
+  "extensionName": {
+    "message": "I-save sa Pinterest",
+    "description": "Name of the extension."
+  },
+  "extensionDescription": {
+    "message": "Mag-save ng mga ideya sa Pinterest.",
+    "description": "Description of the extension."
+  },
+  "actionTitle": {
+    "message": "I-save sa Pinterest",
+    "description": "Title of the Pinterest action button."
+  },
+  "contextMenuSaveActionText": {
+    "message": "I-save sa Pinterest",
+    "description": "Context menu Save action name."
+  },
+  "saveButtonText": {
+    "message": "I-save",
+    "description": "Save button text."
+  },
+  "imagePickerPageheading": {
+    "message": "Mag-save ng ideya sa Pinterest",
+    "description": "Heading on the page that shows all scraped images from a page"
+  },
+  "imagePickerPageinfoPrompt": {
+    "message": "Pumili ng hanggang dalawampung larawan",
+    "description": "Additional info text on the page that shows all scraped images from a page"
+  },
+  "imagePickerPageemptyStateheading": {
+    "message": "Walang nahanap na mga larawan na puwedeng ma-pin sa page",
+    "description": "Text displayed in empty state when no images are present"
+  },
+  "imagePickerPagereportBugButtontext": {
+    "message": "Mag-report ng Isyu",
+    "description": "Button text that goes to the report bug page"
+  },
+  "imagePickerPagenextButtontext": {
+    "message": "Susunod",
+    "description": "Button text that goes from image selection to picking a board"
+  },
+  "imagePickerPagesignIntext": {
+    "message": "Mag-sign In",
+    "description": "Button text that goes to the Sign In page"
+  },
+  "imagePickerPagesettingsEduaccessibilityLabel": {
+    "message": "Popover ng mga setting ng edukasyon",
+    "description": "Accessibility for settings education popover"
+  },
+  "imagePickerPagesettingsEducontent": {
+    "message": "I-disable ang pag-hover ng larawan o mag-report ng bug mula sa mga setting",
+    "description": "Settings education popover message content"
+  },
+  "boardPickerPageheading": {
+    "message": "Pumili ng board",
+    "description": "Heading on the page that shows the board picker interface"
+  },
+  "boardPickerPageheadingloading": {
+    "message": "Nilo-load ang mga board...",
+    "description": "Heading on the page that shows that boards are loading"
+  },
+  "boardPickerPagebackButtontootlipText": {
+    "message": "Bumalik sa pagpili ng larawan",
+    "description": "Text in tooltip that shows up on back button hover"
+  },
+  "boardPickerPagecreateBoardtopChoiceHeading": {
+    "message": "Mga nangungunang pagpipilian",
+    "description": "Heading for a setion listing top choices for user's board selection"
+  },
+  "boardPickerPagecreateBoardallBoardHeading": {
+    "message": "Lahat ng board",
+    "description": "Heading for a setion listing all user's boards"
+  },
+  "boardPickerPageemptyStateheading": {
+    "message": "Gumawa ng board para magpatuloy",
+    "description": "Text displayed in empty state when no boards are present"
+  },
+  "boardPickerPagespinneraccessibility": {
+    "message": "Spinner para sa pag-save",
+    "description": "Accessibility label on a Board loading spinner animation icon"
+  },
+  "boardPickerPagecreateBoardbutton": {
+    "message": "Gumawa ng board",
+    "description": "Button text to create new board"
+  },
+  "signInPagespinneraccessibilityLabel": {
+    "message": "Spinner ng pag-usad ng pag-authenticate",
+    "description": "Accessibility label on a user authentication progress spinner animation icon"
+  },
+  "signInPageconnectHeadingtext": {
+    "message": "Ikonekta ang iyong Pinterest account",
+    "description": "Sign in page heading"
+  },
+  "signInPageconnectDescriptiontext": {
+    "message": "Pahintulutan ang Pinterest Save browser extension para madali mong ma-save ang mga ideya mula sa mga website",
+    "description": "Description of the sign in page"
+  },
+  "signInPageauthorizeButtontext": {
+    "message": "Pahintulutan",
+    "description": "Button for user authorization"
+  },
+  "signInPageretryHeadingtext": {
+    "message": "Nagkakaproblema?",
+    "description": "Heading for authorization retry state"
+  },
+  "signInPageretryButtontext": {
+    "message": "Subukan muli",
+    "description": "Button for retrying authorization"
+  },
+  "appHeaderpinterestLogoaccessibilityLabel": {
+    "message": "Pinterest",
+    "description": "Accessibility label for Pinterest logo"
+  },
+  "appHeadersettingsButtonaccessibilityLabel": {
+    "message": "Settings",
+    "description": "Accessibility label for settings button"
+  },
+  "appHeadercloseButtonaccessibilityLabel": {
+    "message": "Isara ang extension",
+    "description": "Accessibility label for extension close button"
+  },
+  "boardRepcollaborativeBoardIconaccessibilityLabel": {
+    "message": "Collaborative board",
+    "description": "Accessibility label on an icon indicating a collaborative board"
+  },
+  "boardRepsecretBoardIconaccessibilityLabel": {
+    "message": "Sikretong board",
+    "description": "Accessibility label on a lock icon for a secret board"
+  },
+  "boardRepboardSectionsIconaccessibilityLabel": {
+    "message": "Tingnan ang mga seksyon ng board",
+    "description": "Accessibility label on button that shows board sections"
+  },
+  "boardRepsaveButtontext": {
+    "message": "I-save",
+    "description": "Text on a button that saves a new Pin to user's profile"
+  },
+  "buttonIconWithTextaddIconaccessibilityLabel": {
+    "message": "Gumawa ng bago",
+    "description": "Accessibility label on a plus icon button"
+  },
+  "pageHeadingWithSearchbackButtonaccessibilityLabel": {
+    "message": "Bumalik sa naunang screen",
+    "description": "Accessibility label for back button"
+  },
+  "pageHeadingWithSearchsearchFieldaccessibilityLabel": {
+    "message": "Hanapin ayon sa pangalan",
+    "description": "Accessibility label on a search field"
+  },
+  "pageHeadingWithSearchsearchFieldplaceholder": {
+    "message": "Hanapin ayon sa pangalan",
+    "description": "Placeholder text on a search field"
+  },
+  "savePickerpinCreationSuccessIconaccessibilityLabel": {
+    "message": "Ginawa ang Pin",
+    "description": "Accessibility label for an icon indicating successful Pin creation"
+  },
+  "savePickerpinCreationSuccesshading": {
+    "message": "Na-save sa",
+    "description": "Heading tell the user where their Pin has been saved. This is followed by the board name"
+  },
+  "savePickerpinCreationSuccessviewButton": {
+    "message": "Tingnan",
+    "description": "Button text to view newly created pin"
+  },
+  "savePickerboardDropdownIconheading": {
+    "message": "I-save sa board",
+    "description": "Heading on a board picker dropdown"
+  },
+  "savePickerboardDropdownIconaccessibilityLabel": {
+    "message": "Pumili ng board",
+    "description": "Accessibility label on a board picker dropdown arrow"
+  },
+  "savePickerspinneraccessibilityLabel": {
+    "message": "Spinner para sa pag-save",
+    "description": "Accessibility label on a Pin creation spinner animation icon"
+  },
+  "savePickersaveButtontext": {
+    "message": "I-save",
+    "description": "Text on a button to create a Pin"
+  },
+  "boardCreatePagesaveErrortext": {
+    "message": "Nagkaroon ng problema sa amin",
+    "description": "Board save error text"
+  },
+  "boardCreatePagenameFieldmaxLengthError": {
+    "message": "Mangyaring maglagay ng hindi hihigit sa 50 character",
+    "description": "New board name validation error"
+  },
+  "boardCreatePageheading": {
+    "message": "Gumawa ng board",
+    "description": "Heading on the page that shows the board creation interface"
+  },
+  "boardCreatePagebackButtontootlipText": {
+    "message": "Bumalik sa pagpili ng board",
+    "description": "Text in tooltip that shows up on back button hover"
+  },
+  "boardCreatePagenameTextFieldheading": {
+    "message": "Pangalan ng board",
+    "description": "Label for new board name text field"
+  },
+  "boardCreatePagenameTextFieldlabel": {
+    "message": "Pangalan ng board",
+    "description": "Label for new board name text field"
+  },
+  "boardCreatePagenameTextFieldplaceholder": {
+    "message": "Ilagay ang pangalan ng board",
+    "description": "Placeholder text for new board name text field"
+  },
+  "boardCreatePagesecretSwitchheading": {
+    "message": "Gawing sikreto ang board na ito",
+    "description": "Label text for a switch to make new board secret"
+  },
+  "boardCreatePagesecretSwitchinfo": {
+    "message": "Ikaw lang at ang mga collaborator ang makakakita ng board na ito",
+    "description": "Info text for a switch to make new board secret"
+  },
+  "boardCreatePagecreateButtontext": {
+    "message": "Gumawa",
+    "description": "Text on a button that creates new board"
+  },
+  "boardSectionCreatePagesaveErrortext": {
+    "message": "Nagkaroon ng problema sa amin",
+    "description": "Board section save error text"
+  },
+  "boardSectionCreatePagenameFieldmaxLengthError": {
+    "message": "Mangyaring maglagay ng hindi hihigit sa 50 character",
+    "description": "Error for when the new board section name is too long"
+  },
+  "boardSectionCreatePageheading": {
+    "message": "Gumawa ng seksyon",
+    "description": "Heading on the page that shows the board section creation interface"
+  },
+  "boardSectionCreatePagebackButtontootlipText": {
+    "message": "Bumalik sa pagpili ng seksyon",
+    "description": "Text in tooltip that shows up on Pinterest logo hover"
+  },
+  "boardSectionCreatePagetitleTextFieldheading": {
+    "message": "Pangalan ng seksyon",
+    "description": "Label for new board section name text field"
+  },
+  "boardSectionCreatePagetitleTextFieldlabel": {
+    "message": "Pangalan ng seksyon",
+    "description": "Label for new board section name text field"
+  },
+  "boardSectionCreatePagenameTextFieldplaceholder": {
+    "message": "Ilagay ang pangalan ng seksyon",
+    "description": "Placeholder text for new board section name text field"
+  },
+  "boardSectionCreatePagecreateButtontext": {
+    "message": "Gumawa",
+    "description": "Text on a button that creates new board section"
+  },
+  "boardSectionPickerPageheading": {
+    "message": "Pumili ng seksyon",
+    "description": "Heading on the page that shows the board section picker interface"
+  },
+  "boardSectionPickerPagebackButtontootlipText": {
+    "message": "Bumalik sa pagpili ng board",
+    "description": "Text in tooltip that shows up on back button hover"
+  },
+  "boardSectionPickerPagecreateSectionbutton": {
+    "message": "Magdagdag ng seksyon",
+    "description": "Create board section button text"
+  },
+  "pinCreatePagesaveErrortext": {
+    "message": "Nagkaroon ng problema sa amin",
+    "description": "Pin create error text"
+  },
+  "pinCreatePageheadingInProgresstext": {
+    "message": "Sine-save sa",
+    "description": "Pin create page heading text when saving is in progress. This text is followed by a board name"
+  },
+  "pinCreatePageheadingDonetext": {
+    "message": "Na-save sa",
+    "description": "Pin create page heading text when saving is complete. This text is followed by a board name"
+  },
+  "pinCreatePageviewButtontext": {
+    "message": "Tingnan",
+    "description": "Text on a button that opens newly created Pin page"
+  },
+  "extName": {
+    "message": "Button na I-save ng Pinterest",
+    "description": "The extension's title, seen in gallery and extensions page"
+  },
+  "extDescription": {
+    "message": "I-save ang mga paborito mong ideya online para madali mong mabalikan ang mga ito sa ibang pagkakataon.",
+    "description": "The extension's description, seen in gallery and extensions page"
+  },
+  "noPinDomain": {
+    "message": "Pasensya na, hindi pinapayagan ang pag-pin mula sa domain na ito. Pakikontak ang operator ng site kung mayroon kang anumang tanong.",
+    "description": "The default message we alert when someone tries to use the browser button on a forbidden domain"
+  },
+  "optionTitle": {
+    "message": "Mga opsyon ng button na I-save",
+    "description": "Title for the Options page"
+  },
+  "optionHide": {
+    "message": "Itago ang pag-hover sa mga button na I-save",
+    "description": "Text next to the checkbox that turns off hoverbuttons"
+  },
+  "searchAction": {
+    "message": "Maghanap",
+    "description": "Appears in the right-click-to-search menu item"
+  },
+  "saveAction": {
+    "message": "I-save",
+    "description": "Appears wherever we show a Save button or menu prompt"
+  },
+  "choosePinMultiSelectHeader": {
+    "message": "Mag-save ng ideya sa Pinterest",
+    "description": "New header message in the image picker overlay"
+  },
+  "choosePinSelectAllSubHeader": {
+    "message": "Pumili ng hanggang dalawampung larawan",
+    "description": "Subheader in the image picker overlay"
+  },
+  "nextAction": {
+    "message": "Susunod",
+    "description": "Press this button to go to the Create view when multiple images are selected"
+  },
+  "selectAll": {
+    "message": "Piliin lahat",
+    "description": "Text next to the checkbox that selects all images on the grid"
+  },
+  "boardPickerOpenerLabel": {
+    "message": "I-save sa board",
+    "description": "Label in inline board picker"
+  },
+  "boardPickerSuccessLabel": {
+    "message": "Na-save sa",
+    "description": "Label in inline board picker after pin creation"
+  },
+  "visitButton": {
+    "message": "Bisitahin",
+    "description": "Pin create success button to visit pin"
+  },
+  "help": {
+    "message": "Tulong",
+    "description": "Get help after a Pin create failure"
+  },
+  "chooseBoard": {
+    "message": "Pumili ng board",
+    "description": "main header in Save form"
+  },
+  "topChoices": {
+    "message": "Mga nangungunang pagpipilian",
+    "description": "interstitial header in board list"
+  },
+  "allBoards": {
+    "message": "Lahat ng board",
+    "description": "interstitial header in board list"
+  },
+  "createBoard": {
+    "message": "Gumawa ng board",
+    "description": "header in Create form"
+  },
+  "addFormSecretLabel": {
+    "message": "Sikreto",
+    "description": "label over secret/not-secret switch"
+  },
+  "chooseSection": {
+    "message": "Pumili ng seksyon",
+    "description": "label for board sections"
+  },
+  "addSection": {
+    "message": "Magdagdag ng Seksyon",
+    "description": "label to add section"
+  },
+  "optYes": {
+    "message": "Oo",
+    "description": "switch option yes"
+  },
+  "optNo": {
+    "message": "Hindi",
+    "description": "switch option no"
+  },
+  "closeAddForm": {
+    "message": "Kanselahin",
+    "description": "cancel create"
+  },
+  "submitAddForm": {
+    "message": "Gumawa",
+    "description": "create new board"
+  },
+  "msgBoardFail": {
+    "message": "Hindi makagawa ng bagong board",
+    "description": "board create fail"
+  },
+  "msgPinFail": {
+    "message": "Hindi ma-save ang page na ito",
+    "description": "pin create fail"
+  },
+  "msgLoginFail": {
+    "message": "Pasensya na, mayroong medyo hindi tama rito. Pakitingnan kung naka-log in ka sa Pinterest at subukang muli.",
+    "description": "Message shown when someone's login changes while the board picker is open"
+  },
+  "msgOops": {
+    "message": "Naku!",
+    "description": "error header"
+  },
+  "msgHelp": {
+    "message": "Humingi ng Tulong",
+    "description": "get help button"
+  },
+  "authHelpHead": {
+    "message": "Psst!",
+    "description": "You're not signed in. Let's get your attention with this headline. Might also be Hey! or Oops!"
+  },
+  "authHelpBody": {
+    "message": "Mukhang hindi ka pa naka-sign in sa Pinterest. Ayusin natin 'yan!",
+    "description": "If you're not signed in, here's what we'll do when you click the button below"
+  },
+  "signIn": {
+    "message": "Mag-sign in",
+    "description": "Click this button to sign in on Pinterest"
+  },
+  "extensionSetting_hideHoverButtons": {
+    "message": "Itago ang button na I-save sa mga larawan",
+    "description": "User setting to disable Save hover button on images"
+  },
+  "settingsPageheading": {
+    "message": "Settings",
+    "description": "Heading on the settings page"
+  },
+  "settingsPageback": {
+    "message": "Bumalik",
+    "description": "Text in tooltip that shows up on back button hover"
+  },
+  "settingsPagedisableHover": {
+    "message": "I-disable ang pag-hover sa larawan",
+    "description": "Settings toggle for disabling image hover mode"
+  },
+  "settingsPagereportBug": {
+    "message": "Mag-report ng isyu",
+    "description": "Settings link to report bug page"
+  },
+  "settingsPagerevokeAccess": {
+    "message": "Bawiin ang access at mag-sign out",
+    "description": "Settings link to revoke app access and sign out"
+  },
+  "settingsPagelogOut": {
+    "message": "Mag-log out",
+    "description": "Settings link to logout for non-Safari browsers"
+  },
+  "settingsPagedoneButton": {
+    "message": "Tapos na",
+    "description": "Button text to leave settings"
+  },
+  "reportBugheading": {
+    "message": "Mag-report ng isyu",
+    "description": "Heading on the report bug page"
+  },
+  "reportBugback": {
+    "message": "Bumalik sa settings",
+    "description": "Text in tooltip that shows up on back button hover"
+  },
+  "reportBugwebsiteLabel": {
+    "message": "Website",
+    "description": "Label for website input field"
+  },
+  "reportBugdescriptionLabel": {
+    "message": "Paglalarawan",
+    "description": "Label for description input field"
+  },
+  "reportBugdescriptionPlaceholder": {
+    "message": "Ipaliwanag nang maikli ang nangyari",
+    "description": "Placeholder text for description input field"
+  },
+  "reportBugdescriptionHelpText": {
+    "message": "Hindi maigagarantiya ng Pinterest ang pagsagot sa mensaheng ito.",
+    "description": "Help text for description input field explaining that there will be no response"
+  },
+  "reportBugsubmitButton": {
+    "message": "Isumite",
+    "description": "Button text to submit bug report"
+  },
+  "reportBugsubmitSuccessheading": {
+    "message": "Naisumite ang isyu",
+    "description": "Heading on successful report bug toast"
+  },
+  "reportBugsubmitSuccessdetailText": {
+    "message": "Salamat sa iyong feedback!",
+    "description": "Detail text on successful report bug toast"
+  },
+  "errorPageheadingtext": {
+    "message": "Ay, naku...",
+    "description": "Heading text for the error page"
+  },
+  "errorPagebannedDomaintext": {
+    "message": "Pasensya na, hindi pinapayagan ang pag-pin sa site na ito! Mangyaring mag-report ng isyu kung sa tingin mong error ito.",
+    "description": "Error message for when Pinterest prevents pinning on a domain"
+  },
+  "errorPagenoPinDomaintext": {
+    "message": "Hindi pinapayagan ng site na ito ang pag-save sa Pinterest. Pakikontak ang may-ari para sa anumang tanong.",
+    "description": "Error message for when domain owner prevents pinning on their domain"
+  }
+}
