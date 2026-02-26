@@ -67,6 +67,17 @@ from .blip import (
     caption_screen,
     ask_screen
 )
+from .recorder import (
+    ScreenRecorder,
+    RecordingConfig,
+    RecordingSession,
+    RecordingFormat,
+    RecordingQuality,
+    get_recorder,
+    start_recording,
+    stop_recording,
+    record_on_trigger
+)
 from .workspace import (
     EnvironmentType,
     WorkspaceConfig,
@@ -166,6 +177,15 @@ __all__ = [
     "analyze_screen_with_blip",
     "caption_screen",
     "ask_screen",
+    "ScreenRecorder",
+    "RecordingConfig",
+    "RecordingSession",
+    "RecordingFormat",
+    "RecordingQuality",
+    "get_recorder",
+    "start_recording",
+    "stop_recording",
+    "record_on_trigger",
     "EnvironmentType",
     "WorkspaceConfig",
     "WorkspaceManager",
