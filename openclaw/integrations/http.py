@@ -525,8 +525,8 @@ class VisionHTTPServer:
 
     def start(self):
         """Start the HTTP server"""
-        self.server = HTTPServer(("", self.port), VisionHTTPHandler)
-        logger.info(f"HTTP server started on port {self.port}")
+        self.server = HTTPServer(("0.0.0.0", self.port), VisionHTTPHandler)
+        logger.info(f"HTTP server started on 0.0.0.0:{self.port}")
         logger.info(f"API Key: {'Enabled' if self.auth.enabled else 'Disabled'}")
         logger.info("Rate Limit: Disabled")
 
