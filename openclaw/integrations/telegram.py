@@ -155,10 +155,14 @@ class TelegramBot:
         if self.browser_agent_available:
             self.register_command("browser", "Start browser agent", self._handle_browser_start)
             self.register_command("goto", "Navigate to URL", self._handle_browser_goto)
-            self.register_command("click", "Click element", self._handle_browser_click)
-            self.register_command("type", "Type text", self._handle_browser_type)
+            self.register_command("click", "Click element by selector", self._handle_browser_click)
+            self.register_command("clicktext", "Click button/link by text", self._handle_browser_click_text)
+            self.register_command("type", "Type text by selector", self._handle_browser_type)
+            self.register_command("input", "Type in first input field", self._handle_browser_input)
+            self.register_command("submit", "Click submit button", self._handle_browser_submit)
             self.register_command("screenshot", "Take screenshot", self._handle_browser_screenshot)
             self.register_command("extract", "Extract text from element", self._handle_browser_extract)
+            self.register_command("extractall", "Extract all text from page", self._handle_browser_extract_all)
             self.register_command("eval", "Execute JavaScript", self._handle_browser_eval)
             self.register_command("binfo", "Browser info", self._handle_browser_info)
             self.register_command("bclose", "Close browser", self._handle_browser_close)
@@ -472,6 +476,129 @@ class TelegramBot:
         try:
             info = self.browser_agent.get_page_info()
             return f"Browser Info:\nURL: {info.get('url')}\nTitle: {info.get('title')}\nActive: {info.get('initialized')}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_click_text(self, args: List[str]) -> str:
+        """Handle /clicktext command - click element containing text"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if not args:
+            return "Usage: /clicktext <text>\nExample: /clicktext Submit"
+
+        text = " ".join(args)
+
+        try:
+            # Find element containing the text and click it
+            script = f"""
+            function() {{
+                // Try buttons first
+                let btns = document.querySelectorAll('button, input[type="submit"], a[role="button"]');
+                for (let btn of btns) {{
+                    if (btn.innerText.toLowerCase().includes('{text}'.toLowerCase()) ||
+                        btn.value?.toLowerCase().includes('{text}'.toLowerCase())) {{
+                        btn.click();
+                        return 'clicked:' + btn.tagName;
+                    }}
+                }}
+                // Try links
+                let links = document.querySelectorAll('a');
+                for (let link of links) {{
+                    if (link.innerText.toLowerCase().includes('{text}'.toLowerCase())) {{
+                        link.click();
+                        return 'clicked:a';
+                    }}
+                }}
+                return 'not_found';
+            }}()
+            """
+            result = self.browser_agent.evaluate(script)
+            if result.success and result.data != 'not_found':
+                return f"Clicked element containing '{text}'"
+            return f"Could not find element with text '{text}'"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_input(self, args: List[str]) -> str:
+        """Handle /input command - type in first available input field"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        if len(args) < 2:
+            return "Usage: /input <text>\nExample: /input Hello World"
+
+        text = " ".join(args)
+
+        try:
+            script = f"""
+            function() {{
+                let inputs = document.querySelectorAll('input[type="text"], input[type="search"], textarea');
+                for (let input of inputs) {{
+                    if (!input.disabled && !input.readOnly) {{
+                        input.value = '{text}';
+                        input.dispatchEvent(new Event('input', {{bubbles: true}}));
+                        return 'typed:' + input.tagName;
+                    }}
+                }}
+                return 'not_found';
+            }}()
+            """
+            result = self.browser_agent.evaluate(script)
+            if result.success and result.data != 'not_found':
+                return f"Typed '{text}' into input field"
+            return "Could not find input field"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_submit(self, args: List[str]) -> str:
+        """Handle /submit command - click submit button or press Enter"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        try:
+            script = """
+            function() {
+                // Try button type=submit
+                let btns = document.querySelectorAll('button[type="submit"], input[type="submit"]');
+                for (let btn of btns) {
+                    btn.click();
+                    return 'clicked_submit';
+                }
+                // Try form submit
+                let forms = document.querySelectorAll('form');
+                for (let form of forms) {
+                    form.submit();
+                    return 'form_submitted';
+                }
+                return 'not_found';
+            }()
+            """
+            result = self.browser_agent.evaluate(script)
+            if result.success and result.data != 'not_found':
+                return "Submitted form"
+            return "Could not find submit button"
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    def _handle_browser_extract_all(self, args: List[str]) -> str:
+        """Handle /extractall command - extract all visible text"""
+        if not self.browser_agent:
+            return "Browser not started. Use /browser first"
+
+        try:
+            script = """
+            function() {
+                let text = document.body.innerText;
+                // Clean up whitespace
+                text = text.replace(/\\s+/g, ' ').trim();
+                return text.substring(0, 3000);
+            }()
+            """
+            result = self.browser_agent.evaluate(script)
+            if result.success:
+                return f"Page text:\n{result.data}"
+            return f"Error: {result.error}"
         except Exception as e:
             return f"Error: {str(e)}"
 
