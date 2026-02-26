@@ -184,6 +184,8 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             self._handle_screenshot()
         elif path == "/dashboard":
             self._handle_dashboard()
+        elif path == "/dashboard/modern" or path == "/dashboard/new":
+            self._handle_modern_dashboard()
         elif path == "/api/config":
             self._handle_get_config()
         else:
@@ -296,6 +298,19 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
     def _handle_dashboard(self):
         """Serve dashboard HTML"""
         html = self._generate_dashboard()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html")
+        self.end_headers()
+        self.wfile.write(html.encode())
+
+    def _handle_modern_dashboard(self):
+        """Serve modern dashboard HTML"""
+        try:
+            from openclaw.ui.dashboard import MODERN_DASHBOARD_HTML
+            html = MODERN_DASHBOARD_HTML
+        except ImportError:
+            html = self._generate_dashboard()
+
         self.send_response(200)
         self.send_header("Content-Type", "text/html")
         self.end_headers()
