@@ -17,7 +17,6 @@ from openclaw.core import (
     ScreenCapture,
     TriggerAction,
     ActionSequence,
-    Logger,
     setup_logging,
     get_logger
 )
@@ -31,7 +30,7 @@ from openclaw.integrations import (
 from openclaw.storage import DatabaseManager
 
 # Initialize logger
-logger = Logger.get_instance()
+logger = get_logger("main")
 
 
 class OpenClaw:
