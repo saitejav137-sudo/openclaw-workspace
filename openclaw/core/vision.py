@@ -583,6 +583,3 @@ __all__ = [
     "MultiMonitor",
     "RegionSelector",
 ]
-
-# Import utils for backward compatibility
-from openclaw.utils import MultiMonitor, RegionSelector
