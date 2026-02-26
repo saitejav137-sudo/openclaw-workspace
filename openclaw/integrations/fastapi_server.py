@@ -21,7 +21,7 @@ from functools import wraps
 from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
@@ -321,7 +321,8 @@ class TriggerRequest(BaseModel):
     region: Optional[List[int]] = None
     action: Optional[str] = None
 
-    @validator("*", pre=True)
+    @field_validator("*", mode="before")
+    @classmethod
     def sanitize_inputs(cls, v):
         if isinstance(v, str):
             return InputSanitizer.sanitize(v)
@@ -344,7 +345,8 @@ class ConfigUpdate(BaseModel):
     action: Optional[str] = None
     action_delay: Optional[float] = None
 
-    @validator("*", pre=True)
+    @field_validator("*", mode="before")
+    @classmethod
     def sanitize_inputs(cls, v):
         if isinstance(v, str):
             return InputSanitizer.sanitize(v)
@@ -357,7 +359,8 @@ class TriggerCreate(BaseModel):
     config: Dict[str, Any] = {}
     enabled: bool = True
 
-    @validator("name", "mode", pre=True)
+    @field_validator("name", "mode", mode="before")
+    @classmethod
     def sanitize_inputs(cls, v):
         if isinstance(v, str):
             return InputSanitizer.sanitize(v)
@@ -375,7 +378,8 @@ class StatsResponse(BaseModel):
 class NLPRequest(BaseModel):
     text: str
 
-    @validator("text", pre=True)
+    @field_validator("text", mode="before")
+    @classmethod
     def sanitize_text(cls, v):
         if isinstance(v, str):
             return InputSanitizer.sanitize(v)
@@ -386,7 +390,8 @@ class AutomationExecute(BaseModel):
     action: str
     delay: float = 0
 
-    @validator("action", pre=True)
+    @field_validator("action", mode="before")
+    @classmethod
     def sanitize_action(cls, v):
         if isinstance(v, str):
             # Only allow safe characters for actions
