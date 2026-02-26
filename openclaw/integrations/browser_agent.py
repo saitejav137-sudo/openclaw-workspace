@@ -61,8 +61,27 @@ class BrowserAgent:
         try:
             from playwright.sync_api import sync_playwright
             import os
+            import subprocess
+
+            # Get current display
+            display = os.environ.get('DISPLAY', ':0')
+            logger.info(f"Starting browser with DISPLAY={display}")
 
             self._playwright = sync_playwright().start()
+
+            # Try to use system Chrome first (better display support)
+            chrome_paths = [
+                '/usr/bin/google-chrome-stable',
+                '/usr/bin/google-chrome',
+                '/usr/bin/chromium',
+                '/usr/bin/chromium-browser',
+            ]
+
+            chrome_executable = None
+            for path in chrome_paths:
+                if os.path.exists(path):
+                    chrome_executable = path
+                    break
 
             # Build launch args
             launch_args = [
@@ -70,6 +89,8 @@ class BrowserAgent:
                 '--disable-setuid-sandbox',
                 '--disable-dev-shm-usage',
                 '--disable-gpu',
+                f'--display={display}',
+                '--remote-debugging-port=9222',
             ]
 
             # If not headless, add window size args
@@ -79,11 +100,24 @@ class BrowserAgent:
                     '--window-size=1280,720',
                 ])
 
-            self._browser = self._playwright.chromium.launch(
-                headless=self.headless,
-                slow_mo=self.slow_mo,
-                args=launch_args
-            )
+            logger.info(f"Launch args: {launch_args}")
+
+            if chrome_executable:
+                # Use system Chrome with Playwright
+                logger.info(f"Using system Chrome: {chrome_executable}")
+                self._browser = self._playwright.chromium.launch(
+                    headless=False,  # Force visible
+                    slow_mo=self.slow_mo,
+                    executable_path=chrome_executable,
+                    args=launch_args
+                )
+            else:
+                # Fall back to Playwright's Chromium
+                self._browser = self._playwright.chromium.launch(
+                    headless=self.headless,
+                    slow_mo=self.slow_mo,
+                    args=launch_args
+                )
 
             # Create context with default profile
             self._context = self._browser.new_context(
