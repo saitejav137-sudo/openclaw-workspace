@@ -265,3 +265,24 @@ __all__ = [
 
 # Import new database module
 from .database import DatabaseManager as AdvancedDatabaseManager, DatabaseConfig, DatabaseType
+
+# Import vector database
+from .vector_db import (
+    VectorDatabase,
+    VectorEntry,
+    SearchResult,
+    DistanceMetric,
+    get_vector_database,
+    semantic_search,
+    add_to_index,
+)
+
+__all__.extend([
+    "VectorDatabase",
+    "VectorEntry",
+    "SearchResult",
+    "DistanceMetric",
+    "get_vector_database",
+    "semantic_search",
+    "add_to_index",
+])
