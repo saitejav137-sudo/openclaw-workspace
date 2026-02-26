@@ -168,18 +168,10 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
             return
 
         # Authentication
-        if self.auth and not self.auth.enabled:
-            pass  # Auth disabled
-        elif self.auth and self.auth.enabled:
-            # Try to validate
-            if hasattr(self, 'path'):
-                from urllib.parse import urlparse, parse_qs
-                parsed = urlparse(self.path)
-                params = parse_qs(parsed.query)
-                api_key = params.get("api_key", [None])[0]
-                if api_key != self.auth.api_key:
-                    self._send_error(401, "Invalid API key")
-                    return
+        if self.auth and self.auth.enabled:
+            if not self.auth.validate(self):
+                self._send_error(401, "Invalid API key")
+                return
 
         # Route handling
         path = self.path.split("?")[0]
