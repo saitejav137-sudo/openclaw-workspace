@@ -22,6 +22,14 @@ except ImportError:
     SEARCH_AVAILABLE = False
     logger.warning("Search module not available")
 
+# Import browser fetcher for advanced web access
+try:
+    from .browser_fetch import BrowserFetcher, BrowserFetchResult
+    BROWSER_AVAILABLE = True
+except ImportError:
+    BROWSER_AVAILABLE = False
+    logger.warning("Browser fetch not available")
+
 
 @dataclass
 class TelegramCommand:
@@ -58,9 +66,23 @@ class TelegramBot:
         else:
             self.search_engine = None
 
+        # Initialize browser fetcher for advanced web access
+        self.browser_available = BROWSER_AVAILABLE
+        if self.browser_available:
+            try:
+                self.browser_fetcher = BrowserFetcher(headless=True, timeout=30)
+                logger.info("Browser fetcher initialized")
+            except Exception as e:
+                logger.warning(f"Browser fetcher init failed: {e}")
+                self.browser_fetcher = None
+                self.browser_available = False
+        else:
+            self.browser_fetcher = None
+
         if self.enabled:
             self._register_default_commands()
             self._register_search_commands()
+            self._register_browser_commands()
 
     def _load_token(self) -> Optional[str]:
         """Load token from environment or config"""
@@ -110,6 +132,13 @@ class TelegramBot:
             self.register_command("search", "Search the internet", self._handle_search)
             self.register_command("ask", "Quick answer from web", self._handle_ask)
             logger.info("Search commands registered")
+
+    def _register_browser_commands(self):
+        """Register browser-based commands"""
+        if self.browser_available:
+            self.register_command("browse", "Browse URL with real browser", self._handle_browse)
+            self.register_command("bs", "Browser search", self._handle_browser_search)
+            logger.info("Browser commands registered")
 
     def register_command(self, name: str, description: str, handler: Callable):
         """Register a bot command"""
@@ -200,6 +229,73 @@ class TelegramBot:
         except Exception as e:
             logger.error(f"Ask error: {e}")
             return f"Error: {str(e)}"
+
+    def _handle_browse(self, args: List[str]) -> str:
+        """Handle /browse command - fetch URL using real browser"""
+        if not self.browser_available:
+            return "Browser not available. Install playwright: pip install playwright && playwright install chromium"
+
+        if not args:
+            return "Usage: /browse <url>\nExample: /browse https://example.com"
+
+        url = " ".join(args)
+
+        # Add https:// if missing
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = "https://" + url
+
+        try:
+            result = self.browser_fetcher.fetch(url)
+
+            if result.success:
+                # Extract text content (first 2000 chars of HTML stripped)
+                import re
+                text = re.sub(r'<[^>]+>', ' ', result.content)
+                text = ' '.join(text.split())
+
+                lines = [f"Page: {result.title}", f"URL: {result.url}\n"]
+                lines.append("Content preview:")
+                lines.append(text[:2000])
+
+                return "\n".join(lines)
+            else:
+                return f"Failed to fetch: {result.error}"
+
+        except Exception as e:
+            logger.error(f"Browse error: {e}")
+            return f"Error: {str(e)}"
+
+    def _handle_browser_search(self, args: List[str]) -> str:
+        """Handle /bs command - browser-based search (uses regular search for reliability)"""
+        if not args:
+            return "Usage: /bs <query>\nExample: /bs python tutorial"
+
+        query = " ".join(args)
+
+        # Use the regular search engine (works reliably)
+        if self.search_available:
+            try:
+                response = self.search_engine.search(query, max_results=5)
+
+                if not response.results:
+                    return f"No results found for: {query}"
+
+                lines = [f"Search results for: {query}\n"]
+
+                for i, result in enumerate(response.results, 1):
+                    lines.append(f"{i}. {result.title}")
+                    lines.append(f"   {result.url}")
+                    if result.snippet:
+                        lines.append(f"   {result.snippet[:150]}...")
+                    lines.append("")
+
+                return "\n".join(lines)
+
+            except Exception as e:
+                logger.error(f"Search error: {e}")
+                return f"Error: {str(e)}"
+
+        return "Search not available"
 
     def _make_request(self, method: str, data: Dict = None, files: Dict = None) -> Optional[Dict]:
         """Make API request with retry"""

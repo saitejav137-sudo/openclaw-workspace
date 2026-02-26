@@ -450,11 +450,8 @@ class VisionHTTPServer:
         # Setup auth
         self.auth = APIKeyAuth(config.api_key)
 
-        # Setup rate limiter
-        self.rate_limiter = RateLimiter(
-            rate=config.rate_limit,
-            per=60.0
-        )
+        # Setup rate limiter - disabled by default (set to None for no limit)
+        self.rate_limiter = None
 
         # Setup handler class
         VisionHTTPHandler.vision_engine = self.vision_engine
@@ -466,7 +463,7 @@ class VisionHTTPServer:
         self.server = HTTPServer(("", self.port), VisionHTTPHandler)
         logger.info(f"HTTP server started on port {self.port}")
         logger.info(f"API Key: {'Enabled' if self.auth.enabled else 'Disabled'}")
-        logger.info(f"Rate Limit: {self.config.rate_limit} req/min")
+        logger.info("Rate Limit: Disabled")
 
         try:
             self.server.serve_forever()

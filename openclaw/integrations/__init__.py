@@ -29,6 +29,15 @@ from .search import (
     quick_search,
     answer,
 )
+from .browser_fetch import (
+    BrowserFetcher,
+    SimpleWebFetcher,
+    BrowserFetchResult,
+    get_browser_fetcher,
+    get_simple_fetcher,
+    fetch_url,
+    web_search,
+)
 
 __all__ = [
     "VisionHTTPServer",
@@ -68,4 +77,12 @@ __all__ = [
     "search",
     "quick_search",
     "answer",
+    # Browser fetch module
+    "BrowserFetcher",
+    "SimpleWebFetcher",
+    "BrowserFetchResult",
+    "get_browser_fetcher",
+    "get_simple_fetcher",
+    "fetch_url",
+    "web_search",
 ]
