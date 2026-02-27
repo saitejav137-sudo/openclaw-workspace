@@ -86,6 +86,8 @@ class WindowMonitor:
                                 if self.callback:
                                     try:
                                         self.callback(current_title)
+                                    except (TypeError, ValueError) as e:
+                                        logger.error(f"Callback error (invalid arguments): {e}")
                                     except Exception as e:
                                         logger.error(f"Callback error: {e}")
 
@@ -116,7 +118,11 @@ class WindowMonitor:
             if result.returncode == 0:
                 return result.stdout.strip()
 
-        except Exception as e:
+        except subprocess.TimeoutExpired:
+            logger.warning("Window query timeout")
+        except FileNotFoundError:
+            logger.error("xdotool not found")
+        except (OSError, ValueError) as e:
             logger.error(f"Get window error: {e}")
 
         return None
@@ -159,8 +165,10 @@ class WindowMonitor:
                                 "title": name
                             })
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError) as e:
             logger.error(f"Get windows error: {e}")
+        except Exception as e:
+            logger.error(f"Get windows error (unexpected): {e}")
 
         return windows
 
@@ -179,8 +187,14 @@ class WindowAction:
             elif window_name:
                 subprocess.run(["xdotool", "search", "--name", window_name, "windowactivate"], check=True)
             return True
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Activate window error (command failed): {e}")
+            return False
+        except (OSError, ValueError) as e:
             logger.error(f"Activate window error: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Activate window error (unexpected): {e}")
             return False
 
     @staticmethod
@@ -192,8 +206,14 @@ class WindowAction:
             if window_id:
                 subprocess.run(["xdotool", "windowclose", window_id], check=True)
                 return True
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Close window error (command failed): {e}")
+            return False
+        except (OSError, ValueError) as e:
             logger.error(f"Close window error: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Close window error (unexpected): {e}")
             return False
 
     @staticmethod
@@ -207,8 +227,14 @@ class WindowAction:
                 check=True
             )
             return True
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Focus window error (command failed): {e}")
+            return False
+        except (OSError, ValueError) as e:
             logger.error(f"Focus window error: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Focus window error (unexpected): {e}")
             return False
 
 

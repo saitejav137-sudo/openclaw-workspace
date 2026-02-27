@@ -41,30 +41,40 @@ API_VERSION = "2.1.0"
 class InputSanitizer:
     """Sanitize user inputs to prevent XSS and injection attacks"""
 
-    # Dangerous patterns
-    SQL_PATTERNS = [
-        r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION)\b)",
-        r"(--|;|'|\"|%27|%22|%3B)",
-        r"(\bOR\b.*=.*\bOR\b)",
-        r"(\bAND\b.*=.*\bAND\b)",
+    # Compiled patterns for performance
+    _SQL_PATTERNS = [
+        re.compile(r"\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION)\b", re.IGNORECASE),
+        re.compile(r"(--|;|'|\"|%27|%22|%3B)"),
+        re.compile(r"\bOR\b.*=.*\bOR\b", re.IGNORECASE),
+        re.compile(r"\bAND\b.*=.*\bAND\b", re.IGNORECASE),
     ]
 
-    XSS_PATTERNS = [
-        r"<script[^>]*>.*?</script>",
-        r"javascript:",
-        r"on\w+\s*=",
-        r"<iframe[^>]*>.*?</iframe>",
-        r"<object[^>]*>.*?</object>",
+    _XSS_PATTERNS = [
+        re.compile(r"<script[^>]*>.*?</script>", re.IGNORECASE),
+        re.compile(r"javascript:", re.IGNORECASE),
+        re.compile(r"on\w+\s*=", re.IGNORECASE),
+        re.compile(r"<iframe[^>]*>.*?</iframe>", re.IGNORECASE),
+        re.compile(r"<object[^>]*>.*?</object>", re.IGNORECASE),
     ]
 
     @classmethod
-    def sanitize(cls, value: str) -> str:
+    def sanitize(cls, value: str, check_sql: bool = True) -> str:
         """Sanitize a string value"""
         if not value:
             return value
 
+        sanitized = value
+
+        # Check for SQL injection patterns
+        if check_sql:
+            for pattern in cls._SQL_PATTERNS:
+                if pattern.search(sanitized):
+                    logger.warning(f"Potential SQL injection detected: {sanitized[:50]}...")
+                    # Replace dangerous characters
+                    sanitized = sanitized.replace(';', '').replace("'", "''").replace('"', '""')
+
         # HTML escape to prevent XSS
-        sanitized = html.escape(value)
+        sanitized = html.escape(sanitized)
 
         # Remove null bytes
         sanitized = sanitized.replace('\x00', '')

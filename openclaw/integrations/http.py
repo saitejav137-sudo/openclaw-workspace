@@ -68,23 +68,67 @@ from urllib.parse import urlparse
 
 
 def validate_url(url: str) -> bool:
-    """Validate URL is safe and well-formed"""
+    """Validate URL is safe and well-formed.
+
+    Rejects:
+    - Empty URLs
+    - URLs > 2048 chars
+    - Non-http/https schemes
+    - IP addresses (including localhost)
+    - file:// URLs
+    """
     if not url or len(url) > 2048:
         return False
     try:
         parsed = urlparse(url)
-        return parsed.scheme in ('http', 'https') and parsed.netloc
+        if parsed.scheme not in ('http', 'https'):
+            return False
+        if not parsed.netloc:
+            return False
+        # Reject IP addresses (including localhost numeric IPs)
+        import re
+        ip_pattern = r'^(\d{1,3}\.){3}\d{1,3}$|^localhost$|^::1$'
+        if re.match(ip_pattern, parsed.netloc, re.IGNORECASE):
+            return False
+        # Reject file://
+        if parsed.scheme == 'file':
+            return False
+        return True
     except Exception:
         return False
 
 
 def validate_action(action: str) -> bool:
-    """Validate browser action name"""
-    valid_actions = {
+    """Validate browser action or keyboard shortcut.
+
+    Accepts:
+    - Browser actions: start, goto, click, click_text, type, input, submit, extract, extract_all, screenshot, info, close
+    - Keyboard shortcuts: alt+o, ctrl+c, ctrl+s, shift+a, Return, etc.
+    """
+    if not action or not isinstance(action, str):
+        return False
+
+    # Browser actions
+    valid_browser_actions = {
         "start", "goto", "click", "click_text", "type", "input",
         "submit", "extract", "extract_all", "screenshot", "info", "close"
     }
-    return action in valid_actions
+    if action in valid_browser_actions:
+        return True
+
+    # Keyboard shortcuts (case-sensitive: "alt+o", "ctrl+c", "shift+a", "Return", "Delete")
+    import re
+    # Modifier+key combos: ctrl+c, alt+o, shift+a
+    modifier_pattern = r'^(ctrl|alt|shift|super|meta)\+[a-zA-Z0-9]$'
+    # Single keys: a, b, 1, 2
+    single_key_pattern = r'^[a-zA-Z0-9]$'
+    # Special keys (exact case)
+    special_key_pattern = r'^(Return|Space|Tab|Escape|Enter|Backspace|Delete|Insert|F1|F2|F3|F4|F5|F6|F7|F8|F9|F10|F11|F12|Up|Down|Left|Right|Home|End|PageUp|PageDown)$'
+
+    if re.match(modifier_pattern, action) or re.match(single_key_pattern, action) or re.match(special_key_pattern, action):
+        return True
+
+    return False
 
 
 def sanitize_string(s: str, max_length: int = 1000) -> str:

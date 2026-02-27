@@ -158,8 +158,11 @@ class BLIPEngine:
                 timestamp=time.time()
             )
 
-        except Exception as e:
+        except (cv2.error, ImportError, RuntimeError) as e:
             logger.error(f"Caption error: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Caption error (unexpected): {e}")
             return None
 
     def answer_question(
@@ -206,8 +209,11 @@ class BLIPEngine:
                 timestamp=time.time()
             )
 
-        except Exception as e:
+        except (cv2.error, ImportError, RuntimeError) as e:
             logger.error(f"VQA error: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"VQA error (unexpected): {e}")
             return None
 
     def analyze_screen(
@@ -276,8 +282,11 @@ class MiniMaxAI:
         except ImportError:
             logger.error("httpx not installed")
             return False
-        except Exception as e:
+        except (ValueError, ConnectionError, TimeoutError) as e:
             logger.error(f"MiniMax init error: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"MiniMax init error (unexpected): {e}")
             return False
 
     def is_available(self) -> bool:
@@ -308,6 +317,9 @@ class MiniMaxAI:
             data = response.json()
             return data.get("choices", [{}])[0].get("message", {}).get("content")
 
+        except (ValueError, KeyError) as e:
+            logger.error(f"MiniMax chat error (invalid response): {e}")
+            return None
         except Exception as e:
             logger.error(f"MiniMax chat error: {e}")
             return None
@@ -362,8 +374,10 @@ Generate JSON config with:
                 if json_match:
                     import json
                     return json.loads(json_match.group())
-            except Exception:
-                pass
+            except (json.JSONDecodeError, AttributeError) as e:
+                logger.debug(f"Failed to parse JSON from response: {e}")
+            except Exception as e:
+                logger.warning(f"Unexpected error parsing automation config: {e}")
 
         return None
 

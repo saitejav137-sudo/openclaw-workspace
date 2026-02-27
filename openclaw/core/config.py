@@ -183,6 +183,9 @@ class VisionConfig:
     idle_interval: float = 2.0
     active_interval: float = 0.2
 
+    # Cache settings
+    cache_ttl: float = 0.5  # Cache TTL for screenshots in seconds
+
     # OCR settings
     target_text: Optional[str] = None
     text_case_sensitive: bool = False

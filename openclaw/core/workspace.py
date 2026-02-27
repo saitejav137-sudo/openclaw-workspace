@@ -281,26 +281,26 @@ class WorkspaceManager:
         logger.info(f"Switched to workspace: {name}")
         return True
 
-    def _apply_workspace_settings(self, workspace: WorkspaceConfig):
-        """Apply workspace settings to environment"""
-        # Set log level
-        os.environ["OPENCLAW_LOG_LEVEL"] = workspace.log_level
+    def _apply_workspace_settings(self, workspace: WorkspaceConfig) -> Dict[str, Any]:
+        """Apply workspace settings - returns dict instead of modifying os.environ"""
+        # Return settings as a dictionary instead of modifying global environment
+        return {
+            "OPENCLAW_LOG_LEVEL": workspace.log_level,
+            "OPENCLAW_API_HOST": workspace.api_host,
+            "OPENCLAW_API_PORT": str(workspace.api_port),
+            "OPENCLAW_DB_ENABLED": str(workspace.db_enabled),
+            "OPENCLAW_DB_TYPE": workspace.db_type,
+            "OPENCLAW_DB_PATH": workspace.db_path,
+            "OPENCLAW_REDIS_ENABLED": str(workspace.redis_enabled),
+            "OPENCLAW_REDIS_URL": workspace.redis_url,
+            "OPENCLAW_DEBUG": str(workspace.debug_mode).lower(),
+        }
 
-        # Set API settings
-        os.environ["OPENCLAW_API_HOST"] = workspace.api_host
-        os.environ["OPENCLAW_API_PORT"] = str(workspace.api_port)
-
-        # Set database settings
-        os.environ["OPENCLAW_DB_ENABLED"] = str(workspace.db_enabled)
-        os.environ["OPENCLAW_DB_TYPE"] = workspace.db_type
-        os.environ["OPENCLAW_DB_PATH"] = workspace.db_path
-
-        # Set Redis settings
-        os.environ["OPENCLAW_REDIS_ENABLED"] = str(workspace.redis_enabled)
-        os.environ["OPENCLAW_REDIS_URL"] = workspace.redis_url
-
-        # Debug mode
-        os.environ["OPENCLAW_DEBUG"] = str(workspace.debug_mode).lower()
+    def get_workspace_settings(self) -> Dict[str, Any]:
+        """Get current workspace settings without modifying environment"""
+        if self._current_workspace:
+            return self._apply_workspace_settings(self._current_workspace)
+        return {}
 
     def get_workspace(self, name: str) -> Optional[WorkspaceConfig]:
         """Get workspace by name"""

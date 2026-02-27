@@ -59,9 +59,10 @@ class TestWorkspaceIntegration(unittest.TestCase):
 
         workspace = manager.get_workspace("development")
 
-        # Check that environment variables are set
-        self.assertEqual(os.environ.get("OPENCLAW_LOG_LEVEL"), workspace.log_level)
-        self.assertEqual(os.environ.get("OPENCLAW_DEBUG"), str(workspace.debug_mode).lower())
+        # Check that workspace settings are returned as dict (new behavior)
+        settings = manager.get_workspace_settings()
+        self.assertEqual(settings.get("OPENCLAW_LOG_LEVEL"), workspace.log_level)
+        self.assertEqual(settings.get("OPENCLAW_DEBUG"), str(workspace.debug_mode).lower())
 
     def test_custom_workspace(self):
         """Test creating custom workspace"""

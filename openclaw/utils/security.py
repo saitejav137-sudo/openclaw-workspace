@@ -35,13 +35,14 @@ class ConfigEncryption:
         self.salt = None
 
         if CRYPTO_AVAILABLE:
-            # Use password or generate from environment
-            password = password or os.getenv("OPENCLAW_ENCRYPTION_KEY", "")
+            # Use password or get from environment - require non-empty value
+            password = password or os.getenv("OPENCLAW_ENCRYPTION_KEY")
 
             if password:
                 self._init_fernet(password)
             else:
-                # Try to load existing key
+                # Try to load existing key - warn if neither available
+                logger.warning("No encryption key provided. Set OPENCLAW_ENCRYPTION_KEY or generate a key.")
                 self._load_key()
 
     def _init_fernet(self, password: str):
@@ -133,6 +134,9 @@ class ConfigEncryption:
             encrypted = base64.b64decode(encrypted_config.encrypted_data.encode())
             decrypted = self.fernet.decrypt(encrypted)
             return json.loads(decrypted.decode())
+        except (base64.binascii.Error, ValueError, KeyError) as e:
+            logger.error(f"Decryption failed: invalid encoded data: {e}")
+            raise ValueError("Invalid encrypted data format") from e
         except Exception as e:
             logger.error(f"Decryption failed: {e}")
             raise

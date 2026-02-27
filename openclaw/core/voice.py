@@ -88,8 +88,11 @@ class VoiceEngine:
         except ImportError as e:
             logger.error(f"Speech recognition library not available: {e}")
             return False
-        except Exception as e:
+        except (ValueError, RuntimeError) as e:
             logger.error(f"Failed to initialize voice engine: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to initialize voice engine (unexpected): {e}")
             return False
 
     def register_command(self, command: VoiceCommand):
@@ -185,8 +188,13 @@ class VoiceEngine:
                     daemon=True
                 ).start()
 
-            except Exception as e:
+            except (sr.WaitTimeoutError, sr.UnknownValueError) as e:
+                logger.debug(f"Listen loop: {e}")
+            except (OSError, RuntimeError) as e:
                 logger.error(f"Listen loop error: {e}")
+                time.sleep(1)
+            except Exception as e:
+                logger.error(f"Listen loop error (unexpected): {e}")
                 time.sleep(1)
 
     def _process_audio(self, audio):
@@ -267,6 +275,8 @@ class VoiceEngine:
         if command.action in self._callbacks:
             try:
                 self._callbacks[command.action](text)
+            except (TypeError, ValueError) as e:
+                logger.error(f"Callback error (invalid arguments): {e}")
             except Exception as e:
                 logger.error(f"Callback error: {e}")
 

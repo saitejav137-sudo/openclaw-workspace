@@ -26,18 +26,36 @@ class ScreenCapture:
     Attributes:
         _cache: Dictionary storing cached screenshots with timestamps
         _cache_lock: Thread lock for cache operations
-        _cache_ttl: Time-to-live for cached screenshots in seconds
+        _default_cache_ttl: Default time-to-live for cached screenshots in seconds
     """
 
     _cache: Dict[str, Tuple[np.ndarray, float]] = {}
     _cache_lock = threading.Lock()
-    _cache_ttl: float = 0.5  # Cache TTL in seconds
+    _default_cache_ttl: float = 0.5  # Default cache TTL in seconds
+
+    # Class-level configurable TTL
+    _cache_ttl: float = 0.5
+
+    @classmethod
+    def set_cache_ttl(cls, ttl: float) -> None:
+        """Set the cache TTL.
+
+        Args:
+            ttl: Time-to-live for cached screenshots in seconds
+        """
+        cls._cache_ttl = max(0.1, ttl)  # Minimum 0.1 seconds
+
+    @classmethod
+    def get_cache_ttl(cls) -> float:
+        """Get the current cache TTL."""
+        return cls._cache_ttl
 
     @classmethod
     def capture_region(
         cls,
         region: Optional[Tuple[int, int, int, int]] = None,
-        use_cache: bool = False
+        use_cache: bool = False,
+        cache_ttl: Optional[float] = None
     ) -> np.ndarray:
         """Capture a region of the screen.
 
@@ -45,6 +63,7 @@ class ScreenCapture:
             region: Tuple of (x, y, width, height) for the region to capture.
                    If None, captures the entire primary monitor.
             use_cache: If True, uses cached screenshot if available and not expired.
+            cache_ttl: Optional custom TTL for this capture (overrides class setting).
 
         Returns:
             Screenshot as numpy array in BGR format
@@ -55,13 +74,14 @@ class ScreenCapture:
         import mss
 
         cache_key = str(region) if region else "full"
+        ttl = cache_ttl if cache_ttl is not None else cls._cache_ttl
 
         # Check cache
         if use_cache:
             with cls._cache_lock:
                 if cache_key in cls._cache:
                     img, timestamp = cls._cache[cache_key]
-                    if time.time() - timestamp < cls._cache_ttl:
+                    if time.time() - timestamp < ttl:
                         return img.copy()
 
         # Capture

@@ -311,6 +311,10 @@ class AgentMemory:
             with open(filepath, 'w') as f:
                 json.dump(data, f)
 
+        except (OSError, IOError) as e:
+            logger.error(f"Failed to save memory (IO error): {e}")
+        except (TypeError, ValueError) as e:
+            logger.error(f"Failed to save memory (serialization error): {e}")
         except Exception as e:
             logger.error(f"Failed to save memory: {e}")
 
@@ -328,11 +332,17 @@ class AgentMemory:
                         data["memory_type"] = MemoryType(data["memory_type"])
                         memory = Memory(**data)
                         self._memories[memory.id] = memory
+                except (json.JSONDecodeError, KeyError, ValueError) as e:
+                    logger.error(f"Failed to load {filepath} (invalid data): {e}")
+                except (OSError, IOError) as e:
+                    logger.error(f"Failed to load {filepath} (IO error): {e}")
                 except Exception as e:
                     logger.error(f"Failed to load {filepath}: {e}")
 
             logger.info(f"Loaded {len(self._memories)} memories")
 
+        except (OSError, IOError) as e:
+            logger.error(f"Failed to load memories (IO error): {e}")
         except Exception as e:
             logger.error(f"Failed to load memories: {e}")
 
