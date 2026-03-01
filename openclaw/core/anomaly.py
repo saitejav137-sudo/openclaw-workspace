@@ -135,7 +135,7 @@ class StatisticalAnalyzer:
         # Check for drought
         now = time.time()
         last_triggered = triggered[-1]
-        time_since = now - last_triggered.threshold
+        time_since = now - last_triggered.timestamp
 
         if std_interval > 0 and time_since > mean_interval + tolerance * std_interval:
             return Anomaly(

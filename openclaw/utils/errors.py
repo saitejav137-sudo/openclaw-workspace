@@ -1,6 +1,7 @@
 """Comprehensive error handling module"""
 
 import traceback
+import threading
 import functools
 import time
 from typing import Optional, Callable, Any, Dict, List
@@ -38,10 +39,13 @@ class ErrorHandler:
     """Central error handler with logging and recovery"""
 
     _instance = None
-    _errors: List[ErrorRecord] = []
     _max_errors = 1000
 
     def __init__(self):
+        self._errors: List[ErrorRecord] = []
+        self._lock = __import__('threading').Lock()
+        self._errors: List[ErrorRecord] = []
+        self._lock = threading.Lock()
         self.error_callbacks: List[Callable] = []
 
     @classmethod
@@ -70,11 +74,12 @@ class ErrorHandler:
             traceback=traceback.format_exc()
         )
 
-        self._errors.append(record)
+        with self._lock:
+            self._errors.append(record)
 
-        # Keep only recent errors
-        if len(self._errors) > self._max_errors:
-            self._errors = self._errors[-self._max_errors:]
+            # Keep only recent errors
+            if len(self._errors) > self._max_errors:
+                self._errors = self._errors[-self._max_errors:]
 
         # Log the error
         log_method = getattr(logger, severity.value, logger.error)
@@ -89,11 +94,13 @@ class ErrorHandler:
 
     def get_recent_errors(self, limit: int = 100) -> List[ErrorRecord]:
         """Get recent errors"""
-        return self._errors[-limit:]
+        with self._lock:
+            return self._errors[-limit:]
 
     def get_unresolved_errors(self) -> List[ErrorRecord]:
         """Get unresolved errors"""
-        return [e for e in self._errors if not e.resolved]
+        with self._lock:
+            return [e for e in self._errors if not e.resolved]
 
     def resolve_error(self, index: int):
         """Mark error as resolved"""

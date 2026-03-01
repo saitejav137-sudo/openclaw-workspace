@@ -88,15 +88,15 @@ class AgentMemory:
         ).hexdigest()[:16]
 
     def _compute_embedding(self, text: str) -> List[float]:
-        """Compute embedding for text"""
-        if self.embedding_model == "simple":
-            # Simple hash-based embedding
-            hash_val = hash(text.encode())
-            np.random.seed(hash_val % (2**32))
-            return np.random.randn(128).tolist()
-
-        # For other models, would integrate with OpenAI or sentence-transformers
-        return self._simple_embedding(text)
+        """Compute embedding for text using the real embedding provider."""
+        try:
+            from .embeddings import get_embedding_provider
+            provider = get_embedding_provider()
+            embedding = provider.embed(text)
+            return embedding if isinstance(embedding, list) else embedding.tolist()
+        except (ImportError, Exception) as e:
+            logger.debug(f"Falling back to simple embedding: {e}")
+            return self._simple_embedding(text)
 
     def _simple_embedding(self, text: str) -> List[float]:
         """Simple bag-of-words embedding"""

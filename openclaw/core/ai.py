@@ -7,14 +7,14 @@ Allows users to describe automations in plain English.
 
 import json
 import re
-import logging
+from .logger import get_logger
 import time
 from typing import Optional, Dict, List, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime
 
-logger = logging.getLogger("openclaw.ai")
+logger = get_logger("ai")
 
 
 class NLPMode(Enum):
