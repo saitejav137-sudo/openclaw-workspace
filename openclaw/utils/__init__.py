@@ -1,5 +1,8 @@
 """Utility modules"""
 
+from openclaw.core.logger import get_logger
+logger = get_logger("utils")
+
 import os
 import time
 import subprocess
@@ -68,8 +71,8 @@ class MultiMonitor:
                                 "width": mon["width"],
                                 "height": mon["height"]
                             })
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f'mss fallback failed: {e}')
 
         # Default primary
         if not monitors:

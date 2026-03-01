@@ -28,6 +28,7 @@ from openclaw.integrations import (
     WebSocketManagerSync
 )
 from openclaw.storage import DatabaseManager
+from openclaw.core.integration_hub import get_integration_hub
 
 # Initialize logger
 logger = get_logger("main")
@@ -39,6 +40,13 @@ class OpenClaw:
     def __init__(self, config: VisionConfig):
         self.config = config
         self.running = False
+
+        # Stop integration hub
+        if hasattr(self, "integration_hub") and self.integration_hub:
+            try:
+                self.integration_hub.stop()
+            except Exception:
+                pass
         self.vision_engine = None
         self.http_server = None
         self.telegram_bot = None
@@ -55,7 +63,7 @@ class OpenClaw:
         else:
             setup_logging()
 
-        logger.info("OpenClaw v2.0.0 starting...")
+        logger.info("OpenClaw v2.1.0 starting... (v2026.2.26 features)")
 
         # Initialize database
         if self.config.db_enabled:
@@ -120,6 +128,13 @@ class OpenClaw:
         """Stop the application"""
         logger.info("Stopping OpenClaw...")
         self.running = False
+
+        # Stop integration hub
+        if hasattr(self, "integration_hub") and self.integration_hub:
+            try:
+                self.integration_hub.stop()
+            except Exception:
+                pass
 
         if self.http_server:
             self.http_server.stop()

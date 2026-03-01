@@ -1,287 +1,409 @@
 """
-Plugin System for OpenClaw
+Enhanced Plugin System for OpenClaw
 
-Allows extending detection capabilities with custom plugins.
+Hot-loadable plugin architecture with:
+- Plugin discovery from directory
+- Lifecycle hooks (init, start, stop)
+- Plugin manifest (plugin.yaml)
+- Sandboxing via restricted imports
+- Hot-reload support
 """
 
 import os
-import sys
+import importlib
 import importlib.util
-import logging
-from typing import Dict, List, Any, Optional, Callable
+import yaml
+import threading
+import time
+from typing import Any, Callable, Dict, List, Optional
 from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
 from abc import ABC, abstractmethod
 
-logger = logging.getLogger("openclaw.plugins")
+from ..core.logger import get_logger
+
+logger = get_logger("plugins")
+
+
+class PluginStatus(Enum):
+    """Plugin lifecycle status."""
+    DISCOVERED = "discovered"
+    LOADED = "loaded"
+    INITIALIZED = "initialized"
+    RUNNING = "running"
+    STOPPED = "stopped"
+    ERROR = "error"
 
 
 @dataclass
-class PluginMetadata:
-    """Plugin metadata"""
+class PluginManifest:
+    """Plugin metadata from plugin.yaml."""
     name: str
-    version: str
-    author: str
-    description: str
+    version: str = "1.0.0"
+    description: str = ""
+    author: str = ""
+    capabilities: List[str] = field(default_factory=list)
     dependencies: List[str] = field(default_factory=list)
+    permissions: List[str] = field(default_factory=list)  # file_read, file_write, network, shell
+    entry_point: str = "plugin.py"
+    config_schema: Dict[str, Any] = field(default_factory=dict)
 
 
-class BasePlugin(ABC):
-    """Base class for all plugins"""
+@dataclass
+class PluginInfo:
+    """Runtime plugin information."""
+    manifest: PluginManifest
+    status: PluginStatus = PluginStatus.DISCOVERED
+    path: str = ""
+    instance: Optional[Any] = None
+    loaded_at: Optional[float] = None
+    error: Optional[str] = None
+
+
+class PluginBase(ABC):
+    """
+    Base class for all OpenClaw plugins.
+
+    Plugins must implement:
+    - init(): Called when plugin is loaded
+    - start(): Called when plugin is activated
+    - stop(): Called when plugin is deactivated
+
+    Optional:
+    - configure(config): Called with user configuration
+    - health_check(): Return True if plugin is healthy
+    """
 
     def __init__(self):
-        self.metadata: Optional[PluginMetadata] = None
-        self.enabled: bool = True
+        self.config: Dict[str, Any] = {}
+        self._logger = get_logger(f"plugin.{self.__class__.__name__}")
 
     @abstractmethod
-    def initialize(self) -> bool:
-        """Initialize the plugin"""
-        pass
+    def init(self):
+        """Initialize the plugin."""
+        ...
 
     @abstractmethod
-    def process(self, frame: Any) -> Any:
-        """Process a frame and return result"""
-        pass
+    def start(self):
+        """Start the plugin."""
+        ...
 
     @abstractmethod
-    def cleanup(self):
-        """Cleanup resources"""
-        pass
+    def stop(self):
+        """Stop the plugin."""
+        ...
 
+    def configure(self, config: Dict[str, Any]):
+        """Configure the plugin with user settings."""
+        self.config = config
 
-class DetectionPlugin(BasePlugin):
-    """Plugin for custom detection algorithms"""
-
-    def __init__(self):
-        super().__init__()
-        self.config: Dict = {}
-
-    def initialize(self) -> bool:
-        """Initialize the detection plugin"""
+    def health_check(self) -> bool:
+        """Check if plugin is healthy."""
         return True
 
-    def process(self, frame: Any) -> Dict[str, Any]:
-        """Process frame and return detection results"""
-        return {"detected": False, "confidence": 0.0, "data": None}
-
-    def cleanup(self):
-        """Cleanup resources"""
-        pass
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
 
 
-class ActionPlugin(BasePlugin):
-    """Plugin for custom actions"""
+# ============== Plugin Permission Sandboxing ==============
 
-    def __init__(self):
-        super().__init__()
-
-    def initialize(self) -> bool:
-        """Initialize the action plugin"""
-        return True
-
-    def process(self, context: Dict) -> bool:
-        """Execute custom action"""
-        return True
-
-    def cleanup(self):
-        """Cleanup resources"""
-        pass
+PERMISSION_ALLOWLIST = {
+    "file_read": ["os.path", "pathlib", "open"],
+    "file_write": ["os.makedirs", "open", "shutil"],
+    "network": ["requests", "urllib", "aiohttp", "websockets"],
+    "shell": ["subprocess"],
+    "vision": ["cv2", "mss", "easyocr", "ultralytics"],
+}
 
 
-class PluginManager:
-    """Manages plugin loading and lifecycle"""
+def check_plugin_permissions(manifest: PluginManifest) -> List[str]:
+    """
+    Validate plugin permissions.
+    Returns list of warnings about potentially dangerous permissions.
+    """
+    warnings = []
 
-    _instance = None
-    _plugins: Dict[str, BasePlugin] = {}
-    _hooks: Dict[str, List[Callable]] = {}
-
-    def __init__(self):
-        self.plugin_dir = os.path.expanduser("~/.openclaw/plugins")
-        os.makedirs(self.plugin_dir, exist_ok=True)
-        self._enabled = True
-
-    @classmethod
-    def get_instance(cls) -> 'PluginManager':
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
-
-    def register_plugin(self, name: str, plugin: BasePlugin) -> bool:
-        """Register a plugin"""
-        try:
-            self._plugins[name] = plugin
-            logger.info(f"Plugin registered: {name}")
-            return True
-        except Exception as e:
-            logger.error(f"Failed to register plugin {name}: {e}")
-            return False
-
-    def unregister_plugin(self, name: str) -> bool:
-        """Unregister a plugin"""
-        if name in self._plugins:
-            try:
-                self._plugins[name].cleanup()
-                del self._plugins[name]
-                logger.info(f"Plugin unregistered: {name}")
-                return True
-            except Exception as e:
-                logger.error(f"Failed to unregister plugin {name}: {e}")
-        return False
-
-    def get_plugin(self, name: str) -> Optional[BasePlugin]:
-        """Get a plugin by name"""
-        return self._plugins.get(name)
-
-    def list_plugins(self) -> List[str]:
-        """List all registered plugins"""
-        return list(self._plugins.keys())
-
-    def load_plugins(self) -> int:
-        """Load all plugins from plugin directory"""
-        if not os.path.exists(self.plugin_dir):
-            logger.info("Plugin directory does not exist")
-            return 0
-
-        loaded = 0
-        for filename in os.listdir(self.plugin_dir):
-            if filename.endswith(".py") and not filename.startswith("_"):
-                plugin_name = filename[:-3]
-                if self._load_plugin_from_file(plugin_name):
-                    loaded += 1
-
-        logger.info(f"Loaded {loaded} plugins")
-        return loaded
-
-    def _load_plugin_from_file(self, plugin_name: str) -> bool:
-        """Load a plugin from a Python file"""
-        plugin_path = os.path.join(self.plugin_dir, f"{plugin_name}.py")
-
-        try:
-            spec = importlib.util.spec_from_file_location(plugin_name, plugin_path)
-            if spec and spec.loader:
-                module = importlib.util.module_from_spec(spec)
-                sys.modules[plugin_name] = module
-                spec.loader.exec_module(module)
-
-                # Look for plugin class
-                if hasattr(module, 'register'):
-                    plugin = module.register(self)
-                    if plugin:
-                        self.register_plugin(plugin_name, plugin)
-                        return True
-
-        except Exception as e:
-            logger.error(f"Failed to load plugin {plugin_name}: {e}")
-
-        return False
-
-    def register_hook(self, hook_name: str, callback: Callable):
-        """Register a hook callback"""
-        if hook_name not in self._hooks:
-            self._hooks[hook_name] = []
-        self._hooks[hook_name].append(callback)
-
-    def trigger_hook(self, hook_name: str, *args, **kwargs) -> List[Any]:
-        """Trigger all callbacks for a hook"""
-        results = []
-        if hook_name in self._hooks:
-            for callback in self._hooks[hook_name]:
-                try:
-                    result = callback(*args, **kwargs)
-                    results.append(result)
-                except Exception as e:
-                    logger.error(f"Hook {hook_name} error: {e}")
-        return results
-
-    def enable_plugin(self, name: str) -> bool:
-        """Enable a plugin"""
-        if name in self._plugins:
-            self._plugins[name].enabled = True
-            return True
-        return False
-
-    def disable_plugin(self, name: str) -> bool:
-        """Disable a plugin"""
-        if name in self._plugins:
-            self._plugins[name].enabled = False
-            return True
-        return False
-
-    def cleanup_all(self):
-        """Cleanup all plugins"""
-        for name, plugin in self._plugins.items():
-            try:
-                plugin.cleanup()
-            except Exception as e:
-                logger.error(f"Error cleaning up plugin {name}: {e}")
-        self._plugins.clear()
-
-
-# Example plugin template
-EXAMPLE_PLUGIN = '''
-"""
-Example OpenClaw Plugin
-
-Copy this to ~/.openclaw/plugins/ and modify it.
-"""
-
-from openclaw.plugins import DetectionPlugin, PluginMetadata
-
-
-class MyCustomPlugin(DetectionPlugin):
-    """Custom detection plugin"""
-
-    def __init__(self):
-        super().__init__()
-        self.metadata = PluginMetadata(
-            name="my_custom_plugin",
-            version="1.0.0",
-            author="Your Name",
-            description="My custom detection plugin"
+    if "shell" in manifest.permissions:
+        warnings.append(
+            f"Plugin '{manifest.name}' requests SHELL access — "
+            "allows arbitrary command execution"
         )
 
-    def initialize(self) -> bool:
-        """Initialize the plugin"""
-        # Add your initialization code here
-        print("My custom plugin initialized!")
-        return True
+    if "network" in manifest.permissions:
+        warnings.append(
+            f"Plugin '{manifest.name}' requests NETWORK access — "
+            "can make external HTTP requests"
+        )
 
-    def process(self, frame):
-        """Process a frame"""
-        # Add your detection logic here
+    if "file_write" in manifest.permissions:
+        warnings.append(
+            f"Plugin '{manifest.name}' requests FILE WRITE access — "
+            "can modify files on disk"
+        )
+
+    return warnings
+
+
+# ============== Plugin Manager ==============
+
+class PluginManager:
+    """
+    Manages plugin lifecycle: discovery, loading, activation, deactivation.
+
+    Usage:
+        manager = PluginManager("/path/to/plugins/")
+        manager.discover()
+        manager.load_all()
+        manager.start_all()
+    """
+
+    def __init__(self, plugin_dir: Optional[str] = None):
+        self._plugin_dir = plugin_dir or os.path.expanduser("~/.openclaw/plugins")
+        self._plugins: Dict[str, PluginInfo] = {}
+        self._lock = threading.Lock()
+
+        os.makedirs(self._plugin_dir, exist_ok=True)
+
+    def discover(self) -> List[str]:
+        """
+        Discover plugins in the plugin directory.
+        Each plugin should be a directory with a plugin.yaml manifest.
+        """
+        discovered = []
+        plugin_path = Path(self._plugin_dir)
+
+        if not plugin_path.exists():
+            return discovered
+
+        for item in plugin_path.iterdir():
+            if not item.is_dir():
+                continue
+
+            manifest_file = item / "plugin.yaml"
+            if not manifest_file.exists():
+                manifest_file = item / "plugin.yml"
+                if not manifest_file.exists():
+                    continue
+
+            try:
+                with open(manifest_file, "r") as f:
+                    data = yaml.safe_load(f)
+
+                manifest = PluginManifest(
+                    name=data.get("name", item.name),
+                    version=data.get("version", "1.0.0"),
+                    description=data.get("description", ""),
+                    author=data.get("author", ""),
+                    capabilities=data.get("capabilities", []),
+                    dependencies=data.get("dependencies", []),
+                    permissions=data.get("permissions", []),
+                    entry_point=data.get("entry_point", "plugin.py"),
+                    config_schema=data.get("config_schema", {}),
+                )
+
+                # Check permissions
+                warnings = check_plugin_permissions(manifest)
+                for w in warnings:
+                    logger.warning(w)
+
+                self._plugins[manifest.name] = PluginInfo(
+                    manifest=manifest,
+                    status=PluginStatus.DISCOVERED,
+                    path=str(item),
+                )
+
+                discovered.append(manifest.name)
+                logger.info(
+                    f"Discovered plugin: {manifest.name} v{manifest.version} "
+                    f"({manifest.description})"
+                )
+
+            except Exception as e:
+                logger.error(f"Failed to discover plugin at {item}: {e}")
+
+        return discovered
+
+    def load(self, name: str) -> bool:
+        """Load a discovered plugin."""
+        info = self._plugins.get(name)
+        if not info:
+            logger.error(f"Plugin '{name}' not found")
+            return False
+
+        if info.status not in (PluginStatus.DISCOVERED, PluginStatus.STOPPED, PluginStatus.ERROR):
+            logger.warning(f"Plugin '{name}' already loaded (status: {info.status.value})")
+            return True
+
+        try:
+            entry_point = os.path.join(info.path, info.manifest.entry_point)
+            if not os.path.exists(entry_point):
+                raise FileNotFoundError(f"Entry point not found: {entry_point}")
+
+            # Load module
+            spec = importlib.util.spec_from_file_location(
+                f"openclaw_plugin_{name}", entry_point
+            )
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            # Find PluginBase subclass
+            plugin_class = None
+            for attr_name in dir(module):
+                attr = getattr(module, attr_name)
+                if (
+                    isinstance(attr, type)
+                    and issubclass(attr, PluginBase)
+                    and attr is not PluginBase
+                ):
+                    plugin_class = attr
+                    break
+
+            if not plugin_class:
+                raise ValueError(f"No PluginBase subclass found in {entry_point}")
+
+            # Instantiate
+            instance = plugin_class()
+            info.instance = instance
+            info.status = PluginStatus.LOADED
+            info.loaded_at = time.time()
+
+            logger.info(f"Loaded plugin: {name}")
+            return True
+
+        except Exception as e:
+            info.status = PluginStatus.ERROR
+            info.error = str(e)
+            logger.error(f"Failed to load plugin '{name}': {e}")
+            return False
+
+    def load_all(self) -> Dict[str, bool]:
+        """Load all discovered plugins."""
+        results = {}
+        for name in list(self._plugins.keys()):
+            results[name] = self.load(name)
+        return results
+
+    def start(self, name: str) -> bool:
+        """Start a loaded plugin."""
+        info = self._plugins.get(name)
+        if not info or not info.instance:
+            logger.error(f"Plugin '{name}' not loaded")
+            return False
+
+        try:
+            info.instance.init()
+            info.status = PluginStatus.INITIALIZED
+
+            info.instance.start()
+            info.status = PluginStatus.RUNNING
+
+            logger.info(f"Started plugin: {name}")
+            return True
+
+        except Exception as e:
+            info.status = PluginStatus.ERROR
+            info.error = str(e)
+            logger.error(f"Failed to start plugin '{name}': {e}")
+            return False
+
+    def start_all(self) -> Dict[str, bool]:
+        """Start all loaded plugins."""
+        results = {}
+        for name, info in self._plugins.items():
+            if info.status == PluginStatus.LOADED:
+                results[name] = self.start(name)
+        return results
+
+    def stop(self, name: str) -> bool:
+        """Stop a running plugin."""
+        info = self._plugins.get(name)
+        if not info or not info.instance:
+            return False
+
+        try:
+            info.instance.stop()
+            info.status = PluginStatus.STOPPED
+            logger.info(f"Stopped plugin: {name}")
+            return True
+        except Exception as e:
+            info.status = PluginStatus.ERROR
+            info.error = str(e)
+            logger.error(f"Failed to stop plugin '{name}': {e}")
+            return False
+
+    def stop_all(self):
+        """Stop all running plugins."""
+        for name, info in self._plugins.items():
+            if info.status == PluginStatus.RUNNING:
+                self.stop(name)
+
+    def reload(self, name: str) -> bool:
+        """Hot-reload a plugin (stop → load → start)."""
+        self.stop(name)
+
+        info = self._plugins.get(name)
+        if info:
+            info.status = PluginStatus.DISCOVERED
+            info.instance = None
+
+        return self.load(name) and self.start(name)
+
+    def list_plugins(self) -> List[Dict[str, Any]]:
+        """List all plugins with their status."""
+        return [
+            {
+                "name": info.manifest.name,
+                "version": info.manifest.version,
+                "description": info.manifest.description,
+                "status": info.status.value,
+                "capabilities": info.manifest.capabilities,
+                "permissions": info.manifest.permissions,
+                "error": info.error,
+            }
+            for info in self._plugins.values()
+        ]
+
+    def get_plugin(self, name: str) -> Optional[PluginBase]:
+        """Get a running plugin instance."""
+        info = self._plugins.get(name)
+        if info and info.status == PluginStatus.RUNNING:
+            return info.instance
+        return None
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Get plugin manager statistics."""
+        statuses = {}
+        for info in self._plugins.values():
+            statuses[info.status.value] = statuses.get(info.status.value, 0) + 1
+
         return {
-            "detected": False,
-            "confidence": 0.0,
-            "data": None
+            "plugin_dir": self._plugin_dir,
+            "total_plugins": len(self._plugins),
+            "by_status": statuses,
         }
 
-    def cleanup(self):
-        """Cleanup resources"""
-        pass
+
+# ============== Global Access ==============
+
+_manager: Optional[PluginManager] = None
 
 
-def register(manager):
-    """Register the plugin with the manager"""
-    return MyCustomPlugin()
-'''
+def get_plugin_manager(plugin_dir: str = None) -> PluginManager:
+    """Get global plugin manager."""
+    global _manager
+    if _manager is None:
+        _manager = PluginManager(plugin_dir)
+    return _manager
 
 
-def create_example_plugin():
-    """Create example plugin file"""
-    example_path = os.path.expanduser("~/.openclaw/plugins/example.py")
-    os.makedirs(os.path.dirname(example_path), exist_ok=True)
-
-    if not os.path.exists(example_path):
-        with open(example_path, "w") as f:
-            f.write(EXAMPLE_PLUGIN)
-        print(f"Example plugin created at: {example_path}")
-
-
-# Export classes
 __all__ = [
-    "BasePlugin",
-    "DetectionPlugin",
-    "ActionPlugin",
+    "PluginStatus",
+    "PluginManifest",
+    "PluginInfo",
+    "PluginBase",
     "PluginManager",
-    "PluginMetadata",
-    "create_example_plugin",
+    "get_plugin_manager",
+    "check_plugin_permissions",
 ]

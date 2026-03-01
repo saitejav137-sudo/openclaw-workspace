@@ -388,7 +388,8 @@ class VisionHTTPHandler(BaseHTTPRequestHandler):
                     self.wfile.write(f.read())
             else:
                 self.wfile.write(b"")
-        except:
+        except Exception as e:
+            logger.debug(f'Screenshot retrieval failed: {e}')
             self.wfile.write(b"")
 
     def _handle_trigger(self):

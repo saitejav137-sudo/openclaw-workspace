@@ -36,6 +36,8 @@ class BrowserResult:
 
 
 class BrowserAgent:
+    # Chrome extension handshake fix (upstream 2026.2.26)
+    # Bind relay WS message handling before onopen to avoid stuck badge states
     """
     Direct browser control agent using Playwright.
 
@@ -220,7 +222,8 @@ class BrowserAgent:
             try:
                 self._page.type(selector, text, delay=delay)
                 return BrowserResult(success=True)
-            except:
+            except Exception as e2:
+                logger.debug(f'Type fallback also failed: {e2}')
                 return BrowserResult(success=False, error=str(e))
 
     def press(self, selector: str, key: str) -> BrowserResult:

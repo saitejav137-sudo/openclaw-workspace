@@ -48,139 +48,73 @@ class SearchProvider(Enum):
 
 class DuckDuckGoSearch:
     """
-    DuckDuckGo search implementation (free, no API key required).
-
-    Uses DuckDuckGo's HTML interface for search results.
+    DuckDuckGo search implementation using duckduckgo-search package.
     """
-
-    def __init__(self, timeout: int = 10):
+    def __init__(self, timeout: int = 15):
         self.timeout = timeout
-        self.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-        }
 
     def search(self, query: str, max_results: int = 10) -> SearchResponse:
         """Perform search query"""
         start_time = time.time()
-
+        
         try:
-            # Use DuckDuckGo HTML search
-            url = "https://html.duckduckgo.com/html/"
-            data = {"q": query, "b": ""}
-
-            response = requests.post(
-                url,
-                data=data,
-                headers=self.headers,
-                timeout=self.timeout
-            )
-
-            if response.status_code != 200:
-                logger.warning(f"DuckDuckGo search failed: {response.status_code}")
-                return SearchResponse([], query, 0, time.time() - start_time)
-
-            # Parse results
-            results = self._parse_results(response.text)
-            results = results[:max_results]
-
+            import requests
+            from bs4 import BeautifulSoup
+            
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Origin": "https://html.duckduckgo.com",
+            }
+            
+            results = []
+            res = requests.post("https://html.duckduckgo.com/html/", data={"q": query}, headers=headers, timeout=self.timeout)
+            
+            if res.status_code == 200:
+                soup = BeautifulSoup(res.text, 'html.parser')
+                for res_div in soup.find_all('div', class_='result'):
+                    if len(results) >= max_results:
+                        break
+                        
+                    title_elem = res_div.find('h2', class_='result__title')
+                    url_elem = res_div.find('a', class_='result__url')
+                    snippet_elem = res_div.find('a', class_='result__snippet')
+                    
+                    if title_elem and url_elem:
+                        url_val = url_elem.get('href', '').strip()
+                        if url_val.startswith('//'):  # Ad redirects tracking
+                            continue
+                            
+                        results.append(SearchResult(
+                            title=title_elem.get_text(strip=True),
+                            url=url_val,
+                            snippet=snippet_elem.get_text(strip=True) if snippet_elem else "",
+                            source="DuckDuckGo (Native Scraper)"
+                        ))
+            
             return SearchResponse(
                 results=results,
                 query=query,
                 total_results=len(results),
                 time_taken=time.time() - start_time
             )
-
+            
         except Exception as e:
-            logger.error(f"Search error: {e}")
+            logger.error(f"DuckDuckGo search error: {e}")
             return SearchResponse([], query, 0, time.time() - start_time)
-
-    def _parse_results(self, html: str) -> List[SearchResult]:
-        """Parse DuckDuckGo HTML results"""
-        results = []
-
-        # Match result blocks - skip ads (result__a is for organic results)
-        result_pattern = re.compile(
-            r'<a[^>]*class="result__a"[^>]*href="(https?://[^"]+)"[^>]*>(.+?)</a>',
-            re.DOTALL
-        )
-
-        # Also try to get snippet
-        snippet_pattern = re.compile(
-            r'<a[^>]*class="result__a"[^>]*href="[^"]+"[^>]*>.*?</a>.*?'
-            r'<a[^>]*class="result__snippet"[^>]*>(.+?)</a>',
-            re.DOTALL
-        )
-
-        snippets = {}
-        for match in snippet_pattern.finditer(html):
-            # Get the URL from the result to match with snippet
-            href_match = re.search(r'href="(https?://[^"]+)"', match.group(0))
-            if href_match:
-                url_key = href_match.group(1)
-                snippets[url_key] = self._clean_html(match.group(1).strip())
-
-        for match in result_pattern.finditer(html):
-            url = match.group(1).strip() if match.group(1) else ""
-            title = self._clean_html(match.group(2).strip()) if match.group(2) else ""
-
-            # Skip if URL contains duckduckgo.com/y.js (these are ads/redirects)
-            if 'duckduckgo.com/y.js' in url or 'uddg=' in url:
-                continue
-
-            # Get snippet from our map
-            snippet = snippets.get(url, "")
-
-            # Skip empty results
-            if title and url and 'http' in url:
-                results.append(SearchResult(
-                    title=title,
-                    url=url,
-                    snippet=snippet,
-                    source="DuckDuckGo"
-                ))
-
-        return results
-
-    def _clean_html(self, text: str) -> str:
-        """Clean HTML tags from text"""
-        # Remove HTML tags
-        text = re.sub(r'<[^>]+>', '', text)
-        # Decode HTML entities
-        text = text.replace('&amp;', '&')
-        text = text.replace('&lt;', '<')
-        text = text.replace('&gt;', '>')
-        text = text.replace('&quot;', '"')
-        text = text.replace('&#39;', "'")
-        text = text.replace('&nbsp;', ' ')
-        # Normalize whitespace
-        text = ' '.join(text.split())
-        return text
 
     def instant_answer(self, query: str) -> Optional[str]:
         """Get instant answer from DuckDuckGo"""
         try:
-            url = "https://api.duckduckgo.com/"
-            params = {
-                "q": query,
-                "format": "json",
-                "no_html": 1,
-                "skip_disambig": 1
-            }
-
-            response = requests.get(url, params=params, timeout=self.timeout)
-
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("AbstractText"):
-                    return data["AbstractText"]
-                if data.get("Answer"):
-                    return data["Answer"]
-
+            from duckduckgo_search import DDGS
+            with DDGS() as ddgs:
+                answers = list(ddgs.answers(query))
+                if answers and len(answers) > 0:
+                    # Answers can be in text or url
+                    return answers[0].get("text", answers[0].get("url", ""))
         except Exception as e:
             logger.error(f"Instant answer error: {e}")
-
+            
         return None
 
 
