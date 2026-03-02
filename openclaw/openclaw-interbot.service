@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenClaw InterBot Daemon (Ajanta ↔ Ellora Bridge)
+After=network-online.target openclaw-custom.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/saiteja_v137/Desktop/openclaw
+ExecStart=/opt/conda/bin/python3 /home/saiteja_v137/Desktop/openclaw/interbot_daemon.py
+Restart=always
+RestartSec=10
+TimeoutStopSec=10
+Environment="HOME=/home/saiteja_v137"
+Environment="PATH=/opt/conda/bin:/home/saiteja_v137/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=default.target

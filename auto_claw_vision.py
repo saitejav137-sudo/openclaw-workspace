@@ -1603,13 +1603,13 @@ class TelegramBot:
         self.api_url = f"https://api.telegram.org/bot{self.token}"
         self.enabled = bool(self.token and self.chat_id)
 
-    def send_message(self, text: str) -> bool:
+    def send_message(self, text: str, chat_id: str = None) -> bool:
         if not self.enabled:
             return False
 
         try:
             url = f"{self.api_url}/sendMessage"
-            data = {"chat_id": self.chat_id, "text": text}
+            data = {"chat_id": chat_id or self.chat_id, "text": text}
             response = requests.post(url, json=data, timeout=10)
             return response.status_code == 200
         except Exception as e:
@@ -1637,13 +1637,188 @@ class TelegramBot:
 
         try:
             url = f"{self.api_url}/getUpdates"
-            params = {"timeout": 30, "offset": offset}
+            params = {
+                "timeout": 30,
+                "offset": offset,
+                "allowed_updates": json.dumps(["message", "callback_query"])
+            }
             response = requests.get(url, params=params, timeout=35)
             if response.status_code == 200:
                 return response.json().get("result", [])
         except Exception as e:
             print(f"[Telegram] Updates error: {e}")
         return []
+
+    # ---- FILE DOWNLOAD ----
+    def _download_telegram_file(self, file_id: str, dest_path: str) -> bool:
+        """Download a file from Telegram servers."""
+        try:
+            result = requests.post(
+                f"{self.api_url}/getFile",
+                json={"file_id": file_id}, timeout=15
+            ).json()
+            if not result.get("ok"):
+                return False
+            file_path = result.get("result", {}).get("file_path")
+            if not file_path:
+                return False
+            url = f"https://api.telegram.org/file/bot{self.token}/{file_path}"
+            resp = requests.get(url, timeout=60)
+            if resp.status_code == 200:
+                with open(dest_path, "wb") as f:
+                    f.write(resp.content)
+                return True
+            return False
+        except Exception as e:
+            print(f"[Telegram] File download error: {e}")
+            return False
+
+    # ---- VOICE MESSAGE HANDLER ----
+    _whisper_pipeline = None
+
+    def _handle_voice_message(self, message: dict, chat_id: str):
+        """Process voice: download → convert → transcribe → reply."""
+        voice = message.get("voice") or message.get("audio")
+        if not voice:
+            return
+        file_id = voice.get("file_id")
+        if not file_id:
+            return
+
+        self.send_message("🎤 Processing your voice message...", chat_id=chat_id)
+
+        try:
+            import tempfile
+            import subprocess
+            import shutil
+
+            if not shutil.which("ffmpeg"):
+                self.send_message("❌ ffmpeg not installed. Run: sudo apt install ffmpeg", chat_id=chat_id)
+                return
+
+            # Download OGG
+            with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+                ogg_path = f.name
+
+            if not self._download_telegram_file(file_id, ogg_path):
+                self.send_message("❌ Failed to download voice.", chat_id=chat_id)
+                return
+
+            if not os.path.exists(ogg_path) or os.path.getsize(ogg_path) < 100:
+                self.send_message("❌ Voice file is empty/corrupt.", chat_id=chat_id)
+                return
+
+            # Convert OGG → WAV
+            wav_path = ogg_path.replace(".ogg", ".wav")
+            proc = subprocess.run(
+                ["ffmpeg", "-i", ogg_path, "-ar", "16000", "-ac", "1", "-y", wav_path],
+                capture_output=True, timeout=30
+            )
+            if proc.returncode != 0 or not os.path.exists(wav_path):
+                self.send_message("❌ Audio conversion failed.", chat_id=chat_id)
+                return
+
+            # Transcribe with transformers Whisper
+            self.send_message("🔄 Transcribing...", chat_id=chat_id)
+
+            if TelegramBot._whisper_pipeline is None:
+                try:
+                    from transformers import pipeline as tf_pipeline
+                    TelegramBot._whisper_pipeline = tf_pipeline(
+                        "automatic-speech-recognition",
+                        model="openai/whisper-base",
+                        device="cpu"
+                    )
+                    print("[Telegram] Whisper pipeline loaded")
+                except Exception as e:
+                    print(f"[Telegram] Whisper load failed: {e}")
+                    TelegramBot._whisper_pipeline = False
+
+            transcribed = None
+            if TelegramBot._whisper_pipeline and TelegramBot._whisper_pipeline is not False:
+                try:
+                    result = TelegramBot._whisper_pipeline(wav_path)
+                    transcribed = result.get("text", "").strip() if isinstance(result, dict) else str(result).strip()
+                except Exception as e:
+                    self.send_message(f"❌ Transcription error: {str(e)[:150]}", chat_id=chat_id)
+            else:
+                self.send_message("❌ Whisper model failed to load. Check terminal.", chat_id=chat_id)
+
+            # Cleanup
+            for p in [ogg_path, wav_path]:
+                try: os.unlink(p)
+                except: pass
+
+            if not transcribed:
+                self.send_message("🤷 Couldn't understand the audio.", chat_id=chat_id)
+                return
+
+            self.send_message(f"🎤 Heard: {transcribed}", chat_id=chat_id)
+
+        except subprocess.TimeoutExpired:
+            self.send_message("❌ Audio conversion timed out.", chat_id=chat_id)
+        except Exception as e:
+            print(f"[Telegram] Voice error: {e}")
+            self.send_message(f"❌ Voice error: {str(e)[:150]}", chat_id=chat_id)
+
+    # ---- PHOTO HANDLER ----
+    def _handle_photo_message(self, message: dict, chat_id: str):
+        """Acknowledge incoming photo."""
+        photos = message.get("photo", [])
+        if not photos:
+            return
+        photo = photos[-1]
+        caption = message.get("caption", "")
+        w = photo.get("width", "?")
+        h = photo.get("height", "?")
+        size = photo.get("file_size", 0)
+
+        msg = f"📷 Photo received: {w}x{h}, {size} bytes"
+        if caption:
+            msg += f"\nCaption: {caption}"
+        self.send_message(msg, chat_id=chat_id)
+
+    # ---- DOCUMENT HANDLER ----
+    def _handle_document_message(self, message: dict, chat_id: str):
+        """Read and display document contents."""
+        doc = message.get("document", {})
+        file_id = doc.get("file_id")
+        file_name = doc.get("file_name", "document")
+        mime_type = doc.get("mime_type", "")
+        file_size = doc.get("file_size", 0)
+        caption = message.get("caption", "")
+
+        TEXT_EXTS = {".txt", ".py", ".json", ".csv", ".md", ".yaml", ".yml",
+                     ".xml", ".html", ".css", ".js", ".ts", ".log", ".sh",
+                     ".toml", ".ini", ".cfg", ".conf", ".env", ".sql", ".go", ".rs"}
+
+        ext = os.path.splitext(file_name)[1].lower()
+        is_text = ext in TEXT_EXTS or mime_type.startswith("text/")
+
+        if is_text and file_size < 200_000:
+            try:
+                import tempfile as _tf
+                with _tf.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
+                    tmp_path = tmp.name
+                if self._download_telegram_file(file_id, tmp_path):
+                    with open(tmp_path, "r", errors="replace") as f:
+                        content = f.read()[:4000]
+                    try: os.unlink(tmp_path)
+                    except: pass
+                    msg = f"📄 File: {file_name} ({file_size:,} bytes)\n"
+                    if caption:
+                        msg += f"Caption: {caption}\n"
+                    msg += f"\nContent (preview):\n{content[:3000]}"
+                    self.send_message(msg, chat_id=chat_id)
+                    return
+            except Exception as e:
+                print(f"[Telegram] Doc error: {e}")
+
+        sz = f"{file_size/1024:.1f}KB" if file_size < 1_000_000 else f"{file_size/1_000_000:.1f}MB"
+        msg = f"📎 Received: {file_name} ({sz}, {mime_type})"
+        if caption:
+            msg += f"\nCaption: {caption}"
+        self.send_message(msg, chat_id=chat_id)
 
     def handle_commands(self, text: str) -> str:
         """Handle bot commands and return response"""
@@ -1771,8 +1946,49 @@ class TelegramBot:
                         try:
                             offset = update.get("update_id", offset) + 1
                             message = update.get("message", {})
-                            text = message.get("text", "")
+                            chat_id = str(message.get("chat", {}).get("id", ""))
 
+                            # Validate
+                            if chat_id != self.chat_id:
+                                if chat_id:
+                                    print(f"[Telegram] Unauthorized: {chat_id}")
+                                continue
+
+                            # ---- Voice messages ----
+                            if "voice" in message or "audio" in message:
+                                try:
+                                    threading.Thread(
+                                        target=self._handle_voice_message,
+                                        args=(message, chat_id), daemon=True
+                                    ).start()
+                                except Exception as e:
+                                    self.send_message(f"❌ Voice error: {e}", chat_id=chat_id)
+                                continue
+
+                            # ---- Photos ----
+                            if "photo" in message:
+                                try:
+                                    threading.Thread(
+                                        target=self._handle_photo_message,
+                                        args=(message, chat_id), daemon=True
+                                    ).start()
+                                except Exception as e:
+                                    self.send_message(f"❌ Photo error: {e}", chat_id=chat_id)
+                                continue
+
+                            # ---- Documents ----
+                            if "document" in message:
+                                try:
+                                    threading.Thread(
+                                        target=self._handle_document_message,
+                                        args=(message, chat_id), daemon=True
+                                    ).start()
+                                except Exception as e:
+                                    self.send_message(f"❌ Doc error: {e}", chat_id=chat_id)
+                                continue
+
+                            # ---- Text messages ----
+                            text = message.get("text", "")
                             if text:
                                 print(f"[Telegram] Command: {text}")
                                 response = self.handle_commands(text)

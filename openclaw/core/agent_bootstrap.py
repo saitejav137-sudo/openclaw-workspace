@@ -446,6 +446,278 @@ def _create_general_handler():
     return handler
 
 
+# ============== Memory & Knowledge Tools ==============
+
+
+def _create_memory_search_tool() -> Tool:
+    """Create tool for agents to search their own memory."""
+    def search_memory(query: str, memory_type: str = "all", limit: int = 5) -> str:
+        """Search past conversations and stored knowledge from memory.
+        Use this when:
+        - The user references something from a previous conversation
+        - You need context about past interactions or decisions
+        - You want to recall previously stored facts or preferences
+        """
+        try:
+            from .agent_memory import get_agent_memory, MemoryQuery, MemoryType
+            memory = get_agent_memory()
+
+            mem_type = None
+            if memory_type != "all":
+                type_map = {
+                    "episodic": MemoryType.EPISODIC,
+                    "semantic": MemoryType.SEMANTIC,
+                    "procedural": MemoryType.PROCEDURAL,
+                    "working": MemoryType.WORKING,
+                }
+                mem_type = type_map.get(memory_type.lower())
+
+            results = memory.query_memories(MemoryQuery(
+                text=query, memory_type=mem_type, limit=limit
+            ))
+
+            if not results:
+                return f"No memories found for: {query}"
+
+            lines = [f"Found {len(results)} relevant memories:\n"]
+            for i, m in enumerate(results, 1):
+                from datetime import datetime
+                when = datetime.fromtimestamp(m.timestamp).strftime('%Y-%m-%d %H:%M')
+                lines.append(f"{i}. [{when}] (importance: {m.importance:.1f}) {m.content[:300]}")
+            return "\n".join(lines)
+
+        except Exception as e:
+            logger.warning(f"Memory search error: {e}")
+            # Fallback: check file-based memories
+            try:
+                memory_file = os.path.expanduser("~/.openclaw/memories/user_memories.jsonl")
+                if os.path.exists(memory_file):
+                    import json as _json
+                    matches = []
+                    with open(memory_file) as f:
+                        for line in f:
+                            entry = _json.loads(line.strip())
+                            content = entry.get("content", "")
+                            if query.lower() in content.lower():
+                                matches.append(content[:200])
+                    if matches:
+                        return f"Found {len(matches)} memories:\n" + "\n".join(f"- {m}" for m in matches[:limit])
+                return f"No memories found for: {query}"
+            except Exception:
+                return f"Memory system unavailable. No results for: {query}"
+
+    return Tool(
+        name="search_memory",
+        description="Search your memory for past conversations, user preferences, stored facts. Args: query (str), memory_type (str, optional: 'all'|'episodic'|'semantic'), limit (int, optional)",
+        func=search_memory,
+        parameters={"query": "string", "memory_type": "string (optional)", "limit": "int (optional, default 5)"}
+    )
+
+
+def _create_memory_store_tool() -> Tool:
+    """Create tool for agents to store important information in memory."""
+    def store_memory(content: str, importance: float = 0.7, category: str = "episodic") -> str:
+        """Store important information in long-term memory.
+        Use this when:
+        - The user shares important preferences or personal info
+        - You discover a key fact that should be remembered
+        - The user explicitly asks you to remember something
+        """
+        try:
+            from .agent_memory import get_agent_memory, MemoryType
+            memory = get_agent_memory()
+
+            type_map = {
+                "episodic": MemoryType.EPISODIC,
+                "semantic": MemoryType.SEMANTIC,
+                "procedural": MemoryType.PROCEDURAL,
+            }
+            mem_type = type_map.get(category.lower(), MemoryType.EPISODIC)
+
+            memory.add_memory(
+                content=content,
+                memory_type=mem_type,
+                importance=min(max(importance, 0.0), 1.0),
+                metadata={"source": "agent", "auto_stored": True}
+            )
+            return f"✅ Stored in {category} memory (importance: {importance}): {content[:100]}"
+
+        except Exception as e:
+            # Fallback: file-based storage
+            try:
+                memory_dir = os.path.expanduser("~/.openclaw/memories")
+                os.makedirs(memory_dir, exist_ok=True)
+                memory_file = os.path.join(memory_dir, "user_memories.jsonl")
+                import json as _json
+                with open(memory_file, "a") as f:
+                    f.write(_json.dumps({
+                        "content": content,
+                        "importance": importance,
+                        "category": category,
+                        "source": "agent",
+                        "timestamp": time.time()
+                    }) + "\n")
+                return f"✅ Stored: {content[:100]}"
+            except Exception as e2:
+                return f"Failed to store memory: {e2}"
+
+    return Tool(
+        name="store_memory",
+        description="Store important information in long-term memory for future recall. Args: content (str), importance (float 0-1, optional), category (str, optional: 'episodic'|'semantic'|'procedural')",
+        func=store_memory,
+        parameters={"content": "string", "importance": "float (optional)", "category": "string (optional)"}
+    )
+
+
+def _create_rag_search_tool() -> Tool:
+    """Create tool for agents to search the RAG knowledge base."""
+    def search_knowledge(query: str, top_k: int = 5) -> str:
+        """Search the indexed knowledge base for specific information.
+        Use this when:
+        - You need factual information from indexed documents
+        - The user asks about topics that might be in stored files
+        - You want to find relevant documentation or notes
+        """
+        try:
+            from .rag_engine import RAGEngine, RAGConfig
+            rag = RAGEngine(RAGConfig(vector_db_backend="memory"))
+
+            # Auto-index common paths if not already done
+            if rag.store.count() == 0:
+                default_paths = [
+                    os.path.expanduser("~/.openclaw/notes"),
+                    os.path.expanduser("~/.openclaw/memories"),
+                ]
+                for path in default_paths:
+                    if os.path.exists(path):
+                        try:
+                            rag.index_directory(path)
+                        except Exception:
+                            pass
+
+            results = rag.query(query, top_k=top_k)
+
+            if not results:
+                return f"No knowledge base results for: {query}"
+
+            lines = [f"Found {len(results)} relevant documents:\n"]
+            for i, r in enumerate(results, 1):
+                lines.append(f"{i}. [score: {r.similarity:.2f}] Source: {r.source}")
+                lines.append(f"   {r.text[:300]}")
+            return "\n".join(lines)
+
+        except Exception as e:
+            return f"Knowledge base search unavailable: {e}"
+
+    return Tool(
+        name="search_knowledge",
+        description="Search the indexed knowledge base (documents, notes, files). Args: query (str), top_k (int, optional)",
+        func=search_knowledge,
+        parameters={"query": "string", "top_k": "int (optional, default 5)"}
+    )
+
+
+# ============== AskUser Tool ==============
+
+# Global reference to TelegramBot for AskUser tool interaction.
+# Set by TelegramBot._bootstrap_agents() after bootstrapping.
+_telegram_bot_ref = None
+
+
+def set_telegram_bot_ref(bot):
+    """Set the global reference to TelegramBot for AskUser tool.
+    Called by TelegramBot after bootstrap to connect the tool to the bot."""
+    global _telegram_bot_ref
+    _telegram_bot_ref = bot
+    logger.info("✅ AskUser tool connected to Telegram bot")
+
+
+def _create_ask_user_tool() -> Tool:
+    """Create tool for agents to ask the user structured questions."""
+    def ask_user(question: str, options: str = "") -> str:
+        """Ask the user a question and wait for their response.
+        Use this when:
+        - You need clarification before proceeding with a task
+        - The task has multiple valid approaches and user preference matters
+        - You want to confirm before taking an irreversible action
+        
+        Args:
+            question: The question to ask the user
+            options: Comma-separated list of options (e.g., "Python,Rust,Go").
+                     If empty, provides Yes/No by default.
+        """
+        global _telegram_bot_ref
+        if not _telegram_bot_ref:
+            return f"(Cannot ask user — no active chat channel. Proceeding with best judgment for: {question})"
+
+        # Parse options
+        if options and options.strip():
+            option_list = [o.strip() for o in options.split(",") if o.strip()]
+        else:
+            option_list = ["Yes", "No"]
+
+        # Limit to 6 options (Telegram inline keyboard practical limit)
+        option_list = option_list[:6]
+
+        # Generate unique request ID
+        import hashlib
+        request_id = hashlib.sha256(f"{question}{time.time()}".encode()).hexdigest()[:12]
+
+        logger.info(f"AskUser: '{question}' with options {option_list} (id: {request_id})")
+
+        # This blocks until user responds or timeout (120s)
+        response = _telegram_bot_ref.wait_for_user_response(
+            request_id=request_id,
+            question=question,
+            options=option_list,
+            timeout=120.0
+        )
+
+        return f"User responded: {response}"
+
+    return Tool(
+        name="ask_user",
+        description="Ask the user a question with clickable options. Use for clarification or confirmation. Args: question (str), options (str, optional, comma-separated choices e.g. 'Python,Rust,Go')",
+        func=ask_user,
+        parameters={"question": "string", "options": "string (optional, comma-separated)"}
+    )
+
+
+def _create_relay_tool() -> Tool:
+    """Create tool for agents to delegate tasks to the other bot."""
+    def relay_to_bot(task: str, wait_for_response: str = "no") -> str:
+        """Delegate a task to the other bot (Ellora) for processing.
+        Use this when:
+        - The task needs capabilities you don't have
+        - You want a second opinion or cross-validation
+        - The user explicitly asks you to coordinate with the other bot
+
+        Args:
+            task: The task or question to send to the other bot
+            wait_for_response: 'yes' to wait for response, 'no' to fire-and-forget
+        """
+        try:
+            from .interbot import get_interbot_bridge
+            bridge = get_interbot_bridge()
+            other = bridge.get_other_bot()
+
+            if wait_for_response.lower() in ("yes", "true", "1"):
+                response = bridge.send_query(other, task, timeout=90.0)
+                return f"Response from {other.title()}: {response}"
+            else:
+                msg_id = bridge.send_task(other, task)
+                return f"Task delegated to {other.title()} (ID: {msg_id[:8]}). Response will arrive asynchronously."
+        except Exception as e:
+            return f"Relay failed: {e}"
+
+    return Tool(
+        name="relay_to_bot",
+        description="Delegate a task to the other bot (Ellora). Args: task (str), wait_for_response (str, 'yes'|'no')",
+        func=relay_to_bot,
+        parameters={"task": "string", "wait_for_response": "string (optional, 'yes' or 'no')"}
+    )
+
+
 # ============== Bootstrap ==============
 
 _bootstrapped = False
@@ -495,6 +767,11 @@ def bootstrap_agents() -> Dict[str, Any]:
         _create_analyze_tool(),
         _create_code_tool(),
         _create_time_tool(),
+        _create_memory_search_tool(),
+        _create_memory_store_tool(),
+        _create_rag_search_tool(),
+        _create_ask_user_tool(),
+        _create_relay_tool(),
     ]
     for tool in new_tools:
         registry.register(tool)
@@ -826,4 +1103,5 @@ def get_tool_list() -> str:
 __all__ = [
     "bootstrap_agents",
     "get_tool_list",
+    "set_telegram_bot_ref",
 ]

@@ -104,6 +104,11 @@ class TelegramBot:
         self._agent_system = None
         self._system_prompt = "You are a helpful, concise AI assistant. Reply thoughtfully. Feel free to use Markdown formatting."
 
+        # Advanced features state
+        self._active_reminders: Dict[str, Dict] = {}
+        self._reminder_counter = 0
+        self._whisper_pipeline = None  # Lazy-loaded transformers whisper
+
         # Thread safety
         self._history_lock = threading.Lock()
         self._browser_semaphore = threading.Semaphore(3)  # Max 3 concurrent browser sessions
@@ -117,11 +122,16 @@ class TelegramBot:
         self._command_registration_degraded = False
         self._max_bot_commands = 100
 
+        # AskUser tool: pending responses from inline keyboard buttons
+        self._pending_responses: Dict[str, Dict] = {}  # {request_id: {"event": Event, "response": None}}
+        self._pending_lock = threading.Lock()
+
         if self.enabled:
             self._register_default_commands()
             self._register_search_commands()
             self._register_browser_commands()
             self._register_agent_commands()
+            self._register_interbot_commands()
             self._bootstrap_agents()
 
     def send_typing_action(self) -> bool:
@@ -177,6 +187,30 @@ class TelegramBot:
         except Exception:
             pass
 
+        # Check if this is an AskUser response (format: "askuser:<request_id>:<choice>")
+        if data.startswith("askuser:"):
+            parts = data.split(":", 2)
+            if len(parts) == 3:
+                request_id = parts[1]
+                choice = parts[2]
+                with self._pending_lock:
+                    if request_id in self._pending_responses:
+                        self._pending_responses[request_id]["response"] = choice
+                        self._pending_responses[request_id]["event"].set()
+                        logger.info(f"AskUser response received: {request_id} -> {choice}")
+                        # Update the message to show what was selected
+                        try:
+                            msg_id = message.get("message_id")
+                            if msg_id:
+                                original_text = message.get("text", "")
+                                self.edit_message(
+                                    str(chat_id), msg_id,
+                                    f"{original_text}\n\n✅ Selected: {choice}"
+                                )
+                        except Exception:
+                            pass
+                        return None
+
         # If data starts with /, treat as command
         if data.startswith("/"):
             command_parts = data[1:].split()
@@ -187,6 +221,70 @@ class TelegramBot:
                 return self._command_callbacks[command](args)
 
         return None
+
+    def send_inline_keyboard(self, text: str, options: list, request_id: str, chat_id: str = None) -> bool:
+        """Send a message with inline keyboard buttons for AskUser tool."""
+        target_chat = chat_id or self.chat_id
+        if not self.api_url or not target_chat:
+            return False
+
+        # Build keyboard: each option is a row with one button
+        keyboard = []
+        for opt in options:
+            callback_data = f"askuser:{request_id}:{opt}"
+            # Telegram limits callback_data to 64 bytes
+            if len(callback_data.encode('utf-8')) > 64:
+                callback_data = callback_data[:64]
+            keyboard.append([{"text": opt, "callback_data": callback_data}])
+
+        data = {
+            "chat_id": target_chat,
+            "text": text,
+            "reply_markup": json.dumps({"inline_keyboard": keyboard}),
+        }
+        try:
+            result = self._make_request("sendMessage", data)
+            return bool(result and result.get("ok"))
+        except Exception as e:
+            logger.error(f"Failed to send inline keyboard: {e}")
+            return False
+
+    def wait_for_user_response(self, request_id: str, question: str, options: list, timeout: float = 120.0) -> str:
+        """Send an inline keyboard and block until the user responds or timeout.
+        
+        This is the core mechanism for the AskUser tool. It:
+        1. Creates a threading.Event for this request
+        2. Sends the inline keyboard to Telegram
+        3. Blocks until the user taps a button or timeout expires
+        4. Returns the selected option or 'timeout'
+        """
+        event = threading.Event()
+        with self._pending_lock:
+            self._pending_responses[request_id] = {"event": event, "response": None}
+
+        # Send the keyboard
+        sent = self.send_inline_keyboard(
+            text=f"🤔 Agent needs your input:\n\n{question}",
+            options=options,
+            request_id=request_id
+        )
+
+        if not sent:
+            with self._pending_lock:
+                self._pending_responses.pop(request_id, None)
+            return f"(Failed to send question to user. Proceeding with best guess.)"
+
+        # Block until response or timeout
+        event.wait(timeout=timeout)
+
+        with self._pending_lock:
+            result = self._pending_responses.pop(request_id, {})
+
+        response = result.get("response")
+        if response is None:
+            return "(User did not respond in time. Proceeding with best judgment.)"
+
+        return response
 
     def _extract_reply_media_context(self, message: Dict) -> Optional[str]:
         """Extract context from replied-to media (photo, document, etc)."""
@@ -259,6 +357,9 @@ class TelegramBot:
         self.register_command("help", "Show available commands", self._handle_help)
         self.register_command("status", "Get system status", self._handle_status)
         self.register_command("trigger", "Trigger manual check", self._handle_trigger)
+        self.register_command("code", "Execute code in sandbox", self._handle_code)
+        self.register_command("remind", "Set a timed reminder", self._handle_remind)
+        self.register_command("alert", "Manage active reminders", self._handle_alert)
 
     def _register_search_commands(self):
         """Register search-related commands"""
@@ -1639,12 +1740,25 @@ class TelegramBot:
     def _bootstrap_agents(self):
         """Bootstrap the agent system on startup."""
         try:
-            from ..core.agent_bootstrap import bootstrap_agents
+            from ..core.agent_bootstrap import bootstrap_agents, set_telegram_bot_ref
             self._agent_system = bootstrap_agents()
+            # Connect AskUser tool to this Telegram bot instance
+            set_telegram_bot_ref(self)
             logger.info("Agent system bootstrapped successfully")
         except Exception as e:
             logger.error(f"Agent bootstrap failed: {e}")
             self._agent_system = None
+
+        # Initialize InterBot bridge for cross-bot communication
+        try:
+            from ..core.interbot import get_interbot_bridge
+            self._interbot_bridge = get_interbot_bridge(chat_id=self.chat_id)
+            self._interbot_bridge.on_message = self._handle_interbot_incoming
+            self._interbot_bridge.start_listener()
+            logger.info("InterBot bridge started")
+        except Exception as e:
+            logger.error(f"InterBot bridge failed: {e}")
+            self._interbot_bridge = None
 
     def _register_agent_commands(self):
         """Register agent-related commands."""
@@ -1660,6 +1774,133 @@ class TelegramBot:
         self.register_command("history", "Show current chat context", self._handle_history)
         self.register_command("clear", "Clear chat history", self._handle_clear)
         logger.info("Agent commands registered")
+
+    def _register_interbot_commands(self):
+        """Register inter-bot communication commands."""
+        self.register_command("relay", "Send a task to the other bot (Ellora)", self._handle_relay)
+        self.register_command("askbot", "Ask the other bot a question and wait for response", self._handle_askbot)
+        self.register_command("botbridge", "Show inter-bot communication status", self._handle_botbridge)
+        logger.info("InterBot commands registered")
+
+    # ============== InterBot Handlers ==============
+
+    def _handle_relay(self, args: List[str]) -> str:
+        """Handle /relay - send a task to the other bot."""
+        if not args:
+            return "Usage: /relay <task>\nExample: /relay Research quantum computing breakthroughs in 2026"
+
+        if not hasattr(self, '_interbot_bridge') or not self._interbot_bridge:
+            return "❌ InterBot bridge not initialized."
+
+        task = " ".join(args)
+        other_bot = self._interbot_bridge.get_other_bot()
+
+        try:
+            msg_id = self._interbot_bridge.send_task(other_bot, task)
+            return f"📨 Task relayed to {other_bot.title()}!\n\n" \
+                   f"Task: {task}\n" \
+                   f"Message ID: {msg_id[:8]}\n" \
+                   f"Status: Pending"
+        except Exception as e:
+            return f"❌ Relay failed: {e}"
+
+    def _handle_askbot(self, args: List[str]) -> str:
+        """Handle /askbot - ask the other bot a question and wait."""
+        if not args:
+            return "Usage: /askbot <question>\nExample: /askbot What AI model are you using?"
+
+        if not hasattr(self, '_interbot_bridge') or not self._interbot_bridge:
+            return "❌ InterBot bridge not initialized."
+
+        question = " ".join(args)
+        other_bot = self._interbot_bridge.get_other_bot()
+
+        self.send_message(f"🤔 Asking {other_bot.title()}: {question}\n⏳ Waiting for response...")
+
+        try:
+            response = self._interbot_bridge.send_query(other_bot, question, timeout=120.0)
+            return f"💬 Response from {other_bot.title()}:\n\n{response}"
+        except Exception as e:
+            return f"❌ Query failed: {e}"
+
+    def _handle_botbridge(self, args: List[str]) -> str:
+        """Handle /botbridge - show inter-bot status."""
+        if not hasattr(self, '_interbot_bridge') or not self._interbot_bridge:
+            return "InterBot bridge not initialized."
+
+        status = self._interbot_bridge.get_status()
+        from ..core.interbot import BOT_REGISTRY
+
+        lines = ["🌉 InterBot Bridge Status\n"]
+        lines.append(f"My Bot: {status['my_bot'].title()}")
+        lines.append(f"Other Bot: {status['other_bot'].title()}")
+        lines.append(f"Listener: {'🟢 Running' if status['listener_running'] else '🔴 Stopped'}")
+        lines.append(f"Inbox Messages: {status['inbox_messages']}")
+        lines.append(f"Archived Messages: {status['archived_messages']}")
+        lines.append(f"Pending Queries: {status['pending_waiters']}")
+
+        lines.append("\n📋 Known Bots:")
+        for bot_id, info in BOT_REGISTRY.items():
+            marker = "👉" if bot_id == status['my_bot'] else "  "
+            lines.append(f"{marker} {info['name']} ({info['gateway']}) — {info['description'][:60]}")
+
+        return "\n".join(lines)
+
+    def _handle_interbot_incoming(self, msg):
+        """Process incoming inter-bot messages.
+
+        When the other bot sends us a task or query, we process it
+        using our ReAct agent and send the result back.
+        Response messages are handled silently (they just wake up waiting threads).
+        """
+        from ..core.interbot import MessageType
+
+        logger.info(f"Incoming interbot message from {msg.from_bot}: {msg.content[:80]}")
+
+        # Response messages are handled silently by process_incoming() in the bridge
+        # (they wake up the waiting thread). Don't notify the user about them.
+        if msg.msg_type == MessageType.RESPONSE.value:
+            logger.info(f"Response from {msg.from_bot} handled silently")
+            return
+
+        # Info messages: just log, don't process
+        if msg.msg_type == MessageType.INFO.value:
+            logger.info(f"Info from {msg.from_bot}: {msg.content[:200]}")
+            return
+
+        # Only notify user and process for TASK and QUERY types
+        if msg.msg_type in (MessageType.TASK.value, MessageType.QUERY.value):
+            self.send_message(
+                f"📨 Incoming task from {msg.from_bot.title()}:\n"
+                f"{msg.content[:200]}\n\n⏳ Processing..."
+            )
+
+            # Use the ReAct agent to process the task
+            response_text = self._process_interbot_task(msg.content)
+
+            # Send response back
+            self._interbot_bridge.send_response(msg.id, msg.from_bot, response_text)
+
+            # Notify user of the result
+            self.send_message(
+                f"✅ Completed task from {msg.from_bot.title()}:\n"
+                f"{response_text[:500]}"
+            )
+
+    def _process_interbot_task(self, task: str) -> str:
+        """Process a task received from the other bot using the ReAct agent."""
+        try:
+            if self._agent_system and "react_agent" in self._agent_system:
+                agent = self._agent_system["react_agent"]
+                trace = agent.run(task)
+                return trace.final_answer or "Task completed but no clear answer was produced."
+            else:
+                # Fallback: simple LLM call
+                from ..core.agent_bootstrap import _call_llm
+                return _call_llm(f"Please help with this task: {task}")
+        except Exception as e:
+            logger.error(f"InterBot task processing error: {e}")
+            return f"Error processing task: {e}"
 
     def _handle_agent(self, args: List[str]) -> str:
         """Handle /agent - run a ReAct agent on a task."""
@@ -1945,6 +2186,451 @@ class TelegramBot:
         except Exception as e:
             return f"Error: {str(e)}"
 
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Code Interpreter (/code)
+    # Executes code safely via the existing sandbox module.
+    # Supports Python, Bash, Node.js. Preserves original casing.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_code(self, args: List[str]) -> str:
+        """Handle /code command — execute code safely in sandbox."""
+        if not args or not args[0].strip():
+            return (
+                "💻 *Code Interpreter*\n\n"
+                "Usage:\n"
+                "  /code python print('Hello World')\n"
+                "  /code bash ls -la\n"
+                "  /code node console.log('hi')\n\n"
+                "Default language: Python\n"
+                "Timeout: 30s | Sandbox: isolated"
+            )
+
+        raw_input = args[0]  # Already the full text after /code (case preserved)
+
+        # Detect language prefix
+        lang_map = {
+            "python": "python", "py": "python",
+            "bash": "bash", "sh": "bash", "shell": "bash",
+            "node": "nodejs", "nodejs": "nodejs", "js": "nodejs", "javascript": "nodejs",
+        }
+
+        parts = raw_input.split(None, 1)
+        first_word = parts[0].lower() if parts else ""
+
+        if first_word in lang_map:
+            language = lang_map[first_word]
+            code = parts[1] if len(parts) > 1 else ""
+        else:
+            language = "python"
+            code = raw_input
+
+        if not code.strip():
+            return "❌ No code provided. Usage: /code python print('hello')"
+
+        try:
+            from ..core.sandbox import Sandbox, Language, SandboxConfig, ExecutionResult
+
+            lang_enum = {
+                "python": Language.PYTHON,
+                "bash": Language.BASH,
+                "nodejs": Language.NODEJS,
+            }.get(language, Language.PYTHON)
+
+            config = SandboxConfig(timeout_seconds=30, max_output_bytes=8192)
+            sandbox = Sandbox(config)
+
+            try:
+                result = sandbox.execute(code, lang_enum)
+
+                lines = []
+                lines.append(f"💻 *{language.upper()}* | {'✅ Success' if result.success else '❌ Failed'}")
+
+                if result.stdout:
+                    out = result.stdout[:3500]
+                    lines.append(f"\n📤 *Output:*\n```\n{out}\n```")
+
+                if result.stderr:
+                    err = result.stderr[:1500]
+                    lines.append(f"\n⚠️ *Stderr:*\n```\n{err}\n```")
+
+                if result.timed_out:
+                    lines.append("\n⏰ *Execution timed out!*")
+
+                lines.append(f"\n⏱️ {result.duration:.2f}s | Exit: {result.return_code}")
+                return "\n".join(lines)
+
+            finally:
+                sandbox.cleanup()
+
+        except ImportError:
+            return "❌ Sandbox module not available."
+        except Exception as e:
+            logger.error(f"Code execution error: {e}")
+            return f"❌ Error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Reminders & Alerts (/remind, /alert)
+    # Timer-based reminder system with ID tracking.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_remind(self, args: List[str]) -> str:
+        """Handle /remind — set a timed reminder."""
+        if not args:
+            return (
+                "⏰ *Reminders*\n\n"
+                "Usage:\n"
+                "  /remind 30s Check something\n"
+                "  /remind 5m Take a break\n"
+                "  /remind 2h Review the PR\n"
+                "  /remind 1d Daily standup\n\n"
+                "Formats: Ns (sec), Nm (min), Nh (hrs), Nd (days)\n"
+                "Manage: /alert list | /alert cancel <id> | /alert clear"
+            )
+
+        time_str = args[0].lower()
+        description = " ".join(args[1:]) if len(args) > 1 else "⏰ Reminder!"
+
+        multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+        try:
+            if time_str[-1] in multipliers:
+                seconds = float(time_str[:-1]) * multipliers[time_str[-1]]
+            else:
+                seconds = float(time_str) * 60  # Default to minutes
+        except (ValueError, IndexError):
+            return f"❌ Invalid time: `{time_str}`. Use 30s, 5m, 2h, or 1d."
+
+        if seconds < 5:
+            return "⚠️ Minimum: 5 seconds."
+        if seconds > 86400 * 7:
+            return "⚠️ Maximum: 7 days."
+
+        self._reminder_counter += 1
+        rid = f"r{self._reminder_counter}"
+
+        def _fire():
+            self.send_message(f"🔔 *REMINDER* [`{rid}`]\n\n{description}")
+            self._active_reminders.pop(rid, None)
+
+        timer = threading.Timer(seconds, _fire)
+        timer.daemon = True
+        timer.start()
+
+        self._active_reminders[rid] = {
+            "timer": timer, "description": description,
+            "seconds": seconds, "created": time.time(),
+        }
+
+        # Human-readable time
+        if seconds >= 86400:    t_str = f"{seconds/86400:.1f}d"
+        elif seconds >= 3600:   t_str = f"{seconds/3600:.1f}h"
+        elif seconds >= 60:     t_str = f"{seconds/60:.0f}m"
+        else:                   t_str = f"{seconds:.0f}s"
+
+        return f"✅ Reminder `{rid}` set for {t_str}\n📝 {description}"
+
+    def _handle_alert(self, args: List[str]) -> str:
+        """Handle /alert — manage active reminders."""
+        action = args[0].lower() if args else "list"
+
+        if action == "list":
+            if not self._active_reminders:
+                return "📭 No active reminders.\n\nUse /remind to set one."
+            lines = ["📋 *Active Reminders:*\n"]
+            now = time.time()
+            for rid, info in self._active_reminders.items():
+                remaining = max(0, info["seconds"] - (now - info["created"]))
+                if remaining >= 3600:   r = f"{remaining/3600:.1f}h"
+                elif remaining >= 60:   r = f"{remaining/60:.0f}m"
+                else:                   r = f"{remaining:.0f}s"
+                lines.append(f"  `{rid}` — {info['description']} (in {r})")
+            return "\n".join(lines)
+
+        elif action == "cancel" and len(args) > 1:
+            rid = args[1]
+            if rid in self._active_reminders:
+                self._active_reminders[rid]["timer"].cancel()
+                del self._active_reminders[rid]
+                return f"✅ Cancelled `{rid}`."
+            return f"❌ `{rid}` not found. Use /alert list."
+
+        elif action == "clear":
+            n = len(self._active_reminders)
+            for info in self._active_reminders.values():
+                info["timer"].cancel()
+            self._active_reminders.clear()
+            return f"✅ Cleared {n} reminder(s)."
+
+        return "Usage: /alert list | /alert cancel <id> | /alert clear"
+
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Inline Keyboard Buttons
+    # Enables interactive buttons on messages.
+    # ════════════════════════════════════════════════════════════════
+    def send_message_with_buttons(self, text: str, buttons: List[List[Dict]], chat_id: str = None) -> Optional[Dict]:
+        """Send message with inline keyboard.
+
+        buttons: [[{"text": "✅ Yes", "callback_data": "/confirm yes"}, ...]]
+        """
+        data = {
+            "chat_id": chat_id or self.chat_id,
+            "text": text,
+            "reply_markup": json.dumps({
+                "inline_keyboard": [
+                    [{"text": b["text"], "callback_data": b["callback_data"]} for b in row]
+                    for row in buttons
+                ]
+            })
+        }
+        return self._make_request("sendMessage", data)
+
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Telegram File Downloader
+    # Downloads files from Telegram servers (voice, photos, docs).
+    # ════════════════════════════════════════════════════════════════
+    def _download_telegram_file(self, file_id: str, dest_path: str) -> bool:
+        """Download a file from Telegram servers."""
+        try:
+            result = self._make_request("getFile", {"file_id": file_id})
+            if not result or not result.get("ok"):
+                return False
+            file_path = result.get("result", {}).get("file_path")
+            if not file_path:
+                return False
+            url = f"https://api.telegram.org/file/bot{self.token}/{file_path}"
+            resp = requests.get(url, timeout=60)
+            if resp.status_code == 200:
+                with open(dest_path, "wb") as f:
+                    f.write(resp.content)
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"File download error: {e}")
+            return False
+
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Voice Message Transcription
+    # Uses transformers Whisper (already installed!) — zero new deps.
+    # Falls back gracefully if model can't load.
+    # ════════════════════════════════════════════════════════════════
+    def _get_whisper_pipeline(self):
+        """Lazy-load Whisper via transformers (already in env). Timeout after 120s."""
+        if self._whisper_pipeline is None:
+            try:
+                import concurrent.futures
+                from transformers import pipeline as tf_pipeline
+
+                def _load():
+                    return tf_pipeline(
+                        "automatic-speech-recognition",
+                        model="openai/whisper-base",
+                        device="cpu"
+                    )
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(_load)
+                    self._whisper_pipeline = future.result(timeout=120)
+                logger.info("Whisper pipeline loaded successfully")
+            except concurrent.futures.TimeoutError:
+                logger.error("Whisper model loading timed out (120s)")
+                self._whisper_pipeline = False
+            except Exception as e:
+                logger.error(f"Whisper load failed: {e}")
+                self._whisper_pipeline = False  # Mark as failed, don't retry
+        return self._whisper_pipeline if self._whisper_pipeline else None
+
+    def _handle_voice_message(self, message: Dict, chat_id: str):
+        """Process voice message: download → convert → transcribe → AI reply."""
+        voice = message.get("voice") or message.get("audio")
+        if not voice:
+            return
+        file_id = voice.get("file_id")
+        if not file_id:
+            return
+
+        # Immediate feedback so user knows we're working
+        self.send_message("🎤 Processing your voice message...", chat_id=chat_id)
+
+        try:
+            import tempfile
+            import subprocess
+            import shutil
+
+            # Check ffmpeg availability first
+            if not shutil.which("ffmpeg"):
+                self.send_message(
+                    "❌ *ffmpeg not installed*\n\n"
+                    "Voice messages need ffmpeg to convert audio.\n"
+                    "Install it: `sudo apt install ffmpeg`",
+                    chat_id=chat_id
+                )
+                return
+
+            # Download OGG voice file from Telegram
+            with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+                ogg_path = f.name
+
+            if not self._download_telegram_file(file_id, ogg_path):
+                self.send_message("❌ Failed to download voice from Telegram.", chat_id=chat_id)
+                return
+
+            # Verify download
+            if not os.path.exists(ogg_path) or os.path.getsize(ogg_path) < 100:
+                self.send_message("❌ Downloaded voice file is empty or corrupt.", chat_id=chat_id)
+                return
+
+            # Convert OGG → WAV
+            wav_path = ogg_path.replace(".ogg", ".wav")
+            proc = subprocess.run(
+                ["ffmpeg", "-i", ogg_path, "-ar", "16000", "-ac", "1", "-y", wav_path],
+                capture_output=True, timeout=30
+            )
+
+            if proc.returncode != 0 or not os.path.exists(wav_path):
+                stderr_msg = proc.stderr.decode(errors='replace')[:200] if proc.stderr else 'unknown'
+                self.send_message(f"❌ Audio conversion failed: {stderr_msg}", chat_id=chat_id)
+                return
+
+            # Load Whisper (first time takes ~30-120s for model download)
+            self.send_message("🔄 Transcribing... (first time may take ~30s to load model)", chat_id=chat_id)
+
+            whisper = self._get_whisper_pipeline()
+            transcribed = None
+
+            if whisper:
+                try:
+                    result = whisper(wav_path)
+                    transcribed = result.get("text", "").strip() if isinstance(result, dict) else str(result).strip()
+                except Exception as e:
+                    logger.error(f"Whisper transcription error: {e}")
+                    self.send_message(f"❌ Transcription failed: {str(e)[:150]}", chat_id=chat_id)
+            else:
+                self.send_message(
+                    "❌ *Whisper model failed to load*\n\n"
+                    "The `transformers` library couldn't load `openai/whisper-base`.\n"
+                    "Check the bot terminal logs for details.",
+                    chat_id=chat_id
+                )
+
+            # Cleanup temp files
+            for p in [ogg_path, wav_path]:
+                try: os.unlink(p)
+                except Exception: pass
+
+            if not transcribed:
+                if whisper:  # Model loaded but transcription was empty
+                    self.send_message("🤷 Voice was processed but no text was detected.", chat_id=chat_id)
+                return
+
+            # Show transcription + send to AI
+            self.send_message(f"🎤 *Heard:* _{transcribed}_", chat_id=chat_id)
+
+            msg_result = self._make_request("sendMessage", {
+                "chat_id": chat_id, "text": "🤔 Thinking..."
+            })
+            if msg_result and msg_result.get("ok"):
+                msg_id = msg_result.get("result", {}).get("message_id")
+                if msg_id:
+                    self._stream_ai_response(chat_id, msg_id, transcribed)
+
+        except subprocess.TimeoutExpired:
+            self.send_message("❌ Audio conversion timed out.", chat_id=chat_id)
+        except Exception as e:
+            logger.error(f"Voice message error: {e}")
+            self.send_message(f"❌ Voice error: {str(e)[:150]}", chat_id=chat_id)
+
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Photo Analysis
+    # Processes incoming photos — acknowledges with metadata,
+    # sends caption to AI for intelligent response.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_photo_message(self, message: Dict, chat_id: str):
+        """Process incoming photo."""
+        photos = message.get("photo", [])
+        if not photos:
+            return
+
+        photo = photos[-1]  # Highest resolution
+        caption = message.get("caption", "")
+        w = photo.get("width", "?")
+        h = photo.get("height", "?")
+        size = photo.get("file_size", 0)
+
+        self._send_typing(chat_id)
+
+        if caption:
+            prompt = f"[User sent a {w}x{h} photo, {size} bytes]\nCaption: {caption}\n\nRespond helpfully to their question about the image."
+        else:
+            prompt = f"[User sent a {w}x{h} photo, {size} bytes, no caption]\n\nAcknowledge the photo and ask what they'd like to know about it."
+
+        msg_result = self._make_request("sendMessage", {
+            "chat_id": chat_id, "text": "📷 Processing image..."
+        })
+        if msg_result and msg_result.get("ok"):
+            msg_id = msg_result.get("result", {}).get("message_id")
+            if msg_id:
+                self._stream_ai_response(chat_id, msg_id, prompt)
+
+    # ════════════════════════════════════════════════════════════════
+    # ADVANCED FEATURE: Document Analysis
+    # Downloads text-based documents, reads content, sends to AI.
+    # Supports 17+ file extensions.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_document_message(self, message: Dict, chat_id: str):
+        """Process incoming document."""
+        doc = message.get("document", {})
+        file_id = doc.get("file_id")
+        file_name = doc.get("file_name", "document")
+        mime_type = doc.get("mime_type", "")
+        file_size = doc.get("file_size", 0)
+        caption = message.get("caption", "")
+
+        self._send_typing(chat_id)
+
+        TEXT_EXTS = {".txt", ".py", ".json", ".csv", ".md", ".yaml", ".yml",
+                     ".xml", ".html", ".css", ".js", ".ts", ".log", ".sh",
+                     ".toml", ".ini", ".cfg", ".conf", ".env", ".sql", ".r", ".go", ".rs"}
+        TEXT_MIMES = {"text/", "application/json", "application/xml", "application/yaml"}
+
+        ext = os.path.splitext(file_name)[1].lower()
+        is_text = ext in TEXT_EXTS or any(mime_type.startswith(m) for m in TEXT_MIMES)
+
+        if is_text and file_size < 200_000:  # 200KB max
+            try:
+                import tempfile as _tf
+                with _tf.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
+                    tmp_path = tmp.name
+
+                if self._download_telegram_file(file_id, tmp_path):
+                    with open(tmp_path, "r", errors="replace") as f:
+                        content = f.read()[:8000]  # First 8000 chars
+                    try: os.unlink(tmp_path)
+                    except Exception: pass
+
+                    prompt = f"User sent file: `{file_name}` ({file_size:,} bytes, {mime_type})\n"
+                    if caption:
+                        prompt += f"Caption: {caption}\n"
+                    prompt += f"\nFile contents:\n```{ext.lstrip('.')}\n{content}\n```\n\nAnalyze this file. Provide a clear summary, identify key patterns, and note anything important."
+
+                    msg_result = self._make_request("sendMessage", {
+                        "chat_id": chat_id, "text": f"📄 Reading `{file_name}`..."
+                    })
+                    if msg_result and msg_result.get("ok"):
+                        msg_id = msg_result.get("result", {}).get("message_id")
+                        if msg_id:
+                            self._stream_ai_response(chat_id, msg_id, prompt)
+                    return
+                else:
+                    self.send_message(f"❌ Failed to download `{file_name}`.", chat_id=chat_id)
+                    return
+            except Exception as e:
+                logger.error(f"Document processing error: {e}")
+
+        # Non-text or too large
+        sz = f"{file_size/1024:.1f}KB" if file_size < 1_000_000 else f"{file_size/1_000_000:.1f}MB"
+        msg = f"📎 Received: `{file_name}` ({sz}, {mime_type})"
+        if caption:
+            msg += f"\nCaption: {caption}"
+        msg += "\n\nℹ️ I can read: .txt .py .json .csv .md .yaml .html .css .js .ts .sql .go .rs and more."
+        self.send_message(msg, chat_id=chat_id)
+
     def _make_request(self, method: str, data: Dict = None, files: Dict = None) -> Optional[Dict]:
         """Make API request with retry"""
         url = f"{self.api_url}/{method}"
@@ -2041,7 +2727,11 @@ class TelegramBot:
 
         try:
             url = f"{self.api_url}/getUpdates"
-            params = {"timeout": timeout, "offset": offset}
+            params = {
+                "timeout": timeout,
+                "offset": offset,
+                "allowed_updates": json.dumps(["message", "callback_query"])
+            }
             response = requests.get(url, params=params, timeout=timeout + 5)
 
             if response.status_code == 200:
@@ -2053,26 +2743,40 @@ class TelegramBot:
         return []
 
     # Commands that are long-running and must NOT block the listener thread
-    _ASYNC_COMMANDS = {"imagine", "deepresearch", "imglogin", "agent", "swarm", "orchestrate"}
+    _ASYNC_COMMANDS = {"imagine", "deepresearch", "imglogin", "agent", "swarm", "orchestrate", "code"}
 
     def handle_commands(self, text: str, chat_id: str = None) -> str:
         """Handle text as commands"""
-        text = text.strip()
+        raw_text = text.strip()  # Preserve original casing
 
         # Handle !! prefix
-        if text.startswith("!!"):
-            cmd = text[2:].strip().lower().split()
+        if raw_text.startswith("!!"):
+            cmd = raw_text[2:].strip().lower().split()
+            raw_after_cmd = raw_text[2:].strip()
         else:
-            cmd = text.strip().lower().split()
+            cmd = raw_text.strip().lower().split()
+            raw_after_cmd = raw_text.strip()
 
         if not cmd:
             return "Use /help for commands"
 
-        if not text.startswith("/") and not text.startswith("!!"):
-            return self._get_ai_response(text)
+        if not raw_text.startswith("/") and not raw_text.startswith("!!"):
+            return self._get_ai_response(raw_text)
 
         command = cmd[0].replace("/", "")
-        args = cmd[1:] if len(cmd) > 1 else []
+
+        # For /code, preserve original casing (code is case-sensitive)
+        # For other commands, use lowercased args
+        _CASE_SENSITIVE_CMDS = {"code"}
+        if command in _CASE_SENSITIVE_CMDS:
+            # Extract args from raw text, preserving case
+            parts = raw_after_cmd.split(None, 1)  # Split command from rest
+            if len(parts) > 1:
+                args = parts[1].split() if command != "code" else [parts[1]]  # Keep code as single arg
+            else:
+                args = []
+        else:
+            args = cmd[1:] if len(cmd) > 1 else []
 
         if command in self._commands:
             handler = self._commands[command].handler
@@ -2083,6 +2787,7 @@ class TelegramBot:
                     "imagine": f"🎨 Generating image for: {' '.join(args)}\nThis may take up to 90 seconds...",
                     "deepresearch": f"🔬 Starting deep research on: {' '.join(args)}\nThis can take up to 30 minutes. I'll send the result when done.",
                     "imglogin": "🔐 Starting browser login... Opening Gemini in a visible browser.",
+                    "code": "💻 Executing code...",
                 }
                 status_msg = status_msgs.get(command, "⏳ Working on it...")
                 self.send_message(status_msg)
@@ -2128,16 +2833,66 @@ class TelegramBot:
                     for update in updates:
                         try:
                             offset = update.get("update_id", offset) + 1
+
+                            # ---- Inline button callback queries ----
+                            callback_query = update.get("callback_query")
+                            if callback_query:
+                                cb_result = self._handle_callback_query(callback_query)
+                                if cb_result:
+                                    cb_chat = str(callback_query.get("message", {}).get("chat", {}).get("id", ""))
+                                    if cb_chat == self.chat_id:
+                                        self.send_message(cb_result, chat_id=cb_chat)
+                                continue
+
                             message = update.get("message", {})
+                            chat_id = str(message.get("chat", {}).get("id", ""))
+
+                            # Authorize ALL message types
+                            if chat_id != self.chat_id:
+                                if chat_id:
+                                    logger.warning(f"Unauthorized chat: {chat_id}")
+                                continue
+
+                            # ---- Voice messages → transcribe & reply ----
+                            if "voice" in message or "audio" in message:
+                                try:
+                                    threading.Thread(
+                                        target=self._handle_voice_message,
+                                        args=(message, chat_id), daemon=True
+                                    ).start()
+                                except Exception as e:
+                                    logger.error(f"Voice thread error: {e}")
+                                    self.send_message(f"❌ Voice handler failed to start: {str(e)[:100]}", chat_id=chat_id)
+                                continue
+
+                            # ---- Photos → analyze & reply ----
+                            if "photo" in message:
+                                try:
+                                    threading.Thread(
+                                        target=self._handle_photo_message,
+                                        args=(message, chat_id), daemon=True
+                                    ).start()
+                                except Exception as e:
+                                    logger.error(f"Photo thread error: {e}")
+                                    self.send_message(f"❌ Photo handler failed: {str(e)[:100]}", chat_id=chat_id)
+                                continue
+
+                            # ---- Documents → read & analyze ----
+                            if "document" in message:
+                                try:
+                                    threading.Thread(
+                                        target=self._handle_document_message,
+                                        args=(message, chat_id), daemon=True
+                                    ).start()
+                                except Exception as e:
+                                    logger.error(f"Doc thread error: {e}")
+                                    self.send_message(f"❌ Document handler failed: {str(e)[:100]}", chat_id=chat_id)
+                                continue
+
+                            # ---- Text messages (original logic preserved) ----
                             text = message.get("text", "")
 
                             if text:
-                                # Validate chat_id
-                                chat_id = str(message.get("chat", {}).get("id", ""))
-                                if chat_id != self.chat_id:
-                                    logger.warning(f"Unauthorized chat: {chat_id}")
-                                    continue
-
                                 logger.debug(f"Command received: {text}")
 
                                 if not text.startswith("/") and not text.startswith("!!"):
@@ -2146,12 +2901,19 @@ class TelegramBot:
                                     if msg_result and msg_result.get("ok"):
                                         msg_id = msg_result.get("result", {}).get("message_id")
                                         if msg_id:
-                                            # Run in own thread so listener loop doesn't block
-                                            ai_thread = threading.Thread(
-                                                target=self._stream_ai_response,
-                                                args=(chat_id, msg_id, text),
-                                                daemon=True
-                                            )
+                                            # Smart routing: detect if message needs tools (web search, etc.)
+                                            if self._needs_agent_routing(text):
+                                                ai_thread = threading.Thread(
+                                                    target=self._agent_chat_response,
+                                                    args=(chat_id, msg_id, text),
+                                                    daemon=True
+                                                )
+                                            else:
+                                                ai_thread = threading.Thread(
+                                                    target=self._stream_ai_response,
+                                                    args=(chat_id, msg_id, text),
+                                                    daemon=True
+                                                )
                                             ai_thread.start()
                                             continue
 
@@ -2185,6 +2947,299 @@ class TelegramBot:
         return bool(result)
 
 
+
+    def _needs_agent_routing(self, text: str) -> bool:
+        """Detect if a chat message needs tool access (web search, code, etc.).
+        
+        Uses fast keyword matching — no LLM call. Returns True if the message
+        likely needs real-time info, web search, computation, or analysis that
+        the plain LLM can't handle on its own.
+        """
+        text_lower = text.lower()
+
+        # Real-time / current information indicators
+        realtime_keywords = [
+            "today", "latest", "current", "recent", "news", "now",
+            "this week", "this month", "this year", "right now",
+            "happening", "update", "live", "breaking",
+            "2026", "2025",  # Current/recent years
+            "price of", "stock", "weather", "score",
+            "trending", "viral",
+        ]
+
+        # Explicit search/research intent
+        search_keywords = [
+            "search for", "look up", "find out", "google",
+            "research", "investigate", "what is the", "who is",
+            "how much", "how many", "when did", "when will",
+            "compare", "difference between",
+        ]
+
+        # Analysis / tool-requiring intent
+        tool_keywords = [
+            "analyze", "summarize this", "translate",
+            "calculate", "convert",
+            "fetch", "download", "scrape",
+            "what time", "what date",
+        ]
+
+        # Check all keyword groups
+        for kw in realtime_keywords + search_keywords + tool_keywords:
+            if kw in text_lower:
+                logger.info(f"Smart routing: '{kw}' detected → routing to agent")
+                return True
+
+        # Question patterns that likely need factual lookup
+        question_patterns = [
+            text_lower.startswith("what"),
+            text_lower.startswith("who"),
+            text_lower.startswith("where"),
+            text_lower.startswith("when"),
+            text_lower.startswith("how"),
+        ]
+        # Only route "what/who/where" questions if they seem factual (longer queries)
+        if any(question_patterns) and len(text.split()) >= 5:
+            # Check if it's a factual question vs. casual chat
+            casual_indicators = ["you think", "your opinion", "do you", "can you", "would you", "should i", "help me"]
+            if not any(ci in text_lower for ci in casual_indicators):
+                logger.info(f"Smart routing: factual question detected → routing to agent")
+                return True
+
+        return False
+
+    def _is_failed_response(self, text: str) -> bool:
+        """Check if the AI's response indicates it couldn't fulfill the user's request."""
+        if not text:
+            return True
+            
+        lower_text = text.lower()
+        failure_phrases = [
+            "i cannot access the internet",
+            "i don't have real-time",
+            "i do not have real-time",
+            "i cannot browse",
+            "as an ai",
+            "i'm an ai",
+            "i am an ai can",
+            "i am an ai, i",
+            "i cannot fulfill",
+            "i don't have access to",
+            "i am sorry, but",
+            "i cannot provide",
+            "searched for information but couldn't find",
+            "api key not configured",
+            "ai error: http",
+            "no response from ai"
+        ]
+        
+        if any(phrase in lower_text for phrase in failure_phrases):
+            return True
+            
+        return False
+
+    def _try_ellora_fallback(self, user_message: str) -> Optional[str]:
+        """Silently ask Ellora if Ajanta fails to answer."""
+        if getattr(self, '_interbot_bridge', None):
+            try:
+                # Ask Ellora via the interbot bridge
+                response = self._interbot_bridge.send_query("ellora", user_message, timeout=45.0)
+                if response and not response.startswith("(No response"):
+                    return response
+            except Exception as e:
+                from ..core.logger import get_logger
+                get_logger("telegram").error(f"Ellora fallback error: {e}")
+        return None
+
+    def _agent_chat_response(self, chat_id: str, message_id: int, user_message: str):
+        """Run the ReAct agent for a chat message and present only the clean final answer.
+        
+        Unlike _handle_agent (which shows the full trace), this method runs
+        the agent silently and presents just the answer, making it feel like
+        a regular chat response — but powered by tools.
+        """
+        stop_anim = threading.Event()
+        edit_lock = threading.Lock()
+
+        def _safe_edit(text: str):
+            with edit_lock:
+                self.edit_message(chat_id, message_id, text)
+
+        def animate():
+            frames = [
+                "⠋ 🔍 Searching...",
+                "⠙ 🌐 Gathering info...",
+                "⠹ 📊 Analyzing...",
+                "⠸ 🧠 Processing...",
+                "⠼ 🔗 Connecting dots...",
+                "⠴ 📝 Composing answer...",
+            ]
+            i = 0
+            while not stop_anim.is_set():
+                for _ in range(9):
+                    if stop_anim.is_set():
+                        return
+                    time.sleep(0.12)
+                if not stop_anim.is_set():
+                    _safe_edit(frames[i % len(frames)])
+                    i += 1
+
+        anim_thread = threading.Thread(target=animate, daemon=True)
+        anim_thread.start()
+
+        try:
+            if not self._agent_system or "react_agent" not in self._agent_system:
+                stop_anim.set()
+                anim_thread.join(timeout=2.0)
+                # Fallback to plain streaming if agent not available
+                self._stream_ai_response(chat_id, message_id, user_message)
+                return
+
+            agent = self._agent_system["react_agent"]
+            trace = agent.run(user_message)
+
+            stop_anim.set()
+            anim_thread.join(timeout=2.0)
+
+            # Extract just the final answer for clean presentation
+            answer = trace.final_answer if trace.final_answer else None
+
+            if not answer:
+                # Look through steps for final_answer
+                for step in reversed(trace.steps):
+                    if step.step_type.value == "final_answer" and step.content:
+                        answer = step.content
+                        break
+
+            if not answer:
+                answer = "I searched for information but couldn't find a clear answer. Please try rephrasing or use /agent for a detailed trace."
+
+            # Auto-escalation: check for failure and trigger Ellora fallback
+            if self._is_failed_response(answer):
+                _safe_edit("⠋ 🔄 Asking Ellora for help...")
+                fallback_answer = self._try_ellora_fallback(user_message)
+                if fallback_answer:
+                    answer = fallback_answer + "\n\n*(Automatically answered by Ellora)*"
+
+            # Present the answer cleanly, like a normal chat response
+            # Try MarkdownV2 first, fall back to plain text
+            escaped = self._escape_markdown(answer)
+            edit_data = {
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "text": escaped,
+                "parse_mode": "MarkdownV2",
+            }
+            with edit_lock:
+                result = self._make_request("editMessageText", edit_data)
+            if not result:
+                with edit_lock:
+                    self.edit_message(chat_id, message_id, answer)
+
+            # Store in chat history
+            with self._history_lock:
+                if chat_id not in self.history:
+                    self.history[chat_id] = []
+                self.history[chat_id].append({"role": "user", "content": user_message})
+                self.history[chat_id].append({"role": "assistant", "content": answer})
+                if len(self.history[chat_id]) > self.MAX_HISTORY * 2:
+                    self.history[chat_id] = self.history[chat_id][-(self.MAX_HISTORY * 2):]
+
+            # Auto-store in memory
+            try:
+                from ..core.agent_memory import get_agent_memory, MemoryType
+                memory = get_agent_memory()
+                memory.add_memory(
+                    content=f"User asked: {user_message[:300]} | Agent answered: {answer[:300]}",
+                    memory_type=MemoryType.EPISODIC,
+                    importance=0.6,
+                    metadata={"source": "agent_chat", "chat_id": chat_id}
+                )
+            except Exception:
+                pass
+
+        except Exception as e:
+            stop_anim.set()
+            anim_thread.join(timeout=2.0)
+            logger.error(f"Agent chat response error: {e}")
+            with edit_lock:
+                self.edit_message(chat_id, message_id, f"Error: {str(e)[:200]}")
+
+    def _enrich_context(self, user_message: str, chat_id: str) -> str:
+        """Enrich the system prompt with relevant context from memory and chat history.
+        
+        This is the key bridge between regular chat and the agent's intelligence:
+        before every chat response, we do a quick memory search and prepend
+        relevant context to the system prompt. This makes casual conversation
+        feel dramatically more intelligent without requiring any slash commands.
+        """
+        context_parts = []
+
+        # 1. Search agent memory for relevant past interactions
+        try:
+            from ..core.agent_memory import get_agent_memory, MemoryQuery
+            memory = get_agent_memory()
+            results = memory.query_memories(MemoryQuery(
+                text=user_message, limit=3
+            ))
+            if results:
+                memory_context = []
+                for m in results:
+                    # Only include memories with decent relevance
+                    from datetime import datetime
+                    when = datetime.fromtimestamp(m.timestamp).strftime('%b %d')
+                    memory_context.append(f"- [{when}] {m.content[:200]}")
+                if memory_context:
+                    context_parts.append(
+                        "Relevant memories from past conversations:\n" + "\n".join(memory_context)
+                    )
+        except Exception as e:
+            logger.debug(f"Memory enrichment skipped: {e}")
+
+        # 2. Check file-based memories as fallback
+        if not context_parts:
+            try:
+                import json as _json
+                memory_file = os.path.expanduser("~/.openclaw/memories/user_memories.jsonl")
+                if os.path.exists(memory_file):
+                    matches = []
+                    keywords = user_message.lower().split()
+                    with open(memory_file) as f:
+                        for line in f:
+                            try:
+                                entry = _json.loads(line.strip())
+                                content = entry.get("content", "")
+                                if any(kw in content.lower() for kw in keywords if len(kw) > 3):
+                                    matches.append(f"- {content[:200]}")
+                            except Exception:
+                                continue
+                    if matches:
+                        context_parts.append(
+                            "Relevant stored info:\n" + "\n".join(matches[:3])
+                        )
+            except Exception:
+                pass
+
+        # 3. Auto-store this conversation turn in memory for future recall
+        try:
+            from ..core.agent_memory import get_agent_memory, MemoryType
+            memory = get_agent_memory()
+            # Only store messages with enough substance (>20 chars)
+            if len(user_message) > 20:
+                memory.add_memory(
+                    content=f"User said: {user_message[:500]}",
+                    memory_type=MemoryType.EPISODIC,
+                    importance=0.4,
+                    metadata={"source": "chat", "chat_id": chat_id}
+                )
+        except Exception:
+            pass
+
+        if not context_parts:
+            return self._system_prompt
+
+        # Prepend context to system prompt
+        enriched = self._system_prompt + "\n\n--- Context from your memory ---\n" + "\n\n".join(context_parts) + "\n--- End context ---\nUse this context naturally if relevant. Do not mention that you searched memory."
+        return enriched
 
     def _stream_ai_response(self, chat_id: str, message_id: int, user_message: str):
         api_key = self._get_minimax_api_key()
@@ -2245,11 +3300,14 @@ class TelegramBot:
                 "Content-Type": "application/json",
                 "anthropic-version": "2023-06-01",
             }
+            # Enrich system prompt with context from memory
+            enriched_prompt = self._enrich_context(user_message, chat_id)
+
             payload = {
                 "model": "MiniMax-M2.5-Lightning",
                 "max_tokens": 1024,
                 "stream": True,
-                "system": self._system_prompt,
+                "system": enriched_prompt,
                 "messages": messages_payload,
             }
             import json as _json
@@ -2318,6 +3376,14 @@ class TelegramBot:
             _stop_anim_and_wait()
 
             if full_text:
+                # Auto-escalation: check for failure and trigger Ellora fallback
+                if self._is_failed_response(full_text):
+                    with edit_lock:
+                        self.edit_message(chat_id, message_id, "⠋ 🔄 Asking Ellora for help...")
+                    fallback_answer = self._try_ellora_fallback(user_message)
+                    if fallback_answer:
+                        full_text = fallback_answer + "\n\n*(Automatically answered by Ellora)*"
+
                 # Final message: try MarkdownV2, fall back to plain text on failure
                 escaped = self._escape_markdown(full_text)
                 edit_data = {
