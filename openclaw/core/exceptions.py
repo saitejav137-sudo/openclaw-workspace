@@ -239,6 +239,60 @@ class DatabaseError(StorageError):
         self.code = "DATABASE_ERROR"
 
 
+# ============== Memory Errors ==============
+
+class MemoryError(OpenClawError):
+    """Base class for memory-related errors."""
+    def __init__(self, message: str, details: Optional[dict] = None):
+        super().__init__(message, code="MEMORY_ERROR", details=details)
+
+
+class MemoryNotFoundError(MemoryError):
+    """Memory entry not found."""
+    def __init__(self, memory_id: str, details: Optional[dict] = None):
+        super().__init__(f"Memory not found: {memory_id}", details=details)
+        self.code = "MEMORY_NOT_FOUND"
+        self.memory_id = memory_id
+
+
+class MemoryValidationError(MemoryError):
+    """Memory validation error."""
+    def __init__(self, message: str, details: Optional[dict] = None):
+        super().__init__(message, details=details)
+        self.code = "MEMORY_VALIDATION_ERROR"
+
+
+class EmbeddingError(MemoryError):
+    """Embedding computation error."""
+    def __init__(self, message: str, details: Optional[dict] = None):
+        super().__init__(message, details=details)
+        self.code = "EMBEDDING_ERROR"
+
+
+# ============== InterBot Errors ==============
+
+class InterBotError(OpenClawError):
+    """Base class for inter-bot communication errors."""
+    def __init__(self, message: str, details: Optional[dict] = None):
+        super().__init__(message, code="INTERBOT_ERROR", details=details)
+
+
+class InterBotConnectionError(InterBotError):
+    """Connection to other bot failed."""
+    def __init__(self, bot_id: str, details: Optional[dict] = None):
+        super().__init__(f"Failed to connect to bot: {bot_id}", details=details)
+        self.code = "INTERBOT_CONNECTION_ERROR"
+        self.bot_id = bot_id
+
+
+class InterBotTimeoutError(InterBotError):
+    """Message delivery timeout."""
+    def __init__(self, message_id: str, details: Optional[dict] = None):
+        super().__init__(f"Message delivery timed out: {message_id}", details=details)
+        self.code = "INTERBOT_TIMEOUT"
+        self.message_id = message_id
+
+
 # ============== Utility Functions ==============
 
 def is_retryable(error: Exception) -> bool:

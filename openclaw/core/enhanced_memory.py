@@ -793,16 +793,22 @@ class EnhancedMemory:
     def consolidate(self, threshold: float = MemoryConfig.CONSOLIDATION_THRESHOLD):
         """Consolidate similar memories"""
         memories = list(self._memories.values())
+        merged_ids = set()  # Track already merged memories
 
         to_merge = []
         for i, mem1 in enumerate(memories):
+            if mem1.id in merged_ids:
+                continue
             for mem2 in memories[i+1:]:
+                if mem2.id in merged_ids:
+                    continue
                 if mem1.memory_type == mem2.memory_type:
                     # Check similarity
                     if mem1.embedding and mem2.embedding:
                         sim = self._cosine_similarity(mem1.embedding, mem2.embedding)
                         if sim >= threshold:
                             to_merge.append((mem1, mem2))
+                            merged_ids.add(mem2.id)
 
         # Merge
         for mem1, mem2 in to_merge:
