@@ -492,8 +492,7 @@ Total memories: {stats['total']}
             content=content,
             memory_type="semantic",
             importance=0.9,
-            scope=scope,
-            source="user"
+            scope=scope
         )
 
     def findMemory(self, query: str) -> List[Dict[str, Any]]:

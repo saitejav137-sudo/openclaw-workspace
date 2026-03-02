@@ -185,6 +185,9 @@ class MemoryConfig:
     ASYNC_SAVE = True
     MAX_WORKERS = 4
 
+    # Embedding
+    EMBEDDING_DIM = 384  # Matches sentence-transformers/all-MiniLM-L6-v2
+
 
 # ============== Git Scope Detector ==============
 
@@ -281,11 +284,12 @@ class EmbeddingProvider:
     def _simple_embedding(self, text: str) -> List[float]:
         """Simple bag-of-words embedding"""
         words = text.lower().split()
-        embedding = np.zeros(128)
+        dim = MemoryConfig.EMBEDDING_DIM
+        embedding = np.zeros(dim)
 
         for word in words:
             hash_val = hash(word)
-            idx = hash_val % 128
+            idx = hash_val % dim
             embedding[idx] += 1
 
         norm = np.linalg.norm(embedding)
@@ -601,6 +605,15 @@ class EnhancedMemory:
         """Calculate cosine similarity"""
         a = np.array(a)
         b = np.array(b)
+
+        # Handle dimension mismatch
+        if a.shape != b.shape:
+            # Try to resize smaller to larger
+            if len(a) < len(b):
+                a = np.pad(a, (0, len(b) - len(a)))
+            elif len(b) < len(a):
+                b = np.pad(b, (0, len(a) - len(b)))
+
         return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8))
 
     # --- Working Memory ---
