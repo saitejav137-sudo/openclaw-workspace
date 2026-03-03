@@ -5,6 +5,7 @@ import os
 import argparse
 import signal
 import time
+import threading
 
 # Add parent directory to path (to import openclaw package)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -49,6 +50,7 @@ class OpenClaw:
                 pass
         self.vision_engine = None
         self.http_server = None
+        self.gateway_server = None
         self.telegram_bot = None
         self.ws_manager = None
         self.db_manager = None
@@ -106,6 +108,61 @@ class OpenClaw:
             self.ws_manager.start()
             logger.info(f"WebSocket server enabled on port {self.config.websocket_port}")
 
+        # Initialize Gateway dashboard server
+        if self.config.gateway_enabled:
+            from http.server import HTTPServer, BaseHTTPRequestHandler
+            from openclaw.ui.dashboard import MODERN_DASHBOARD_HTML
+
+            config_ref = self.config
+
+            class GatewayHandler(BaseHTTPRequestHandler):
+                """Lightweight gateway handler serving the dashboard"""
+
+                def log_message(self, format, *args):
+                    logger.debug(f"Gateway: {args[0]}")
+
+                def do_GET(self):
+                    import json as _json
+                    path = self.path.split("?")[0]
+
+                    if path in ("/", "/dashboard", "/dashboard/modern", "/dashboard/new"):
+                        self.send_response(200)
+                        self.send_header("Content-Type", "text/html")
+                        self.end_headers()
+                        self.wfile.write(MODERN_DASHBOARD_HTML.encode())
+                    elif path == "/health":
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        import time as _time
+                        health = {
+                            "status": "healthy",
+                            "timestamp": _time.time(),
+                            "version": "2.1.0",
+                            "gateway_port": config_ref.gateway_port,
+                            "services": {
+                                "telegram": config_ref.telegram_enabled,
+                                "http": config_ref.http_enabled,
+                                "websocket": config_ref.websocket_enabled,
+                                "gateway": True
+                            }
+                        }
+                        self.wfile.write(_json.dumps(health).encode())
+                    elif path == "/api/stats":
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        stats = {"total": 0, "triggered": 0, "failed": 0, "success_rate": 0.0}
+                        self.wfile.write(_json.dumps(stats).encode())
+                    else:
+                        self.send_response(404)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        self.wfile.write(_json.dumps({"error": "Not found"}).encode())
+
+            self.gateway_server = HTTPServer(("0.0.0.0", self.config.gateway_port), GatewayHandler)
+            logger.info(f"Gateway dashboard initialized on port {self.config.gateway_port}")
+
         logger.info("Setup complete")
 
     def run(self):
@@ -118,11 +175,29 @@ class OpenClaw:
 
         logger.info("OpenClaw running. Press Ctrl+C to stop.")
 
-        # Start HTTP server (blocking)
-        try:
-            self.http_server.start()
-        except Exception as e:
-            logger.error(f"HTTP server error: {e}")
+        # Start gateway server in background thread
+        if self.gateway_server:
+            self._gateway_thread = threading.Thread(
+                target=self.gateway_server.serve_forever,
+                daemon=True,
+                name="gateway-dashboard"
+            )
+            self._gateway_thread.start()
+            logger.info(f"Gateway dashboard serving at http://0.0.0.0:{self.config.gateway_port}")
+
+        # Start HTTP server (blocking) if enabled
+        if self.http_server:
+            try:
+                self.http_server.start()
+            except Exception as e:
+                logger.error(f"HTTP server error: {e}")
+        else:
+            # If no HTTP server, keep running for telegram/gateway
+            try:
+                while self.running:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                pass
 
     def stop(self):
         """Stop the application"""
@@ -135,6 +210,10 @@ class OpenClaw:
                 self.integration_hub.stop()
             except Exception:
                 pass
+
+        if self.gateway_server:
+            self.gateway_server.shutdown()
+            logger.info("Gateway dashboard stopped")
 
         if self.http_server:
             self.http_server.stop()

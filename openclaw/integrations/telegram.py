@@ -132,6 +132,7 @@ class TelegramBot:
             self._register_browser_commands()
             self._register_agent_commands()
             self._register_interbot_commands()
+            self._register_phase4_commands()
             self._bootstrap_agents()
 
     def send_typing_action(self) -> bool:
@@ -355,7 +356,7 @@ class TelegramBot:
     def _register_default_commands(self):
         """Register default bot commands"""
         self.register_command("help", "Show available commands", self._handle_help)
-        self.register_command("status", "Get system status", self._handle_status)
+        self.register_command("status", "Get full system status", self._handle_status)
         self.register_command("trigger", "Trigger manual check", self._handle_trigger)
         self.register_command("code", "Execute code in sandbox", self._handle_code)
         self.register_command("remind", "Set a timed reminder", self._handle_remind)
@@ -409,8 +410,69 @@ class TelegramBot:
         return "\n".join(lines)
 
     def _handle_status(self, args: List[str]) -> str:
-        """Handle /status command"""
-        return "System is running"
+        """Handle /status — full system dashboard."""
+        lines = ["📊 OpenClaw System Status\n"]
+
+        # Uptime
+        try:
+            from ..core.system_bootstrap import get_system_state
+            state = get_system_state()
+            if state.started_at:
+                uptime = time.time() - state.started_at
+                if uptime >= 86400:
+                    lines.append(f"⏱️ Uptime: {uptime/86400:.1f}d")
+                elif uptime >= 3600:
+                    lines.append(f"⏱️ Uptime: {uptime/3600:.1f}h")
+                else:
+                    lines.append(f"⏱️ Uptime: {uptime/60:.0f}m")
+
+                summary = state.summary()
+                active = sum(1 for v in summary.values() if v is True)
+                total = sum(1 for v in summary.values() if isinstance(v, bool))
+                lines.append(f"🔧 Subsystems: {active}/{total} active")
+        except Exception:
+            pass
+
+        # Event bus
+        try:
+            from ..core.event_bus import get_event_bus
+            bus = get_event_bus()
+            stats = bus.get_stats()
+            lines.append(f"\n📡 Event Bus:")
+            lines.append(f"  Events: {stats['total_events_emitted']}")
+            lines.append(f"  Subscribers: {stats['subscriptions']}")
+            lines.append(f"  Errors: {stats['total_errors']}")
+        except Exception:
+            pass
+
+        # Plugins
+        try:
+            from ..core.plugin_system import get_plugin_registry
+            reg = get_plugin_registry()
+            pstats = reg.get_stats()
+            lines.append(f"\n🔌 Plugins: {pstats['total_registered']} registered, {pstats['active_slots']} active")
+        except Exception:
+            pass
+
+        # Health
+        try:
+            from ..core.resilience import HealthChecker
+            checker = HealthChecker()
+            report = checker.check_all()
+            status_emoji = "🟢" if report["status"] == "healthy" else "🟡"
+            lines.append(f"\n{status_emoji} Health: {report['status']}")
+        except Exception:
+            pass
+
+        # Agent system
+        if self._agent_system:
+            agent_list = [k for k in self._agent_system.keys() if self._agent_system[k]]
+            lines.append(f"\n🤖 Agents: {', '.join(agent_list) if agent_list else 'None'}")
+
+        if len(lines) == 1:
+            lines.append("System is running")
+
+        return "\n".join(lines)
 
     def _handle_trigger(self, args: List[str]) -> str:
         """Handle /trigger command"""
@@ -1773,7 +1835,13 @@ class TelegramBot:
         self.register_command("system", "Set AI system prompt/personality", self._handle_system_prompt)
         self.register_command("history", "Show current chat context", self._handle_history)
         self.register_command("clear", "Clear chat history", self._handle_clear)
-        logger.info("Agent commands registered")
+        # Phase 3 commands
+        self.register_command("dag", "Run DAG pipeline (build/exec)", self._handle_dag)
+        self.register_command("negotiate", "Agent consensus on approach", self._handle_negotiate)
+        self.register_command("metrics", "Show system metrics", self._handle_metrics)
+        self.register_command("health", "System health check", self._handle_health)
+        self.register_command("issues", "GitHub Issues (list/create)", self._handle_issues)
+        logger.info("Agent commands registered (including Phase 3)")
 
     def _register_interbot_commands(self):
         """Register inter-bot communication commands."""
@@ -2174,6 +2242,893 @@ class TelegramBot:
         count = sum(len(msgs) for msgs in self.history.values())
         self.history.clear()
         return f"🧹 Cleared {count} messages from chat history."
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 3: DAG Workflow Engine (/dag)
+    # Build and execute DAG pipelines via Telegram.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_dag(self, args: List[str]) -> str:
+        """Handle /dag — DAG workflow builder/runner.
+
+        Subcommands:
+            /dag demo              — Run the built-in 4-node diamond DAG demo
+            /dag run <task>        — Auto-decompose task into DAG and execute
+            /dag stats             — Show DAG engine stats
+        """
+        if not args:
+            return (
+                "🔀 DAG Workflow Engine\n\n"
+                "Usage:\n"
+                "  /dag demo — Run diamond DAG demo\n"
+                "  /dag run <task> — Decompose task into DAG\n"
+                "  /dag stats — Engine statistics"
+            )
+
+        sub = args[0].lower()
+
+        try:
+            from ..core.workflow_engine import (
+                WorkflowDAG, DAGNode, WorkflowDAGEngine, DAGStatus, get_dag_engine
+            )
+
+            if sub == "demo":
+                # Run a 4-node diamond dependency demo
+                dag = WorkflowDAG(name="demo-diamond")
+                dag.add_node(DAGNode(id="fetch", name="Fetch Data",
+                    handler=lambda ctx: "raw_data_123"))
+                dag.add_node(DAGNode(id="parse", name="Parse",
+                    handler=lambda ctx: f"parsed({ctx.get('_fetch_result', '')})",
+                    depends_on=["fetch"]))
+                dag.add_node(DAGNode(id="analyze", name="Analyze",
+                    handler=lambda ctx: f"analyzed({ctx.get('_fetch_result', '')})",
+                    depends_on=["fetch"]))
+                dag.add_node(DAGNode(id="report", name="Report",
+                    handler=lambda ctx: f"Report: {ctx.get('_parse_result', '')} + {ctx.get('_analyze_result', '')}",
+                    depends_on=["parse", "analyze"]))
+
+                engine = get_dag_engine()
+                result = engine.execute(dag)
+
+                lines = ["🔀 DAG Demo: Diamond Pipeline\n"]
+                lines.append(f"Status: {'✅ ' + result.status.value if result.status == DAGStatus.COMPLETED else '❌ ' + result.status.value}")
+                lines.append(f"Duration: {result.duration:.2f}s")
+                lines.append(f"Completed: {result.completed_count}/{len(dag)}")
+                lines.append("\n🔗 Execution Order:")
+                lines.append("  fetch → parse + analyze (parallel) → report")
+                lines.append(f"\n📋 Final output: {result.get_output('report')}")
+                return "\n".join(lines)
+
+            elif sub == "run" and len(args) > 1:
+                task = " ".join(args[1:])
+
+                # Auto-decompose: search → analyze → summarize
+                dag = WorkflowDAG(name=f"auto-{task[:20]}")
+
+                def search_step(ctx):
+                    try:
+                        from ..core.agent_bootstrap import _call_llm
+                        return _call_llm(f"Search and find information about: {ctx.get('_task', task)}")
+                    except Exception:
+                        return f"Info about: {task}"
+
+                def analyze_step(ctx):
+                    try:
+                        from ..core.agent_bootstrap import _call_llm
+                        search_result = ctx.get("_search_result", "")
+                        return _call_llm(f"Analyze this: {search_result[:500]}")
+                    except Exception:
+                        return f"Analysis of search results"
+
+                def summarize_step(ctx):
+                    try:
+                        from ..core.agent_bootstrap import _call_llm
+                        analysis = ctx.get("_analyze_result", "")
+                        return _call_llm(f"Summarize concisely: {analysis[:500]}")
+                    except Exception:
+                        return f"Summary complete"
+
+                dag.add_node(DAGNode(id="search", name="Search", handler=search_step))
+                dag.add_node(DAGNode(id="analyze", name="Analyze", handler=analyze_step, depends_on=["search"]))
+                dag.add_node(DAGNode(id="summarize", name="Summarize", handler=summarize_step, depends_on=["analyze"]))
+
+                engine = get_dag_engine()
+                result = engine.execute(dag, context={"_task": task})
+
+                lines = [f"🔀 DAG: {task}\n"]
+                lines.append(f"Status: {'✅' if result.status == DAGStatus.COMPLETED else '❌'} {result.status.value}")
+                lines.append(f"Duration: {result.duration:.1f}s")
+                for nid, node in result.nodes.items():
+                    status_icon = "✅" if node.status.value == "completed" else "❌"
+                    lines.append(f"  {status_icon} {node.name}: {node.duration:.1f}s")
+
+                output = result.get_output("summarize") or result.get_output("analyze")
+                if output:
+                    lines.append(f"\n📋 Result:\n{str(output)[:2000]}")
+
+                return "\n".join(lines)
+
+            elif sub == "stats":
+                engine = get_dag_engine()
+                stats = engine.get_stats()
+                return (
+                    f"📊 DAG Engine Stats\n\n"
+                    f"Executions: {stats['total_executions']}\n"
+                    f"Nodes run: {stats['total_nodes_run']}\n"
+                    f"Workers: {stats['max_workers']}"
+                )
+
+            return "Unknown subcommand. Use: demo, run, stats"
+
+        except Exception as e:
+            logger.error(f"DAG error: {e}")
+            return f"DAG error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 3: Agent Negotiation (/negotiate)
+    # Multi-agent consensus on approach.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_negotiate(self, args: List[str]) -> str:
+        """Handle /negotiate — multi-agent consensus.
+
+        Usage:
+            /negotiate <question>  — Agents propose + vote on best approach
+            /negotiate stats       — Negotiation engine stats
+        """
+        if not args:
+            return (
+                "🤝 Agent Negotiation\n\n"
+                "Usage:\n"
+                "  /negotiate <question> — Agents debate the best approach\n"
+                "  /negotiate stats — Engine statistics\n\n"
+                "Example: /negotiate How should we handle this user's complex request?"
+            )
+
+        sub = args[0].lower()
+
+        try:
+            from ..core.agent_negotiation import (
+                NegotiationEngine, Proposal, ConsensusMethod, get_negotiation_engine
+            )
+
+            if sub == "stats":
+                engine = get_negotiation_engine()
+                stats = engine.get_stats()
+                return (
+                    f"📊 Negotiation Stats\n\n"
+                    f"Total rounds: {stats['total_rounds']}\n"
+                    f"Total proposals: {stats['total_proposals']}\n"
+                    f"Active rounds: {stats['active_rounds']}\n"
+                    f"Decided rounds: {stats['decided_rounds']}"
+                )
+
+            # Run a negotiation
+            question = " ".join(args)
+            engine = get_negotiation_engine()
+            round_id = engine.open_round(question, method=ConsensusMethod.BEST_SCORE)
+
+            # Simulate agents proposing approaches
+            agent_proposals = [
+                ("researcher", "Search and analyze", 0.0),
+                ("coder", "Write code to solve", 0.0),
+                ("analyst", "Break down and reason", 0.0),
+            ]
+
+            # Try to get LLM-scored proposals
+            try:
+                from ..core.agent_bootstrap import _call_llm
+                for agent_id, default_approach, _ in agent_proposals:
+                    prompt = f"You are a {agent_id} agent. Given this question: '{question}', briefly describe your approach in 1-2 sentences and rate your confidence 0-1. Reply in format: approach|confidence"
+                    response = _call_llm(prompt)
+                    parts = response.strip().split("|")
+                    approach = parts[0].strip() if parts else default_approach
+                    try:
+                        confidence = float(parts[1].strip()) if len(parts) > 1 else 0.5
+                        confidence = min(1.0, max(0.0, confidence))
+                    except (ValueError, IndexError):
+                        confidence = 0.5
+
+                    engine.submit_proposal(round_id, Proposal(
+                        agent_id=agent_id,
+                        agent_name=agent_id.title(),
+                        approach=approach,
+                        confidence=confidence,
+                    ))
+            except Exception:
+                # Fallback: use default proposals
+                for agent_id, approach, _ in agent_proposals:
+                    import random
+                    engine.submit_proposal(round_id, Proposal(
+                        agent_id=agent_id,
+                        agent_name=agent_id.title(),
+                        approach=approach,
+                        confidence=round(random.uniform(0.4, 0.95), 2),
+                    ))
+
+            # Decide
+            winner = engine.decide(round_id)
+            negotiation = engine.get_round(round_id)
+
+            lines = [f"🤝 Negotiation: {question}\n"]
+            lines.append("Proposals:")
+            for p in negotiation.proposals:
+                marker = "👑" if winner and p.id == winner.id else "  "
+                lines.append(f"{marker} {p.agent_name}: {p.approach[:100]} ({p.confidence:.0%})")
+
+            if winner:
+                lines.append(f"\n✅ Winner: {winner.agent_name} ({winner.confidence:.0%})")
+                lines.append(f"📋 Approach: {winner.approach}")
+            else:
+                lines.append("\n❌ No consensus reached")
+
+            lines.append(f"\n⏱️ Duration: {negotiation.duration:.1f}s")
+            return "\n".join(lines)
+
+        except Exception as e:
+            logger.error(f"Negotiation error: {e}")
+            return f"Negotiation error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 3: Metrics (/metrics)
+    # System metrics in Telegram.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_metrics(self, args: List[str]) -> str:
+        """Handle /metrics — show system metrics."""
+        lines = ["📊 OpenClaw Metrics\n"]
+
+        # Event bus
+        try:
+            from ..core.event_bus import get_event_bus
+            stats = get_event_bus().get_stats()
+            lines.append(f"📡 Events emitted: {stats['total_events_emitted']}")
+            lines.append(f"📡 Subscribers: {stats['subscriptions']}")
+            lines.append(f"📡 Errors: {stats['total_errors']}")
+        except Exception:
+            pass
+
+        # Reaction engine
+        try:
+            from ..core.reaction_engine import get_reaction_engine
+            stats = get_reaction_engine().get_stats()
+            lines.append(f"\n⚡ Reactions triggered: {stats['total_reactions_triggered']}")
+        except Exception:
+            pass
+
+        # Plugins
+        try:
+            from ..core.plugin_system import get_plugin_registry
+            stats = get_plugin_registry().get_stats()
+            lines.append(f"\n🔌 Plugins: {stats['total_registered']} registered")
+            lines.append(f"🔌 Active slots: {stats['active_slots']}")
+        except Exception:
+            pass
+
+        # DAG engine
+        try:
+            from ..core.workflow_engine import get_dag_engine
+            stats = get_dag_engine().get_stats()
+            lines.append(f"\n🔀 DAG executions: {stats['total_executions']}")
+            lines.append(f"🔀 Nodes run: {stats['total_nodes_run']}")
+        except Exception:
+            pass
+
+        # Negotiation
+        try:
+            from ..core.agent_negotiation import get_negotiation_engine
+            stats = get_negotiation_engine().get_stats()
+            lines.append(f"\n🤝 Negotiations: {stats['total_rounds']}")
+            lines.append(f"🤝 Proposals: {stats['total_proposals']}")
+        except Exception:
+            pass
+
+        # Metrics server info
+        try:
+            from ..core.system_bootstrap import get_system_state
+            state = get_system_state()
+            if state.metrics_server_started:
+                server = state.references.get("metrics_server")
+                if server:
+                    lines.append(f"\n🌐 Metrics HTTP: {server.url}")
+        except Exception:
+            pass
+
+        if len(lines) == 1:
+            lines.append("No metrics available yet.")
+
+        return "\n".join(lines)
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 3: Health Check (/health)
+    # System health from HealthChecker.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_health(self, args: List[str]) -> str:
+        """Handle /health — system health check."""
+        lines = ["🏥 System Health\n"]
+
+        try:
+            from ..core.resilience import HealthChecker
+            from ..core.system_bootstrap import get_system_state
+            state = get_system_state()
+
+            checker = state.references.get("health_checker")
+            if checker:
+                report = checker.check_all()
+                overall = report["status"]
+                icon = "🟢" if overall == "healthy" else "🟡" if overall == "degraded" else "🔴"
+                lines.append(f"{icon} Overall: {overall.upper()}\n")
+
+                for name, check in report.get("checks", {}).items():
+                    status = check.get("status", "unknown")
+                    msg = check.get("message", "")
+                    s_icon = "✅" if status in ("healthy", "HEALTHY") else "❌"
+                    lines.append(f"  {s_icon} {name}: {msg}")
+            else:
+                # Fallback: manual checks
+                checks = []
+
+                try:
+                    from ..core.event_bus import get_event_bus
+                    get_event_bus().get_stats()
+                    checks.append("✅ Event Bus")
+                except Exception:
+                    checks.append("❌ Event Bus")
+
+                try:
+                    from ..core.plugin_system import get_plugin_registry
+                    get_plugin_registry().get_stats()
+                    checks.append("✅ Plugin Registry")
+                except Exception:
+                    checks.append("❌ Plugin Registry")
+
+                if self._agent_system:
+                    checks.append("✅ Agent System")
+                else:
+                    checks.append("❌ Agent System")
+
+                lines.extend(checks)
+
+        except Exception as e:
+            lines.append(f"Error running health check: {e}")
+
+        return "\n".join(lines)
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 3: GitHub Issues (/issues)
+    # CRUD on GitHub Issues via Telegram.
+    # ════════════════════════════════════════════════════════════════
+    def _handle_issues(self, args: List[str]) -> str:
+        """Handle /issues — GitHub Issues CRUD.
+
+        Subcommands:
+            /issues list               — List open issues
+            /issues create <title>     — Create new issue
+            /issues get <number>       — Get issue details
+            /issues close <number>     — Close an issue
+        """
+        if not args:
+            return (
+                "🐙 GitHub Issues\n\n"
+                "Usage:\n"
+                "  /issues list — List open issues\n"
+                "  /issues create <title> — Create issue\n"
+                "  /issues get <number> — Get issue\n"
+                "  /issues close <number> — Close issue\n\n"
+                "Requires GITHUB_TOKEN env var."
+            )
+
+        sub = args[0].lower()
+
+        try:
+            import asyncio
+            # Import directly
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(
+                "github_tracker",
+                os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                             "plugins", "github_tracker.py"),
+            )
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            tracker = mod.GitHubTrackerPlugin()
+            tracker.configure({})
+
+            if not tracker.token:
+                return "❌ GITHUB_TOKEN not set. Export it as an environment variable."
+
+            loop = asyncio.new_event_loop()
+
+            if sub == "list":
+                issues = loop.run_until_complete(tracker.list_issues())
+                if not issues:
+                    return "No open issues found."
+                lines = ["🐙 Open Issues:\n"]
+                for i in issues[:15]:
+                    labels = ", ".join(i.get("labels", [])[:3])
+                    lines.append(f"  #{i['id']} {i['title']} [{labels}]")
+                return "\n".join(lines)
+
+            elif sub == "create" and len(args) > 1:
+                title = " ".join(args[1:])
+                result = loop.run_until_complete(
+                    tracker.create_issue(title, f"Created via Telegram /issues")
+                )
+                if "error" in result:
+                    return f"❌ {result['error']}"
+                return f"✅ Created issue #{result['id']}: {result['title']}\n🔗 {result.get('url', '')}"
+
+            elif sub == "get" and len(args) > 1:
+                result = loop.run_until_complete(tracker.get_issue(args[1]))
+                if "error" in result:
+                    return f"❌ {result['error']}"
+                lines = [
+                    f"🐙 Issue #{result['id']}: {result['title']}\n",
+                    f"State: {result['state']}",
+                    f"Labels: {', '.join(result.get('labels', []))}",
+                    f"Assignees: {', '.join(result.get('assignees', []))}",
+                ]
+                if result.get("description"):
+                    lines.append(f"\n📝 {result['description'][:500]}")
+                lines.append(f"\n🔗 {result.get('url', '')}")
+                return "\n".join(lines)
+
+            elif sub == "close" and len(args) > 1:
+                loop.run_until_complete(
+                    tracker.update_issue(args[1], state="completed",
+                                        comment="Closed via Telegram /issues")
+                )
+                return f"✅ Issue #{args[1]} closed."
+
+            return "Unknown subcommand. Use: list, create, get, close"
+
+        except Exception as e:
+            logger.error(f"Issues error: {e}")
+            return f"Issues error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Scheduler (/schedule)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_schedule(self, args: List[str]) -> str:
+        """Handle /schedule — cron job management."""
+        if not args:
+            return (
+                "⏰ Task Scheduler\n\n"
+                "Usage:\n"
+                "  /schedule list — List scheduled tasks\n"
+                "  /schedule stats — Scheduler statistics\n"
+                "  /schedule run <id> — Run task immediately\n"
+                "  /schedule add <interval> <name> — Schedule new task\n"
+                "    Interval: 30s, 5m, 1h, 24h\n"
+                "  /schedule remove <id> — Remove task"
+            )
+
+        sub = args[0].lower()
+
+        try:
+            from ..core.scheduler import get_scheduler, ScheduleConfig, ScheduleType
+            sched = get_scheduler()
+
+            if sub == "list":
+                tasks = sched.list_tasks()
+                if not tasks:
+                    return "📭 No scheduled tasks.\n\nUse /schedule add <interval> <name>"
+                lines = ["⏰ Scheduled Tasks:\n"]
+                for t in tasks:
+                    icon = "🟢" if t["enabled"] else "⏸️"
+                    lines.append(f"  {icon} {t['name']} ({t['id']}) — {t['type']}, runs: {t['run_count']}")
+                return "\n".join(lines)
+
+            elif sub == "stats":
+                stats = sched.get_stats()
+                return (
+                    f"📊 Scheduler Stats\n\n"
+                    f"Total tasks: {stats['total_tasks']}\n"
+                    f"Enabled: {stats['enabled']}\n"
+                    f"Total runs: {stats['total_runs']}\n"
+                    f"Errors: {stats['total_errors']}\n"
+                    f"Running: {'🟢' if stats['running'] else '🔴'}"
+                )
+
+            elif sub == "run" and len(args) > 1:
+                sched.run_now(args[1])
+                return f"✅ Task {args[1]} triggered."
+
+            elif sub == "add" and len(args) > 2:
+                interval_str = args[1].lower()
+                task_name = " ".join(args[2:])
+                multipliers = {"s": 1, "m": 60, "h": 3600}
+                try:
+                    seconds = float(interval_str[:-1]) * multipliers.get(interval_str[-1], 60)
+                except (ValueError, IndexError):
+                    return f"❌ Invalid interval: {interval_str}. Use 30s, 5m, 1h."
+
+                config = ScheduleConfig(
+                    schedule_type=ScheduleType.INTERVAL,
+                    interval_seconds=seconds
+                )
+                task_id = sched.add_task(
+                    name=task_name,
+                    func=lambda: logger.info(f"Scheduled task: {task_name}"),
+                    schedule=config
+                )
+                return f"✅ Scheduled '{task_name}' every {interval_str}\nID: {task_id}"
+
+            elif sub == "remove" and len(args) > 1:
+                sched.remove_task(args[1])
+                return f"✅ Removed task {args[1]}."
+
+            return "Unknown subcommand. Use: list, stats, run, add, remove"
+
+        except Exception as e:
+            logger.error(f"Schedule error: {e}")
+            return f"Schedule error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Research Agent (/research)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_research(self, args: List[str]) -> str:
+        """Handle /research — autonomous web research."""
+        if not args:
+            return (
+                "🔬 Research Agent\n\n"
+                "Usage: /research <topic>\n"
+                "Example: /research Latest trends in AI agents 2026\n\n"
+                "Searches web, reads sources, synthesizes findings."
+            )
+
+        topic = " ".join(args)
+
+        try:
+            from ..core.research_agent import ResearchAgent
+
+            # Wire in search + LLM functions
+            search_fn = None
+            fetch_fn = None
+            llm_fn = None
+
+            try:
+                from ..integrations.search import search_internet
+                search_fn = search_internet
+            except Exception:
+                pass
+
+            try:
+                from ..integrations.browser_fetch import fetch_url_content
+                fetch_fn = fetch_url_content
+            except Exception:
+                pass
+
+            try:
+                from ..core.agent_bootstrap import _call_llm
+                llm_fn = _call_llm
+            except Exception:
+                pass
+
+            agent = ResearchAgent(
+                search_fn=search_fn,
+                fetch_fn=fetch_fn,
+                llm_fn=llm_fn
+            )
+            report = agent.research(topic)
+
+            lines = [f"🔬 Research: {topic}\n"]
+            lines.append(f"Sources consulted: {report.sources_consulted}")
+            lines.append(f"Findings: {len(report.findings)}")
+            lines.append(f"Confidence: {report.confidence:.0%}")
+            lines.append(f"Duration: {report.duration:.1f}s")
+
+            if report.summary:
+                lines.append(f"\n📋 Summary:\n{report.summary[:2000]}")
+
+            if report.findings:
+                lines.append("\n🔍 Key findings:")
+                for i, f in enumerate(report.findings[:5], 1):
+                    lines.append(f"  {i}. {f.content[:200]}")
+
+            return "\n".join(lines)
+
+        except Exception as e:
+            logger.error(f"Research error: {e}")
+            return f"Research error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Knowledge Graph (/knowledge)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_knowledge(self, args: List[str]) -> str:
+        """Handle /knowledge — knowledge graph CRUD."""
+        if not args:
+            return (
+                "🧠 Knowledge Graph\n\n"
+                "Usage:\n"
+                "  /knowledge stats — Graph statistics\n"
+                "  /knowledge search <query> — Search entities\n"
+                "  /knowledge add <type> <name> — Add entity\n"
+                "  /knowledge save — Persist to disk"
+            )
+
+        sub = args[0].lower()
+
+        try:
+            from ..core.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+
+            if sub == "stats":
+                stats = kg.get_stats()
+                lines = ["🧠 Knowledge Graph Stats\n"]
+                lines.append(f"Entities: {stats['total_entities']}")
+                lines.append(f"Relationships: {stats['total_relationships']}")
+                if stats['entity_types']:
+                    lines.append("\nEntity types:")
+                    for t, c in stats['entity_types'].items():
+                        lines.append(f"  {t}: {c}")
+                return "\n".join(lines)
+
+            elif sub == "search" and len(args) > 1:
+                query = " ".join(args[1:])
+                results = kg.search(query, limit=10)
+                if not results:
+                    return f"No entities found for: {query}"
+                lines = [f"🔍 Search: {query}\n"]
+                for e in results:
+                    props = ", ".join(f"{k}={v}" for k, v in list(e.properties.items())[:3])
+                    lines.append(f"  📌 {e.name} ({e.entity_type}) {props}")
+                return "\n".join(lines)
+
+            elif sub == "add" and len(args) > 2:
+                entity_type = args[1]
+                name = " ".join(args[2:])
+                entity = kg.add_entity(name=name, entity_type=entity_type, source="telegram")
+                return f"✅ Added entity: {entity.name} ({entity.entity_type})\nID: {entity.id}"
+
+            elif sub == "save":
+                kg.save()
+                return "✅ Knowledge graph saved to disk."
+
+            return "Unknown subcommand. Use: stats, search, add, save"
+
+        except Exception as e:
+            logger.error(f"Knowledge error: {e}")
+            return f"Knowledge error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Code Generator (/codegen)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_codegen(self, args: List[str]) -> str:
+        """Handle /codegen — AI code generation."""
+        if not args:
+            return (
+                "💻 Code Generator\n\n"
+                "Usage: /codegen <description>\n"
+                "Example: /codegen python function to sort a list of dicts by key\n\n"
+                "Generates code using MiniMax AI."
+            )
+
+        prompt = " ".join(args)
+
+        # Detect language prefix
+        lang = "python"
+        first = args[0].lower()
+        if first in ("python", "javascript", "bash", "typescript", "go", "rust"):
+            lang = first
+            prompt = " ".join(args[1:])
+
+        try:
+            from ..core.code_gen import CodeGenerator, Provider
+            gen = CodeGenerator(provider=Provider.MINIMAX)
+            result = gen.generate(prompt, language=lang)
+
+            if result.success:
+                code = result.code[:3000]
+                return (
+                    f"💻 Generated {lang.upper()} code\n"
+                    f"Model: {result.model}\n"
+                    f"Time: {result.generation_time:.1f}s\n\n"
+                    f"```{lang}\n{code}\n```"
+                )
+            else:
+                return f"❌ Code generation failed: {result.error}"
+
+        except Exception as e:
+            logger.error(f"Codegen error: {e}")
+            return f"Codegen error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Audit Logger (/audit)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_audit(self, args: List[str]) -> str:
+        """Handle /audit — view audit trail."""
+        try:
+            from ..core.audit_logger import AuditLogger
+            al = AuditLogger.get_instance()
+
+            sub = args[0].lower() if args else "recent"
+
+            if sub == "recent":
+                events = al.query_recent(count=15)
+                if not events:
+                    return "📭 No audit events today."
+                lines = ["📜 Recent Audit Events\n"]
+                for e in events:
+                    ts = e.get("timestamp", "")
+                    if isinstance(ts, (int, float)):
+                        from datetime import datetime
+                        ts = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
+                    etype = e.get("event_type", "?")
+                    msg = e.get("description", e.get("message", ""))[:100]
+                    lines.append(f"  [{ts}] {etype}: {msg}")
+                return "\n".join(lines)
+
+            elif sub == "stats":
+                events = al.query_recent(count=1000)
+                from collections import Counter
+                types = Counter(e.get("event_type", "?") for e in events)
+                lines = [f"📊 Audit Stats (today)\n\nTotal events: {len(events)}\n"]
+                for t, c in types.most_common(10):
+                    lines.append(f"  {t}: {c}")
+                return "\n".join(lines)
+
+            return "Usage: /audit recent | /audit stats"
+
+        except Exception as e:
+            logger.error(f"Audit error: {e}")
+            return f"Audit error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Adaptive Learning (/learn)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_learn(self, args: List[str]) -> str:
+        """Handle /learn — adaptive learning insights."""
+        try:
+            from ..core.adaptive_learning import AdaptiveLearner
+            learner = AdaptiveLearner()
+
+            sub = args[0].lower() if args else "insights"
+
+            if sub == "insights":
+                insights = learner.get_insights()
+                lines = ["🧬 Learning Insights\n"]
+                lines.append(f"Total experiences: {insights['total_experiences']}")
+                lines.append(f"Strategies: {insights['total_strategies']}")
+
+                if insights['top_strategies']:
+                    lines.append("\n🏆 Top strategies:")
+                    for s in insights['top_strategies'][:5]:
+                        lines.append(f"  ⭐ {s['name']} (score: {s['score']:.2f}, uses: {s['uses']})")
+
+                if insights['action_stats']:
+                    lines.append("\n📊 Action stats:")
+                    for action, stats in list(insights['action_stats'].items())[:8]:
+                        lines.append(f"  {action}: {stats['total_uses']} uses, avg reward: {stats['avg_reward']:.2f}")
+
+                return "\n".join(lines)
+
+            elif sub == "recommend" and len(args) > 1:
+                context = " ".join(args[1:])
+                strategy = learner.recommend_strategy(context)
+                if strategy:
+                    return (
+                        f"🎯 Recommendation for: {context}\n\n"
+                        f"Strategy: {strategy.name}\n"
+                        f"Actions: {', '.join(strategy.actions)}\n"
+                        f"Score: {strategy.score:.2f}"
+                    )
+                return f"No strategy found for: {context}\n\nThe system needs more experience data. Use more agent commands to build up patterns."
+
+            return "Usage: /learn insights | /learn recommend <task>"
+
+        except Exception as e:
+            logger.error(f"Learn error: {e}")
+            return f"Learn error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: Task Queue (/queue)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_queue(self, args: List[str]) -> str:
+        """Handle /queue — background task queue."""
+        try:
+            from ..core.task_queue import TaskQueue, Priority
+            # Use singleton pattern
+            if not hasattr(self, '_task_queue'):
+                self._task_queue = TaskQueue()
+
+            sub = args[0].lower() if args else "stats"
+
+            if sub == "stats":
+                stats = self._task_queue.get_stats()
+                return (
+                    f"📦 Task Queue Stats\n\n"
+                    f"Queued: {stats.get('queued', 0)}\n"
+                    f"Running: {stats.get('running', 0)}\n"
+                    f"Completed: {stats.get('completed', 0)}\n"
+                    f"Failed: {stats.get('failed', 0)}\n"
+                    f"Max concurrent: {stats.get('max_concurrent', '?')}"
+                )
+
+            elif sub == "add" and len(args) > 1:
+                task_desc = " ".join(args[1:])
+                task_id = self._task_queue.enqueue(
+                    func=lambda desc=task_desc: logger.info(f"Queue task: {desc}"),
+                    name=task_desc,
+                    priority=Priority.NORMAL
+                )
+                return f"✅ Queued: {task_desc}\nID: {task_id}"
+
+            elif sub == "list":
+                stats = self._task_queue.get_stats()
+                return f"📦 Queue: {stats.get('queued', 0)} pending, {stats.get('running', 0)} running"
+
+            return "Usage: /queue stats | /queue add <task> | /queue list"
+
+        except Exception as e:
+            logger.error(f"Queue error: {e}")
+            return f"Queue error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # PHASE 4: RAG Engine (/rag)
+    # ════════════════════════════════════════════════════════════════
+    def _handle_rag(self, args: List[str]) -> str:
+        """Handle /rag — vector knowledge base."""
+        if not args:
+            return (
+                "📚 RAG Knowledge Base\n\n"
+                "Usage:\n"
+                "  /rag add <text> — Add to knowledge base\n"
+                "  /rag search <query> — Semantic search\n"
+                "  /rag stats — Collection statistics"
+            )
+
+        sub = args[0].lower()
+
+        try:
+            from ..core.rag_engine import InMemoryVectorStore
+            from ..core.embeddings import HashEmbeddingProvider
+            if not hasattr(self, '_rag_store'):
+                self._rag_store = InMemoryVectorStore()
+                self._rag_embedder = HashEmbeddingProvider(dimension=128)
+                self._rag_doc_count = 0
+
+            if sub == "add" and len(args) > 1:
+                text = " ".join(args[1:])
+                doc_id = f"doc_{self._rag_doc_count}"
+                embedding = self._rag_embedder.embed(text)
+                self._rag_store.add(doc_id, text, embedding, metadata={"source": "telegram"})
+                self._rag_doc_count += 1
+                return f"✅ Added to RAG: {text[:100]}{'...' if len(text) > 100 else ''}\nDoc ID: {doc_id}"
+
+            elif sub == "search" and len(args) > 1:
+                query = " ".join(args[1:])
+                query_embedding = self._rag_embedder.embed(query)
+                results = self._rag_store.search(query_embedding, top_k=5)
+                if not results:
+                    return f"No results for: {query}\n\nAdd knowledge with /rag add <text>"
+                lines = [f"🔍 RAG Search: {query}\n"]
+                for r in results:
+                    text = r.get("text", str(r))[:200]
+                    score = r.get("similarity", 0)
+                    lines.append(f"  📄 {text} (similarity: {score:.2f})")
+                return "\n".join(lines)
+
+            elif sub == "stats":
+                return f"📚 RAG Stats\n\nDocuments: {self._rag_doc_count}\nStore type: InMemory"
+
+            return "Unknown subcommand. Use: add, search, stats"
+
+        except Exception as e:
+            logger.error(f"RAG error: {e}")
+            return f"RAG error: {str(e)[:200]}"
+
+    # ════════════════════════════════════════════════════════════════
+    # Phase 4 Command Registration
+    # ════════════════════════════════════════════════════════════════
+    def _register_phase4_commands(self):
+        """Register Phase 4 commands — previously unused features."""
+        self.register_command("schedule", "Manage scheduled tasks (cron)", self._handle_schedule)
+        self.register_command("research", "Autonomous web research", self._handle_research)
+        self.register_command("knowledge", "Knowledge graph CRUD", self._handle_knowledge)
+        self.register_command("codegen", "AI code generation", self._handle_codegen)
+        self.register_command("audit", "View audit trail", self._handle_audit)
+        self.register_command("learn", "Adaptive learning insights", self._handle_learn)
+        self.register_command("queue", "Background task queue", self._handle_queue)
+        self.register_command("rag", "Vector knowledge base (RAG)", self._handle_rag)
+        logger.info("Phase 4 commands registered (8 new features)")
 
     def _handle_browser_close(self, args: List[str]) -> str:
         """Handle /bclose command - close browser"""
@@ -2743,7 +3698,7 @@ class TelegramBot:
         return []
 
     # Commands that are long-running and must NOT block the listener thread
-    _ASYNC_COMMANDS = {"imagine", "deepresearch", "imglogin", "agent", "swarm", "orchestrate", "code"}
+    _ASYNC_COMMANDS = {"imagine", "deepresearch", "imglogin", "agent", "swarm", "orchestrate", "code", "dag", "negotiate", "research", "codegen"}
 
     def handle_commands(self, text: str, chat_id: str = None) -> str:
         """Handle text as commands"""

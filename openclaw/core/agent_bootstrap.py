@@ -756,6 +756,14 @@ def bootstrap_agents() -> Dict[str, Any]:
 
     logger.info("🚀 Bootstrapping agent system...")
 
+    # Emit bootstrap started event
+    try:
+        from .event_bus import get_event_bus, EventType
+        _bus = get_event_bus()
+        _bus.emit(EventType.SYSTEM_STARTUP, "Agent bootstrap starting", source="agent_bootstrap")
+    except Exception:
+        _bus = None
+
     # 1. Register AI-powered tools
     registry = get_tool_registry()
     new_tools = [

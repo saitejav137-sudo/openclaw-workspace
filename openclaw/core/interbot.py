@@ -67,23 +67,51 @@ class InterBotMessage:
         return time.time() - self.timestamp > self.ttl
 
 
-# ============== Bot Registry ==============
-
-# Known bots with their Telegram tokens and identities
+# Known bots with their identities (tokens loaded at runtime)
 BOT_REGISTRY = {
     "ajanta": {
         "name": "Ajanta",
-        "token": "REDACTED",
+        "token": None,  # Loaded from AJANTA_BOT_TOKEN env var or openclaw.json
         "gateway": "python",
         "description": "Python gateway bot with ReAct agent, swarm, and deep research",
     },
     "ellora": {
         "name": "Ellora",
-        "token": "REDACTED",
+        "token": None,  # Loaded from ELLORA_BOT_TOKEN env var or openclaw.json
         "gateway": "typescript",
         "description": "TypeScript gateway bot with OpenClaw native capabilities",
     },
 }
+
+
+def _load_bot_tokens():
+    """Load bot tokens from environment variables or openclaw.json config."""
+    # Try env vars first
+    ajanta_token = os.environ.get("AJANTA_BOT_TOKEN")
+    ellora_token = os.environ.get("ELLORA_BOT_TOKEN")
+
+    # Fall back to openclaw.json
+    if not ajanta_token or not ellora_token:
+        config_path = os.path.expanduser("~/.openclaw/openclaw.json")
+        try:
+            with open(config_path) as f:
+                config = json.load(f)
+            telegram_cfg = config.get("channels", {}).get("telegram", {})
+            if not ajanta_token:
+                ajanta_token = telegram_cfg.get("botToken")
+            if not ellora_token:
+                ellora_token = telegram_cfg.get("elloraToken")
+        except Exception as e:
+            logger.debug(f"Could not load bot tokens from config: {e}")
+
+    if ajanta_token:
+        BOT_REGISTRY["ajanta"]["token"] = ajanta_token
+    if ellora_token:
+        BOT_REGISTRY["ellora"]["token"] = ellora_token
+
+
+# Load tokens on module import
+_load_bot_tokens()
 
 
 class InterBotBridge:

@@ -165,24 +165,218 @@ def config_validate(config_file):
 
 @cli.command()
 def status():
-    """Show OpenClaw status"""
+    """Show OpenClaw status — agents, events, reactions, health"""
+    # Server health (original)
     try:
         response = requests.get("http://localhost:8765/health", timeout=5)
         health = response.json()
+        server_status = health.get("status", "unknown")
+    except Exception:
+        health = {}
+        server_status = "offline"
 
-        table = Table(title="OpenClaw Status", show_header=False)
-        table.add_column("Service", style="cyan")
-        table.add_column("Status", style="green")
+    # Orchestration status (new)
+    try:
+        from core.agent_state import get_state_manager
+        from core.event_bus import get_event_bus
+        from core.lifecycle_manager import get_lifecycle_manager
+        from core.reaction_engine import get_reaction_engine
 
-        table.add_row("Status", health.get("status", "unknown"))
-        table.add_row("Version", health.get("version", "unknown"))
-        table.add_row("Vision", "✓" if health.get("services", {}).get("vision") else "✗")
-        table.add_row("API", "✓" if health.get("services", {}).get("api") else "✗")
+        sm = get_state_manager()
+        bus = get_event_bus()
+
+        agent_states = {aid: s.status.value for aid, s in sm._states.items()}
+        bus_stats = bus.get_stats()
+    except Exception:
+        agent_states = {}
+        bus_stats = {}
+
+    # Display
+    table = Table(title="🔧 OpenClaw Status", show_header=False, border_style="cyan")
+    table.add_column("", style="bold cyan", width=24)
+    table.add_column("", style="green")
+
+    table.add_row("Server", server_status)
+    table.add_row("Agents registered", str(len(agent_states)))
+    for aid, st in agent_states.items():
+        color = {"running": "green", "idle": "dim", "stuck": "red", "error": "red"}.get(st, "yellow")
+        table.add_row(f"  └─ {aid}", f"[{color}]{st}[/{color}]")
+    table.add_row("Events emitted", str(bus_stats.get("total_events_emitted", 0)))
+    table.add_row("Events (last hour)", str(bus_stats.get("events_last_hour", 0)))
+
+    console.print(table)
+
+
+@cli.command()
+def agents():
+    """List all registered agents with health and activity"""
+    try:
+        from core.agent_state import get_state_manager
+        sm = get_state_manager()
+
+        if not sm._states:
+            console.print("[yellow]No agents registered.[/yellow]")
+            return
+
+        table = Table(title="🤖 Agents", border_style="cyan")
+        table.add_column("ID", style="cyan")
+        table.add_column("Name", style="white")
+        table.add_column("Status", style="bold")
+        table.add_column("Activity", style="dim")
+        table.add_column("Tasks", style="green", justify="right")
+        table.add_column("Errors", style="red", justify="right")
+        table.add_column("Recoveries", style="yellow", justify="right")
+
+        for aid, state in sm._states.items():
+            activity = state.detect_activity()
+            status_color = {
+                "running": "green", "idle": "dim", "stuck": "red",
+                "error": "red", "completed": "blue", "spawning": "yellow",
+            }.get(state.status.value, "white")
+
+            table.add_row(
+                aid,
+                state.name,
+                f"[{status_color}]{state.status.value}[/{status_color}]",
+                activity.value,
+                str(state.success_count),
+                str(state.error_count),
+                str(state.recovery_count),
+            )
 
         console.print(table)
 
-    except requests.exceptions.ConnectionError:
-        console.print("[red]Error: Server is not running[/red]")
+    except ImportError:
+        console.print("[red]Agent modules not available[/red]")
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+
+
+@cli.command()
+@click.option("--limit", default=20, help="Number of events to show")
+@click.option("--category", default=None, help="Filter by category (agent, task, swarm, etc.)")
+def events(limit, category):
+    """Show recent event log"""
+    try:
+        from core.event_bus import get_event_bus
+        bus = get_event_bus()
+
+        history = bus.get_history(limit=limit, category=category)
+
+        if not history:
+            console.print("[yellow]No events recorded.[/yellow]")
+            return
+
+        table = Table(title=f"📡 Events (last {limit})", border_style="cyan")
+        table.add_column("Time", style="dim", width=10)
+        table.add_column("Priority", width=8)
+        table.add_column("Type", style="cyan", width=24)
+        table.add_column("Message", style="white")
+
+        for event in history:
+            import datetime
+            ts = datetime.datetime.fromtimestamp(event.timestamp).strftime("%H:%M:%S")
+            priority_color = {
+                "urgent": "red bold", "action": "yellow",
+                "warning": "yellow dim", "info": "dim",
+            }.get(event.priority.value, "white")
+
+            table.add_row(
+                ts,
+                f"[{priority_color}]{event.priority.value}[/{priority_color}]",
+                event.type.value,
+                event.message[:80],
+            )
+
+        console.print(table)
+
+    except ImportError:
+        console.print("[red]Event bus not available[/red]")
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+
+
+@cli.command()
+def reactions():
+    """Show configured reactions and their status"""
+    try:
+        from core.reaction_engine import get_reaction_engine
+        engine = get_reaction_engine()
+
+        reaction_list = engine.list_reactions()
+        stats = engine.get_stats()
+
+        table = Table(title="⚡ Reaction Engine", border_style="cyan")
+        table.add_column("Name", style="cyan")
+        table.add_column("Event", style="white")
+        table.add_column("Action", style="yellow")
+        table.add_column("Enabled", justify="center")
+        table.add_column("Retries", justify="right")
+
+        for name, info in reaction_list.items():
+            enabled = "[green]✓[/green]" if info["enabled"] else "[red]✗[/red]"
+            table.add_row(
+                name,
+                info["event_type"],
+                info["action"],
+                enabled,
+                str(info["retries"]),
+            )
+
+        console.print(table)
+
+        # Stats summary
+        console.print(f"\n[dim]Triggered: {stats['total_reactions_triggered']} | "
+                      f"Successes: {stats['total_successes']} | "
+                      f"Failures: {stats['total_failures']} | "
+                      f"Escalations: {stats['total_escalations']}[/dim]")
+
+    except ImportError:
+        console.print("[red]Reaction engine not available[/red]")
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+
+
+@cli.command()
+@click.argument("task_description")
+@click.option("--decompose/--no-decompose", default=True, help="Auto-decompose into subtasks")
+def spawn(task_description, decompose):
+    """Spawn an agent swarm for a task — like 'ao spawn'"""
+    try:
+        from core.agent_swarm import AgentSwarm
+        from core.event_bus import get_event_bus, EventType
+
+        console.print(f"\n[bold cyan]🚀 Spawning swarm for:[/bold cyan] {task_description}\n")
+
+        bus = get_event_bus()
+        bus.emit(
+            EventType.SWARM_STARTED,
+            f"CLI spawn: {task_description}",
+            data={"task": task_description, "decompose": decompose},
+            source="cli",
+        )
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            progress.add_task(f"Decomposing: {task_description[:60]}...", total=None)
+
+            swarm = AgentSwarm()
+            result = swarm.submit_task(task_description, decompose=decompose)
+
+        if result:
+            console.print(Panel(
+                f"[green]✓ Swarm completed[/green]\n\nResults: {str(result)[:500]}",
+                title="Result",
+                border_style="green",
+            ))
+        else:
+            console.print("[yellow]Swarm completed with no result[/yellow]")
+
+    except ImportError as e:
+        console.print(f"[red]Module not available: {e}[/red]")
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
 
@@ -193,9 +387,7 @@ def screenshots(count):
     """Show recent screenshots"""
     try:
         console.print("[yellow]Opening screenshots...[/yellow]")
-        # This would open the screenshots
         console.print(f"[green]Found {count} screenshots[/green]")
-
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
 
@@ -276,7 +468,11 @@ def start():
             if command.lower() == "help":
                 console.print("""
 Available commands:
-  status      - Show system status
+  status      - Show system status (agents, events, health)
+  agents      - List all agents with health
+  events      - Show recent event log
+  reactions   - Show active reactions
+  spawn <msg> - Spawn agent swarm for a task
   triggers    - List triggers
   config      - Show configuration
   stats       - Show statistics

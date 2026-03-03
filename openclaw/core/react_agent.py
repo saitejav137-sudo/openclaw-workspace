@@ -41,6 +41,7 @@ class ReActStep:
     tool_result: Optional[Any] = None
     timestamp: float = field(default_factory=time.time)
     duration: float = 0.0
+    chain_of_thought: str = ""  # LLM's full reasoning for transparency
 
 
 @dataclass
@@ -309,6 +310,122 @@ Respond in JSON format:
         return "\n".join(prompt_parts)
 
 
+# ============== LLM-Powered Think ==============
+
+class LLMReActThink:
+    """
+    LLM-powered think function for ReActAgent.
+
+    Uses the AI module to reason about goals, select tools,
+    and provide structured decisions. Falls back to the
+    default rule-based think if LLM is unavailable.
+
+    Usage:
+        llm_think = LLMReActThink()
+        agent = ReActAgent(think_fn=llm_think)
+    """
+
+    def __init__(self, model: str = "MiniMax-Text-01", temperature: float = 0.3):
+        self.model = model
+        self.temperature = temperature
+        self._call_count = 0
+        self._fallback_count = 0
+
+    def __call__(self, goal: str, history: List[ReActStep], context: Dict) -> Dict:
+        """Reason about the goal using LLM."""
+        try:
+            return self._llm_think(goal, history, context)
+        except Exception as e:
+            logger.warning("LLM think failed (%s), falling back to rule-based", e)
+            self._fallback_count += 1
+            return self._fallback_think(goal, history, context)
+
+    def _llm_think(self, goal: str, history: List[ReActStep], context: Dict) -> Dict:
+        """Call LLM with ReAct prompt."""
+        tools = context.get("available_tools", [])
+        prompt = ReActPromptBuilder.build_prompt(goal, history, tools)
+
+        # Try to use the AI module
+        from .ai import send_prompt
+        response = send_prompt(
+            prompt,
+            system_prompt=ReActPromptBuilder.SYSTEM_PROMPT,
+            model_override=self.model,
+            temperature=self.temperature,
+        )
+
+        self._call_count += 1
+
+        # Parse the LLM response (expects JSON)
+        return self._parse_response(response)
+
+    def _parse_response(self, response: str) -> Dict:
+        """Parse LLM JSON response into action dict."""
+        import json
+
+        # Try to extract JSON from the response
+        text = response.strip()
+
+        # Look for JSON block
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+
+        # Handle case where response starts with { directly
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        if start >= 0 and end > start:
+            text = text[start:end]
+
+        data = json.loads(text)
+
+        result = {
+            "reasoning": data.get("reasoning", data.get("thought", "")),
+            "action": data.get("action", data.get("step_type", "final_answer")),
+        }
+
+        if result["action"] == "final_answer":
+            result["answer"] = data.get("answer", data.get("content", ""))
+        else:
+            result["action_args"] = data.get("action_args", data.get("args", {}))
+
+        return result
+
+    def _fallback_think(self, goal: str, history: List[ReActStep], context: Dict) -> Dict:
+        """Rule-based fallback when LLM is unavailable."""
+        tools = context.get("available_tools", [])
+
+        if not history:
+            if tools:
+                return {
+                    "reasoning": f"Goal: {goal}. Starting with {tools[0]['name']}.",
+                    "action": tools[0]["name"],
+                    "action_args": {},
+                }
+
+        observations = [s for s in history if s.step_type == StepType.OBSERVATION]
+        if observations:
+            return {
+                "reasoning": "Have gathered information. Providing answer.",
+                "action": "final_answer",
+                "answer": observations[-1].content,
+            }
+
+        return {
+            "reasoning": "No more actions needed.",
+            "action": "final_answer",
+            "answer": "Task completed.",
+        }
+
+    def get_stats(self) -> Dict:
+        return {
+            "llm_calls": self._call_count,
+            "fallbacks": self._fallback_count,
+            "model": self.model,
+        }
+
+
 # ============== Global Instance ==============
 
 _react_agent: Optional[ReActAgent] = None
@@ -328,5 +445,6 @@ __all__ = [
     "ReActTrace",
     "ReActAgent",
     "ReActPromptBuilder",
+    "LLMReActThink",
     "get_react_agent",
 ]

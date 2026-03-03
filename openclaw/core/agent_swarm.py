@@ -248,6 +248,23 @@ class AgentSwarm:
         self.decomposer = TaskDecomposer()
         self._lock = threading.Lock()
 
+        # Wire up event bus for orchestration events
+        try:
+            from .event_bus import get_event_bus
+            self._event_bus = get_event_bus()
+        except ImportError:
+            self._event_bus = None
+
+    def _emit_event(self, event_type, message: str, data: dict = None):
+        """Emit an event to the bus if available."""
+        if self._event_bus:
+            self._event_bus.emit(
+                event_type=event_type,
+                message=message,
+                data=data or {},
+                source="swarm",
+            )
+
     def add_agent(
         self,
         name: str,
@@ -295,6 +312,15 @@ class AgentSwarm:
 
         logger.info(f"Task submitted: {description}")
 
+        # Emit swarm.started event
+        try:
+            from .event_bus import EventType
+            self._emit_event(EventType.SWARM_STARTED, f"Swarm task: {description}", {
+                "task_id": task.id, "description": description, "decompose": decompose,
+            })
+        except Exception:
+            pass
+
         if decompose:
             available_roles = list(set(a.role for a in self._agents.values()))
             subtasks = self.decomposer.decompose(task, available_roles)
@@ -323,7 +349,20 @@ class AgentSwarm:
                 time.sleep(1)  # Poll every second
                 
             with self._lock:
-                task.status = "completed"
+                # Determine overall status
+                failed_count = sum(1 for st in subtasks if self._tasks.get(st.id) and self._tasks[st.id].status == "failed")
+                task.status = "failed" if failed_count == len(subtasks) else "completed"
+
+            # Emit swarm completion event
+            try:
+                from .event_bus import EventType
+                final_event = EventType.SWARM_COMPLETED if task.status == "completed" else EventType.SWARM_FAILED
+                self._emit_event(final_event, f"Swarm {task.status}: {description}", {
+                    "task_id": task.id, "status": task.status,
+                    "subtasks_total": len(subtasks), "subtasks_failed": failed_count,
+                })
+            except Exception:
+                pass
         else:
             self._assign_task(task)
             
@@ -381,6 +420,15 @@ class AgentSwarm:
 
                 logger.info(f"Task assigned to {best_agent.name}: {task.description}")
 
+                # Emit task.assigned event
+                try:
+                    from .event_bus import EventType
+                    self._emit_event(EventType.TASK_ASSIGNED, f"Task assigned to {best_agent.name}", {
+                        "task_id": task.id, "agent_id": best_agent.id, "agent_name": best_agent.name,
+                    })
+                except Exception:
+                    pass
+
                 # Execute in parallel thread
                 thread = threading.Thread(
                     target=self._execute_task,
@@ -422,6 +470,15 @@ class AgentSwarm:
             task.error = str(e)
             agent.failed_tasks += 1
             logger.error(f"Agent '{agent.name}' task failed: {e}")
+
+            # Emit task.failed event
+            try:
+                from .event_bus import EventType
+                self._emit_event(EventType.TASK_FAILED, f"Task failed: {task.description[:60]}", {
+                    "task_id": task.id, "agent_id": agent.id, "error": str(e),
+                })
+            except Exception:
+                pass
 
         finally:
             agent.status = "idle"

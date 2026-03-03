@@ -1,0 +1,110 @@
+# ==============================================================
+# OpenClaw Configuration — Reference Example
+# ==============================================================
+# 
+# Copy this to openclaw.yaml and customize.
+# Environment variables: use ${VAR} or ${VAR:-default} syntax.
+# Durations: "30s", "5m", "1h", "2d"
+#
+# Inspired by ComposioHQ/agent-orchestrator config pattern.
+# ==============================================================
+
+# Server port for web dashboard / API
+port: 8080
+
+# Plugin defaults — which implementation to use for each slot
+defaults:
+  llm: minimax              # AI backend: minimax, openai, anthropic, ollama
+  gateway: telegram          # Message platform: telegram, discord, slack, rest
+  search: duckduckgo         # Web search: duckduckgo, google, brave, tavily
+  storage: file              # Persistence: file, redis, sqlite, postgres
+
+# Pre-configured agents with roles and capabilities
+agents:
+  researcher:
+    role: researcher
+    capabilities: [web_search, analysis, summarization, url_fetch]
+    max_concurrent: 3
+    auto_restart: true
+
+  coder:
+    role: coder
+    capabilities: [code_generation, debugging, code_review]
+    max_concurrent: 2
+    auto_restart: true
+
+  planner:
+    role: planner
+    capabilities: [task_decomposition, analysis, summarization]
+    max_concurrent: 1
+
+  reviewer:
+    role: reviewer
+    capabilities: [code_review, analysis]
+    max_concurrent: 2
+
+# Automated reactions to system events
+# When an event occurs, the reaction engine automatically takes action.
+reactions:
+  agent-stuck:
+    auto: true
+    action: restart-agent      # Restart the stuck agent
+    retries: 2
+    escalate_after: 10m        # Notify human if still stuck after 10 min
+    cooldown: 60s
+
+  agent-error:
+    auto: true
+    action: send-to-agent      # Send error context back to agent
+    message: "An error occurred. Analyze and recover: {error_details}"
+    retries: 1
+    escalate_after: 5m
+
+  task-failed:
+    auto: true
+    action: retry-task
+    retries: 1
+    escalate_after: 15m
+
+  swarm-completed:
+    auto: true
+    action: notify
+    # No escalation — just inform the human
+
+  swarm-failed:
+    auto: true
+    action: notify
+
+  health-degraded:
+    auto: true
+    action: notify
+    cooldown: 5m               # Don't spam health alerts
+
+# Bot configurations
+bots:
+  ajanta:
+    gateway: python
+    token: ${AJANTA_BOT_TOKEN}
+
+  ellora:
+    gateway: typescript
+    token: ${ELLORA_BOT_TOKEN}
+
+# Notification channels
+notifications:
+  telegram:
+    plugin: telegram
+    chat_id: ${TELEGRAM_CHAT_ID}
+    routing:
+      urgent: true             # Always notify for urgent events
+      action: true             # Notify when action is needed
+      warning: true            # Notify on warnings
+      info: false              # Skip informational events
+
+# Lifecycle manager settings
+lifecycle:
+  poll_interval: 10s           # How often to check agent health
+  stuck_threshold: 10m         # Agent inactive for this long → stuck
+  idle_threshold: 5m           # Agent ready but idle for this long → idle
+  max_auto_recoveries: 3       # Max recovery attempts per agent
+  auto_recover: true           # Auto-recover stuck/errored agents

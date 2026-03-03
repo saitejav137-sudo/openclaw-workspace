@@ -38,9 +38,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("interbot-daemon")
 
-# Bot tokens
-AJANTA_TOKEN = "REDACTED"
-ELLORA_TOKEN = "REDACTED"
+# Bot tokens (loaded from env vars or ~/.openclaw/openclaw.json)
+AJANTA_TOKEN = None
+ELLORA_TOKEN = None
 
 # Chat ID for the user (loaded from config)
 CHAT_ID = None
@@ -56,19 +56,40 @@ GATEWAY_TOKEN = None
 
 
 def load_config():
-    """Load chat_id and gateway token from openclaw.json."""
-    global CHAT_ID, GATEWAY_TOKEN
+    """Load bot tokens, chat_id, and gateway token from env vars / openclaw.json."""
+    global CHAT_ID, GATEWAY_TOKEN, AJANTA_TOKEN, ELLORA_TOKEN
+
+    # 1. Try environment variables first
+    AJANTA_TOKEN = os.environ.get("AJANTA_BOT_TOKEN")
+    ELLORA_TOKEN = os.environ.get("ELLORA_BOT_TOKEN")
+
+    # 2. Fall back to openclaw.json
     config_path = os.path.expanduser("~/.openclaw/openclaw.json")
     try:
         with open(config_path) as f:
             config = json.load(f)
-        allow_from = config.get("channels", {}).get("telegram", {}).get("allowFrom", [])
+
+        telegram_cfg = config.get("channels", {}).get("telegram", {})
+
+        if not AJANTA_TOKEN:
+            AJANTA_TOKEN = telegram_cfg.get("botToken")
+        if not ELLORA_TOKEN:
+            ELLORA_TOKEN = telegram_cfg.get("elloraToken")
+
+        allow_from = telegram_cfg.get("allowFrom", [])
         if allow_from:
             CHAT_ID = str(allow_from[0])
+
         GATEWAY_TOKEN = config.get("gateway", {}).get("auth", {}).get("token")
         logger.info(f"Config loaded — chat_id: {CHAT_ID}, gateway_port: {GATEWAY_PORT}")
     except Exception as e:
         logger.error(f"Failed to load config: {e}")
+
+    # 3. Validate that tokens were loaded
+    if not AJANTA_TOKEN:
+        logger.warning("AJANTA_TOKEN not set — set AJANTA_BOT_TOKEN env var or channels.telegram.botToken in openclaw.json")
+    if not ELLORA_TOKEN:
+        logger.warning("ELLORA_TOKEN not set — set ELLORA_BOT_TOKEN env var or channels.telegram.elloraToken in openclaw.json")
 
 
 def ensure_dirs():

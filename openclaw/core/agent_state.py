@@ -2,13 +2,19 @@
 Persistent Agent State Management for OpenClaw
 
 Manages agent state persistence, recovery, and checkpointing.
+
+Upgraded with patterns from ComposioHQ/agent-orchestrator:
+- 12-state lifecycle (was 6)
+- Activity detection (active, ready, idle, blocked, exited)
+- State transition validation
+- Event bus integration
 """
 
 import os
 import json
 import time
 import threading
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from pathlib import Path
@@ -19,14 +25,71 @@ from .logger import get_logger
 logger = get_logger("agent_state")
 
 
-class AgentStatus(Enum):
-    """Agent status"""
+class AgentStatus(str, Enum):
+    """Agent lifecycle status — 12 states inspired by agent-orchestrator."""
+    # Original 6
     IDLE = "idle"
     RUNNING = "running"
     WAITING = "waiting"
     PAUSED = "paused"
     STOPPED = "stopped"
     ERROR = "error"
+    # New 6 from agent-orchestrator patterns
+    SPAWNING = "spawning"         # Agent is being initialized
+    STUCK = "stuck"               # Agent has been inactive for too long
+    RECOVERING = "recovering"     # Agent is being restored from checkpoint
+    NEEDS_INPUT = "needs_input"   # Agent is waiting for human input
+    COMPLETED = "completed"       # Agent finished its task successfully
+    TERMINATED = "terminated"     # Agent was forcefully killed
+
+
+# Terminal states — agent is done and won't transition further
+TERMINAL_STATUSES: Set[AgentStatus] = {
+    AgentStatus.STOPPED,
+    AgentStatus.COMPLETED,
+    AgentStatus.TERMINATED,
+}
+
+# States that can be auto-recovered
+RECOVERABLE_STATUSES: Set[AgentStatus] = {
+    AgentStatus.ERROR,
+    AgentStatus.STUCK,
+}
+
+# Valid state transitions (from → set of allowed destinations)
+VALID_TRANSITIONS: Dict[AgentStatus, Set[AgentStatus]] = {
+    AgentStatus.SPAWNING:    {AgentStatus.IDLE, AgentStatus.RUNNING, AgentStatus.ERROR},
+    AgentStatus.IDLE:        {AgentStatus.RUNNING, AgentStatus.PAUSED, AgentStatus.STOPPED, AgentStatus.TERMINATED},
+    AgentStatus.RUNNING:     {AgentStatus.IDLE, AgentStatus.WAITING, AgentStatus.PAUSED, AgentStatus.STUCK, AgentStatus.NEEDS_INPUT, AgentStatus.ERROR, AgentStatus.COMPLETED, AgentStatus.TERMINATED},
+    AgentStatus.WAITING:     {AgentStatus.RUNNING, AgentStatus.IDLE, AgentStatus.STUCK, AgentStatus.ERROR, AgentStatus.TERMINATED},
+    AgentStatus.PAUSED:      {AgentStatus.RUNNING, AgentStatus.IDLE, AgentStatus.STOPPED, AgentStatus.TERMINATED},
+    AgentStatus.STUCK:       {AgentStatus.RECOVERING, AgentStatus.RUNNING, AgentStatus.ERROR, AgentStatus.TERMINATED},
+    AgentStatus.NEEDS_INPUT: {AgentStatus.RUNNING, AgentStatus.IDLE, AgentStatus.STUCK, AgentStatus.TERMINATED},
+    AgentStatus.RECOVERING:  {AgentStatus.IDLE, AgentStatus.RUNNING, AgentStatus.ERROR, AgentStatus.TERMINATED},
+    AgentStatus.ERROR:       {AgentStatus.RECOVERING, AgentStatus.IDLE, AgentStatus.RUNNING, AgentStatus.TERMINATED},
+    AgentStatus.COMPLETED:   {AgentStatus.IDLE, AgentStatus.SPAWNING},  # can be reused
+    AgentStatus.STOPPED:     {AgentStatus.IDLE, AgentStatus.SPAWNING},
+    AgentStatus.TERMINATED:  set(),  # truly terminal
+}
+
+
+class ActivityState(str, Enum):
+    """
+    Activity state as detected by monitoring — finer-grained than AgentStatus.
+    Inspired by agent-orchestrator's ActivityState.
+    """
+    ACTIVE = "active"           # Agent is actively processing
+    READY = "ready"             # Agent finished its turn, waiting for work
+    IDLE = "idle"               # Agent has been inactive for a while
+    WAITING_INPUT = "waiting_input"  # Agent needs human input
+    BLOCKED = "blocked"         # Agent hit an error
+    EXITED = "exited"           # Agent process is no longer running
+
+
+# Threshold before a "ready" agent becomes "idle"
+DEFAULT_IDLE_THRESHOLD_SEC = 300  # 5 minutes
+# Threshold before an "idle" agent is considered "stuck"
+DEFAULT_STUCK_THRESHOLD_SEC = 600  # 10 minutes
 
 
 @dataclass
@@ -41,7 +104,7 @@ class AgentCheckpoint:
 
 @dataclass
 class AgentState:
-    """Complete agent state"""
+    """Complete agent state with activity tracking."""
     agent_id: str
     name: str
     status: AgentStatus
@@ -55,6 +118,42 @@ class AgentState:
     last_update: float
     created_at: float
     metadata: Dict[str, Any] = field(default_factory=dict)
+    # New fields from agent-orchestrator patterns
+    activity: ActivityState = ActivityState.READY
+    last_activity_at: float = field(default_factory=time.time)
+    stuck_since: Optional[float] = None
+    last_error: Optional[str] = None
+    total_tasks: int = 0
+    recovery_count: int = 0
+
+    def detect_activity(self) -> ActivityState:
+        """Detect current activity state based on timing thresholds."""
+        if self.status in TERMINAL_STATUSES:
+            return ActivityState.EXITED
+        if self.status == AgentStatus.ERROR:
+            return ActivityState.BLOCKED
+        if self.status == AgentStatus.NEEDS_INPUT:
+            return ActivityState.WAITING_INPUT
+        if self.status == AgentStatus.RUNNING:
+            return ActivityState.ACTIVE
+
+        # Check idle/stuck thresholds
+        elapsed = time.time() - self.last_activity_at
+        if elapsed > DEFAULT_STUCK_THRESHOLD_SEC:
+            return ActivityState.IDLE
+        if elapsed > DEFAULT_IDLE_THRESHOLD_SEC:
+            return ActivityState.IDLE
+        return ActivityState.READY
+
+    @property
+    def is_terminal(self) -> bool:
+        """Check if the agent is in a terminal state."""
+        return self.status in TERMINAL_STATUSES
+
+    @property
+    def is_recoverable(self) -> bool:
+        """Check if the agent can be auto-recovered."""
+        return self.status in RECOVERABLE_STATUSES
 
 
 class AgentStateManager:
@@ -138,16 +237,52 @@ class AgentStateManager:
         context: Dict[str, Any] = None,
         workflow_id: str = None,
         current_node: str = None,
+        validate_transition: bool = True,
         **kwargs
     ) -> bool:
-        """Update agent state"""
+        """Update agent state with optional transition validation."""
         with self._lock:
             state = self._states.get(agent_id)
             if not state:
                 return False
 
-            if status:
+            if status and status != state.status:
+                # Validate the state transition
+                if validate_transition:
+                    allowed = VALID_TRANSITIONS.get(state.status, set())
+                    if status not in allowed:
+                        logger.warning(
+                            "Invalid transition for agent '%s': %s → %s (allowed: %s)",
+                            agent_id, state.status.value, status.value,
+                            [s.value for s in allowed],
+                        )
+                        return False
+
+                old_status = state.status
                 state.status = status
+                state.last_activity_at = time.time()
+
+                # Track stuck timing
+                if status == AgentStatus.STUCK:
+                    state.stuck_since = time.time()
+                elif old_status == AgentStatus.STUCK:
+                    state.stuck_since = None
+
+                # Track recoveries
+                if status == AgentStatus.RECOVERING:
+                    state.recovery_count += 1
+
+                # Update activity state
+                state.activity = state.detect_activity()
+
+                logger.info(
+                    "Agent '%s' transition: %s → %s (activity: %s)",
+                    agent_id, old_status.value, status.value, state.activity.value,
+                )
+
+                # Emit event via event bus (if available)
+                self._emit_status_event(agent_id, old_status, status)
+
             if context:
                 state.context.update(context)
             if workflow_id:
@@ -163,6 +298,34 @@ class AgentStateManager:
             state.last_update = time.time()
 
             return True
+
+    def _emit_status_event(self, agent_id: str, old_status: AgentStatus, new_status: AgentStatus):
+        """Emit a status change event to the event bus."""
+        try:
+            from .event_bus import get_event_bus, EventType
+            bus = get_event_bus()
+
+            event_map = {
+                AgentStatus.SPAWNING: EventType.AGENT_SPAWNED,
+                AgentStatus.RUNNING: EventType.AGENT_WORKING,
+                AgentStatus.STUCK: EventType.AGENT_STUCK,
+                AgentStatus.ERROR: EventType.AGENT_ERRORED,
+                AgentStatus.NEEDS_INPUT: EventType.AGENT_NEEDS_INPUT,
+                AgentStatus.COMPLETED: EventType.AGENT_COMPLETED,
+                AgentStatus.TERMINATED: EventType.AGENT_KILLED,
+                AgentStatus.RECOVERING: EventType.AGENT_RECOVERED,
+            }
+
+            event_type = event_map.get(new_status)
+            if event_type:
+                bus.emit(
+                    event_type=event_type,
+                    message=f"Agent '{agent_id}' transitioned: {old_status.value} → {new_status.value}",
+                    data={"agent_id": agent_id, "old_status": old_status.value, "new_status": new_status.value},
+                    source=f"agent:{agent_id}",
+                )
+        except Exception:
+            pass  # Event bus not available yet — that's fine
 
     def record_success(self, agent_id: str):
         """Record successful action"""
@@ -378,6 +541,7 @@ def restore_agent(agent_id: str, version: int = None) -> bool:
 
 __all__ = [
     "AgentStatus",
+    "ActivityState",
     "AgentCheckpoint",
     "AgentState",
     "AgentStateManager",
@@ -385,4 +549,9 @@ __all__ = [
     "create_agent",
     "save_checkpoint",
     "restore_agent",
+    "TERMINAL_STATUSES",
+    "RECOVERABLE_STATUSES",
+    "VALID_TRANSITIONS",
+    "DEFAULT_IDLE_THRESHOLD_SEC",
+    "DEFAULT_STUCK_THRESHOLD_SEC",
 ]

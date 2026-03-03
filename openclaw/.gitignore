@@ -37,3 +37,12 @@ env/
 
 # Local data (memory, credentials, etc.)
 ~/.openclaw/
+
+# Browser profile data (never commit)
+**/Default/History
+**/Default/History-journal
+**/shared_proto_db/
+**/Service Worker/
+**/Code Cache/
+**/ScriptCache/
+*.leveldb/
