@@ -101,11 +101,11 @@ class AgentMemory:
     def _simple_embedding(self, text: str) -> List[float]:
         """Simple bag-of-words embedding"""
         words = text.lower().split()
-        embedding = np.zeros(128)
+        embedding = np.zeros(384)  # Match default embedding provider dimension
 
         for word in words:
             hash_val = hash(word)
-            idx = hash_val % 128
+            idx = hash_val % 384
             embedding[idx] += 1
 
         # Normalize
@@ -119,6 +119,15 @@ class AgentMemory:
         """Calculate cosine similarity"""
         a = np.array(a)
         b = np.array(b)
+
+        # Handle dimension mismatch - pad smaller array or truncate larger
+        if len(a) != len(b):
+            min_len = min(len(a), len(b))
+            a = a[:min_len]
+            b = b[:min_len]
+            if min_len == 0:
+                return 0.0
+
         return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8))
 
     def add_memory(
